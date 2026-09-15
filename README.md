@@ -364,6 +364,33 @@ Wings beat, a cape sways, a jetpack flickers, an aura pulses, sparks twinkle out
 
 Motion is scoped to the part that should move rather than the whole figure, and only full-size Pips animate — a grid of thirty swatches in the dressing room stays still. Reduced-motion settings stop all of it.
 
+## Moments
+
+Everything else announces itself with the same small toast, which makes nothing feel bigger than anything else. Four things get a proper beat instead: the screen dims, Pip arrives, a token of what was earned rises under him, and it is over in about three seconds. Tap to carry on, or let it go by itself.
+
+Reserved for:
+
+- **A book finished** — every chapter and the whole-book test passed. It fires on the paper that completed it and never again, and says the book is on the shelf in the room now.
+- **A streak run completed** — the moment the last period in the run counts.
+- **A wish granted** — the thing that was saved for, with what came back.
+- **A top-tier look unlocked**, with the power it carries.
+
+There is no fifth, and the power of it is entirely in that. Adding a beat for every passed chapter would spend the effect within a week.
+
+Moments queue rather than collide, the page is frozen behind one, and reduced-motion settings replace the animation with a plain card. The streak toast was removed when the beat replaced it, so nothing is announced twice.
+
+## Bonus cosmetics
+
+A store item, an activity or an event can carry a Pip part along with it. The controls are the same in all three editors: a switch, a daily chance, and a pool of parts to tick.
+
+**The roll is deterministic.** It is a function of the thing, the reader and the date, so it holds still all day, cannot flicker as the page redraws, and gives a reason to look again tomorrow. Nothing is stored and nothing ticks over in the background. Verified: identical when rolled twice, independent between readers, flipping about half the days in a month, and honest about its odds — 10, 25, 50 and 80 per cent came out at 9.8, 24.6, 49.6 and 79.2 over four thousand rolls each.
+
+**A pool, not one part.** Anything a reader already owns is never picked, so a bonus does not quietly stop meaning anything once they have the hat.
+
+**Win-only parts.** A part taken off sale in Settings → Pip can still sit in a bonus pool — that is how something becomes obtainable only by earning it. The pool marks those, so you can see what you are making exclusive.
+
+**It is shown before anyone acts**, as a strip along the bottom of the card with the actual part drawn on a Pip and named: *"Comes with Wings — a bonus for Pip, today only."* The base reward is never reduced to pay for it, and nothing is ever bought in the hope of a bonus. For events the bonus lands with the **rating**, which is also the moment worth celebrating; for approval-gated activities it lands on approval; for store items, on redemption.
+
 ## Events
 
 Off by default. Settings → Events switches the tab on for readers.

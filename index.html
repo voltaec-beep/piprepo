@@ -1538,6 +1538,124 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .room .frame:hover{transform:rotate(0deg) scale(1.06)}
   .wallpick:hover{border-color:var(--brand-hi)}
 }
+
+/* ============ bonus cosmetics ============ */
+.bonusstrip{
+  display:flex;align-items:center;gap:11px;margin-top:11px;
+  padding:8px 12px;border-radius:11px;
+  border:1px solid var(--gold-soft);
+  background:linear-gradient(100deg,var(--gold-faint) 0%,rgba(46,140,255,.10) 55%,var(--gold-faint) 100%);
+  background-size:220% 100%;
+  animation:drift 6s linear infinite;
+}
+.bonusstrip .bpv{
+  width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;
+  background:var(--sunk);box-shadow:inset 0 0 0 1px var(--edge-soft);overflow:hidden;
+}
+.bonusstrip .btxt{display:grid;line-height:1.3;min-width:0}
+.bonusstrip .btxt b{font-size:.82rem;color:var(--gold-hi)}
+.bonusstrip .btxt span{font-size:.69rem;color:var(--text-2)}
+.bonusstrip .bspark{margin-left:auto;flex:none;color:var(--gold-hi)}
+.bonusstrip .bspark svg{width:17px;height:17px;fill:currentColor;stroke:none;
+  animation:pipTwinkle 2.2s ease-in-out infinite}
+.evcard .bonusstrip,.actrow .bonusstrip{width:100%}
+.actrow{flex-wrap:wrap}
+
+.bonuspool{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.bpick{
+  display:grid;justify-items:center;gap:3px;padding:8px 5px 7px;border-radius:11px;
+  border:1px solid var(--edge-soft);background:var(--sunk);transition:.14s;position:relative;
+}
+.bpick.on{border-color:var(--gold);background:var(--gold-faint);box-shadow:0 0 0 1px var(--gold)}
+.bpick .n{font-size:.68rem;color:var(--text-2);text-align:center;line-height:1.2}
+.bpick .winonly{
+  position:absolute;top:-7px;right:-4px;font-size:.54rem;letter-spacing:.06em;
+  padding:2px 6px;border-radius:999px;background:var(--brand);color:#fff;
+}
+@media (hover:hover) and (pointer:fine){.bpick:hover{border-color:var(--gold-hi)}}
+
+/* ============ the moment ============ */
+.moment{
+  position:fixed;z-index:200;
+  top:var(--vv-top);left:var(--vv-left);width:var(--vv-w);height:var(--vv-h);
+  display:grid;place-items:center;padding:20px;
+  background:radial-gradient(circle at 50% 46%,rgba(20,28,58,.72),rgba(6,9,20,.93));
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  animation:mFade .22s var(--ease);
+  cursor:pointer;
+}
+@keyframes mFade{from{opacity:0}}
+.mstage{position:relative;display:grid;justify-items:center;text-align:center;max-width:460px}
+
+.mrays{
+  position:absolute;top:-56px;left:50%;width:520px;height:520px;
+  transform:translateX(-50%);
+  background:conic-gradient(from 0deg,
+    rgba(244,181,63,.20) 0deg 9deg, transparent 9deg 30deg,
+    rgba(244,181,63,.14) 30deg 39deg, transparent 39deg 60deg);
+  border-radius:50%;
+  -webkit-mask-image:radial-gradient(circle,#000 24%,transparent 68%);
+  mask-image:radial-gradient(circle,#000 24%,transparent 68%);
+  animation:mSpin 18s linear infinite, mFade .5s var(--ease);
+}
+@keyframes mSpin{to{transform:translateX(-50%) rotate(360deg)}}
+
+.mburst{position:absolute;top:96px;left:50%;width:0;height:0}
+.mspark{
+  position:absolute;width:7px;height:19px;border-radius:4px;background:var(--gold-hi);
+  transform:rotate(var(--a)) translateY(0);
+  animation:mFly 1.1s var(--ease) both;
+  animation-delay:var(--d);
+}
+.mspark.s1{background:#5FE3B0}
+.mspark.s2{background:#B79BFF}
+@keyframes mFly{
+  0%{opacity:0;transform:rotate(var(--a)) translateY(0) scale(.4)}
+  30%{opacity:1}
+  100%{opacity:0;transform:rotate(var(--a)) translateY(-168px) scale(1)}
+}
+
+.mpip{position:relative;animation:mPop .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes mPop{
+  0%{opacity:0;transform:scale(.5) translateY(26px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.mtoken{
+  position:relative;margin-top:-14px;
+  animation:mRise .5s var(--ease) both;animation-delay:.28s;
+}
+.mtoken .ic{width:54px;height:54px;--ib:34px;box-shadow:0 8px 20px -8px #000}
+.mspine{
+  display:block;width:26px;height:64px;border-radius:3px;position:relative;
+  box-shadow:inset -3px 0 0 rgba(0,0,0,.3),inset 3px 0 0 rgba(255,255,255,.18),0 8px 18px -8px #000;
+}
+.mspine i{position:absolute;left:3px;right:3px;top:20%;height:3px;
+  background:rgba(255,255,255,.45);box-shadow:0 8px 0 rgba(255,255,255,.3)}
+
+.mwords{margin-top:16px;animation:mRise .5s var(--ease) both;animation-delay:.38s}
+@keyframes mRise{from{opacity:0;transform:translateY(14px)}}
+.mkicker{
+  font-size:.66rem;letter-spacing:.24em;color:var(--gold-hi);text-transform:uppercase;
+}
+.mtitle{
+  font-family:var(--serif);font-size:clamp(1.7rem,5.6vw,2.5rem);
+  color:#fff;line-height:1.14;margin-top:6px;letter-spacing:-.015em;
+}
+.mline{color:var(--text-2);font-size:.92rem;margin-top:7px}
+.mprize{
+  display:inline-block;margin-top:14px;padding:7px 16px;border-radius:999px;
+  border:1px solid var(--gold-soft);background:var(--gold-faint);
+  color:var(--gold-hi);font-size:.86rem;
+}
+.mtap{
+  margin-top:22px;font-size:.7rem;letter-spacing:.1em;color:var(--text-3);
+  animation:mFade 1s var(--ease) both;animation-delay:1.2s;
+}
+.moment.still .mpip,.moment.still .mwords,.moment.still .mtoken,.moment.still .mtap{animation:none}
+@media(max-width:480px){
+  .mrays{width:420px;height:420px}
+  .mpip .pip{width:146px;height:146px}
+}
 </style>
 </head>
 <body>
@@ -2518,6 +2636,7 @@ function finish(){
   if(p)p.records.push(rec);
   S.last={rec:rec,missed:missed};
   S.run=null;save();
+  if(rec.passed&&completedTitle(m,p,rec))momentBookFinished(m);
   settleStreaks();
   checkWishReached();
   snapshot('after '+(p?p.name:'a')+'\u2019s test',{force:true});
@@ -3742,6 +3861,10 @@ document.addEventListener('click',function(e){
       var f=findLog(id);if(!f)return;
       f.r.approved=(act==='act-approve');
       save();
+      if(f.r.approved){
+        var ga=activityById(f.r.activityId);
+        if(ga)grantBonus(ga,f.p,'activity');
+      }
       toast(f.r.approved?pts(f.r.points)+' points awarded to '+f.p.name+'.':'Approval withdrawn.',
         f.r.approved?'good':'');
       render();
@@ -4743,6 +4866,7 @@ function itemCard(it,p,hero){
         esc(it.id)+'" title="Save up for this">'+ico('star')+'Wish</button>':'')+
       (it.hidden?'<span class="pill cold">hidden</span>':'')+
     '</div>'+
+    bonusStrip(it,p)+
     (S.admin?'<div class="adminrow">'+
       '<button class="btn btn-sm btn-ghost" data-act="item-edit" data-id="'+esc(it.id)+'">Edit</button>'+
       '<button class="btn btn-sm btn-ghost" data-act="item-feature" data-id="'+esc(it.id)+'">'+
@@ -4778,6 +4902,8 @@ function buyItem(id){
       }]);
       if(back)p.wish=null;                       /* the wish is granted; pick a new one */
       save();
+      if(back)momentWish(it,back);
+      grantBonus(it,p,'store');
       snapshot('after redeeming '+it.title);
       toast(back
         ? it.title+' is yours, and '+pts(back)+' points came back for saving up.'
@@ -4843,6 +4969,7 @@ function itemEditor(existing){
     repurchase:{mode:'unlimited',limit:1,days:7},
     avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
     locked:false,hidden:false,hideWhenClosed:false,featured:false,
+    bonus:{on:false,chance:20,pool:[]},
     feature:{style:'gold',label:'FEATURED',wide:false,glow:true},
     sale:{on:false,min:10,max:30,every:30,lasts:3,cooldown:14,chance:100,autoFeature:true,anchor:''},
     created:nowISO()
@@ -4956,6 +5083,7 @@ function itemEditor(existing){
         '<p class="tiny" id="s-preview" style="color:var(--gold-hi)"></p>'+
       '</div>':'')+
 
+      bonusEditorHTML(d)+
       '<div class="err" id="i-err"></div>'+
       '<div class="foot"><button class="btn" data-close>Cancel</button>'+
       '<button class="btn btn-primary" id="i-save">'+(existing?'Save item':'Add to the store')+'</button></div>';
@@ -4985,6 +5113,7 @@ function itemEditor(existing){
     if(g('#s-chance')!==null)d.sale.chance=Math.max(1,Math.min(100,num(g('#s-chance'),100)));
     if(g('#s-anchor')!==null)d.sale.anchor=g('#s-anchor');
     if(g('#f-label')!==null)d.feature.label=g('#f-label').trim()||'FEATURED';
+    bonusEditorGrab(scrim,d);
     var cb=function(id){var el=scrim.querySelector(id);return el?el.checked:false;};
     d.locked=cb('#i-locked');d.hidden=cb('#i-hidden');d.hideWhenClosed=cb('#i-hideclosed');
     d.featured=cb('#i-featured');
@@ -5006,11 +5135,13 @@ function itemEditor(existing){
         redraw();return;
       }
       grab(scrim);
+      if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
     });
     var featBox=scrim.querySelector('#i-featured');
     if(featBox)featBox.addEventListener('change',function(){grab(scrim);d.featured=featBox.checked;redraw();});
 
+    bonusEditorMount(scrim,d,redraw);
     var saleBox=scrim.querySelector('#i-sale');
     if(saleBox)saleBox.addEventListener('change',function(){grab(scrim);d.sale.on=saleBox.checked;redraw();});
 
@@ -5197,6 +5328,7 @@ function logActivity(id){
     icon:a.icon,date:nowISO(),approved:!a.approval};
   p.activities=logOf(p).concat([entry]);
   save();
+  if(!a.approval)grantBonus(a,p,'activity');
   settleStreaks();
   checkWishReached();
   snapshot('after '+p.name+' logged '+a.title);
@@ -5273,7 +5405,7 @@ function viewActivities(){
         (a.approval?'<span class="pill cold">needs approving</span>':'')+
         (who?'<span class="pill cold">for '+esc(who)+'</span>':'')+
         (a.hidden?'<span class="pill cold">hidden</span>':'')+
-      '</div></div>'+
+      '</div>'+bonusStrip(a,p)+'</div>'+
       '<div style="text-align:right;display:grid;gap:8px;justify-items:end">'+
         '<span class="worth">+'+pts(a.points)+'</span>'+
         (st.can?'<button class="btn btn-sm btn-primary" data-act="act-do" data-id="'+esc(a.id)+'">Mark done</button>':'')+
@@ -5342,6 +5474,7 @@ function activityEditor(existing){
     cadence:{mode:'daily',limit:1,perDay:0},
     assign:{mode:'all',ids:[]},
     avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
+    bonus:{on:false,chance:20,pool:[]},
     approval:false,hidden:false,hideWhenClosed:false,created:nowISO()
   };
   if(!d.icon)d.icon={glyph:'star',fg:'#F4B53F',bg:'#1C2340',scale:100};
@@ -5428,6 +5561,7 @@ function activityEditor(existing){
       '<label class="check"><input type="checkbox" id="i-hidden"'+(d.hidden?' checked':'')+
       '><span>Hidden from readers</span></label>'+
 
+      bonusEditorHTML(d)+
       '<div class="err" id="i-err"></div>'+
       '<div class="foot"><button class="btn" data-close>Cancel</button>'+
       '<button class="btn btn-primary" id="i-save">'+(existing?'Save activity':'Add activity')+'</button></div>';
@@ -5448,6 +5582,7 @@ function activityEditor(existing){
       var em=g('#i-emoji').trim();
       if(em){d.icon.emoji=em;delete d.icon.image;}else delete d.icon.emoji;
     }
+    bonusEditorGrab(scrim,d);
     var cb=function(id){var el=scrim.querySelector(id);return el?el.checked:false;};
     d.approval=cb('#i-approval');d.hidden=cb('#i-hidden');
     if(scrim.querySelector('#i-hideclosed'))d.hideWhenClosed=cb('#i-hideclosed');
@@ -5456,6 +5591,7 @@ function activityEditor(existing){
   function mount(scrim){
     scrim.addEventListener('click',function(e){
       grab(scrim);
+      if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
@@ -5474,6 +5610,7 @@ function activityEditor(existing){
         d.assign.ids=ids;redraw();return;
       }
     });
+    bonusEditorMount(scrim,d,redraw);
     var vp=scrim.querySelector('#v-preview');
     if(vp){
       var refreshAvail=function(){
@@ -6163,12 +6300,10 @@ function settleStreaks(){
         at:nowISO(),title:rule.title||'Streak'});
       given[rule.id+'|'+key]=1;
       paid+=pointsFor;names.push(rule.title||'a streak');
+      momentStreak(rule,pointsFor);
     });
   });
-  if(paid>0){
-    save();
-    toast(names[0]+' — '+pts(paid)+' points.','good',7000);
-  }
+  if(paid>0)save();
 }
 
 /* ---------- reader-facing strip ---------- */
@@ -6594,7 +6729,8 @@ function buyPip(id){
       if(p.face!=='pip')p.face='pip';
       save();
       snapshot('after unlocking '+thing.name);
-      toast(thing.name+' unlocked, and Pip is wearing it.','good',6000);
+      if(thing.tier==='top')momentTopLook(thing);
+      else toast(thing.name+' unlocked, and Pip is wearing it.','good',6000);
       render();
     });
 }
@@ -7038,7 +7174,7 @@ function viewEvents(){
           '<button class="btn btn-sm btn-ghost" data-act="ev-edit" data-id="'+esc(ev.id)+'">Edit</button>'+
           '<button class="btn btn-sm btn-danger" data-act="ev-del" data-id="'+esc(ev.id)+'">Remove</button>'+
         '</span>':'')+
-      '</div></div>';
+      '</div>'+bonusStrip(ev,p)+'</div>';
   });
   return h+'</div>';
 }
@@ -7124,6 +7260,7 @@ function rateEntry(id,ratingId){
   f.e.status='rated';f.e.ratingId=rb.id;f.e.ratingLabel=rb.label;
   f.e.points=boosted.points;f.e.boost=boosted.boost;f.e.ratedAt=nowISO();
   save();
+  if(ev)grantBonus(ev,f.p,'event');
   toast(f.p.name+' earned '+pts(f.e.points)+' for '+f.e.eventTitle+'.','good',6000);
   render();
 }
@@ -7153,6 +7290,7 @@ function eventEditor(existing){
     avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
     assign:{mode:'all',ids:[]},
     entries:{mode:'limit',limit:3},
+    bonus:{on:false,chance:20,pool:[]},
     rubric:JSON.parse(JSON.stringify(DEFAULT_RUBRIC)),
     hidden:false,hideWhenClosed:false,created:nowISO()
   };
@@ -7249,6 +7387,7 @@ function eventEditor(existing){
         }).join('')+'</div></div>':'')+
       '<label class="check"><input type="checkbox" id="v-hidden"'+(d.hidden?' checked':'')+
       '><span>Hidden from readers</span></label>'+
+      bonusEditorHTML(d)+
       '<div class="err" id="v-err"></div>'+
       '<div class="foot"><button class="btn" data-close>Cancel</button>'+
       '<button class="btn btn-primary" id="v-save">'+(existing?'Save event':'Add event')+'</button></div>';
@@ -7274,6 +7413,7 @@ function eventEditor(existing){
     $$('[data-rp]',scrim).forEach(function(el){
       var i=+el.dataset.rp; if(d.rubric[i])d.rubric[i].points=Math.max(0,num(el.value,0));
     });
+    bonusEditorGrab(scrim,d);
     var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:false;};
     d.hidden=cb('#v-hidden');
     if(scrim.querySelector('#v-hideclosed'))d.hideWhenClosed=cb('#v-hideclosed');
@@ -7282,6 +7422,7 @@ function eventEditor(existing){
   function mount(scrim){
     scrim.addEventListener('click',function(e){
       grab(scrim);
+      if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
@@ -7305,6 +7446,7 @@ function eventEditor(existing){
       var rd=e.target.closest('[data-rdel]');
       if(rd){d.rubric.splice(+rd.dataset.rdel,1);redraw();return;}
     });
+    bonusEditorMount(scrim,d,redraw);
     var addr=scrim.querySelector('#v-addr');
     if(addr)addr.addEventListener('click',function(){
       grab(scrim);
@@ -7565,6 +7707,263 @@ function viewRoom(){
     h+='</div></div>';
   }
   return h;
+}
+
+/* =========================================================
+   Bonus cosmetics.
+
+   A store item, an activity or an event can sometimes come
+   with a Pip part attached. The roll is a deterministic
+   function of the thing, the reader and the day — so it
+   holds still all day, cannot flicker as the page redraws,
+   and gives a reason to look again tomorrow.
+
+   The base reward is never reduced to pay for it, the prize
+   is shown before anyone acts, and nothing is ever bought in
+   the hope of a bonus.
+   ========================================================= */
+
+function todayKey(){
+  var n=new Date();
+  return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();
+}
+function bonusCfg(thing){
+  var b=(thing&&thing.bonus)||{};
+  return{on:b.on===true,
+    chance:Math.max(0,Math.min(100,num(b.chance,20))),
+    pool:Array.isArray(b.pool)?b.pool:[]};
+}
+/* Which part, if any, this thing carries for this reader today. */
+function bonusFor(thing,p){
+  p=p||me();
+  if(!p||!thing)return null;
+  var cfg=bonusCfg(thing);
+  if(!cfg.on||!cfg.chance||!cfg.pool.length)return null;
+  var eligible=cfg.pool.filter(function(id){
+    return pipPart(id)&&!ownsPip(id,p);
+  });
+  if(!eligible.length)return null;
+  var seed=thing.id+':'+p.id+':'+todayKey();
+  if(hashUnit(seed)*100>=cfg.chance)return null;
+  var pick=Math.floor(hashUnit(seed+'#pick')*eligible.length);
+  return pipPart(eligible[Math.min(pick,eligible.length-1)]);
+}
+function grantBonus(thing,p,why){
+  var part=bonusFor(thing,p);
+  if(!part)return null;
+  if(!Array.isArray(p.pipOwned))p.pipOwned=[];
+  if(p.pipOwned.indexOf(part.id)<0)p.pipOwned.push(part.id);
+  if(!p.pipLook)p.pipLook={};
+  p.pipLook[part.slot]=part.v;
+  if(p.face!=='pip')p.face='pip';
+  save();
+  toast('A bonus came with it — '+part.name+'. Pip is wearing it.','good',8000);
+  return part;
+}
+/* The strip along the bottom of a card, showing what is riding along. */
+function bonusStrip(thing,p){
+  var part=bonusFor(thing,p);
+  if(!part)return '';
+  var preview={body:pipLook(p).body};
+  preview[part.slot]=part.v;
+  return '<div class="bonusstrip">'+
+    '<span class="bpv">'+pipSVG(preview,'idle',36,{shadow:false,still:true})+'</span>'+
+    '<span class="btxt"><b>Comes with '+esc(part.name)+'</b>'+
+    '<span>a bonus for Pip, today only</span></span>'+
+    '<span class="bspark">'+ico('star')+'</span></div>';
+}
+
+/* ---------- instructor controls, shared by all three editors ---------- */
+function bonusEditorHTML(d){
+  var cfg=bonusCfg(d);
+  var h='<div class="divider"></div>'+
+    '<h4 style="font-size:.95rem;color:var(--text-hi)">Bonus for Pip</h4>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:70ch">Now and then this can carry a '+
+    'cosmetic as well. The chance is rolled once a day per reader, and a part they already own is '+
+    'never picked. Parts you have taken off sale in the Pip shelf can still be won here — which is '+
+    'how something becomes win-only.</p>'+
+    '<label class="check stack"><input type="checkbox" id="b-on"'+(cfg.on?' checked':'')+
+    '><span>Sometimes comes with a Pip cosmetic</span></label>';
+  if(!cfg.on)return h;
+  h+='<div class="subfields">'+
+    '<label class="field"><span>Chance each day (%)</span>'+
+    '<input class="inp" id="b-chance" type="number" min="1" max="100" value="'+cfg.chance+'"></label>'+
+    '<div class="tiny muted" style="margin-bottom:7px">Which parts it can give — tick as many as you like</div>'+
+    '<div class="bonuspool">';
+  PIP_PARTS.filter(function(pt){return pt.price>0;}).forEach(function(pt){
+    var on=cfg.pool.indexOf(pt.id)>=0;
+    var preview={body:'sun'};preview[pt.slot]=pt.v;
+    h+='<button type="button" class="bpick'+(on?' on':'')+'" data-pool="'+esc(pt.id)+'">'+
+      pipSVG(preview,'idle',44,{shadow:false,still:true})+
+      '<span class="n">'+esc(pt.name)+'</span>'+
+      (pipOffered(pt)?'':'<span class="winonly">win only</span>')+
+      '</button>';
+  });
+  h+='</div>'+
+    (cfg.pool.length?'':'<p class="tiny" style="color:var(--fail);margin-top:8px">'+
+      'Pick at least one part, or the bonus can never happen.</p>')+
+    '</div>';
+  return h;
+}
+function bonusEditorGrab(scrim,d){
+  if(!d.bonus)d.bonus={on:false,chance:20,pool:[]};
+  var on=scrim.querySelector('#b-on');
+  if(on)d.bonus.on=on.checked;
+  var ch=scrim.querySelector('#b-chance');
+  if(ch)d.bonus.chance=Math.max(1,Math.min(100,num(ch.value,20)));
+}
+/* Ticking the switch has to reveal its fields straight away, or the
+   editor looks broken. */
+function bonusEditorMount(scrim,d,redraw){
+  var on=scrim.querySelector('#b-on');
+  if(on)on.addEventListener('change',function(){
+    bonusEditorGrab(scrim,d);
+    d.bonus.on=on.checked;
+    redraw();
+  });
+}
+function bonusEditorClick(e,d){
+  var b=e.target.closest('[data-pool]');
+  if(!b)return false;
+  if(!d.bonus)d.bonus={on:true,chance:20,pool:[]};
+  var pool=d.bonus.pool||[];
+  var at=pool.indexOf(b.dataset.pool);
+  if(at>=0)pool.splice(at,1);else pool.push(b.dataset.pool);
+  d.bonus.pool=pool;
+  return true;
+}
+
+/* =========================================================
+   Moments.
+
+   Everything in PipHub announces itself with the same grey
+   toast, so nothing feels bigger than anything else. This is
+   the one exception: a short beat for the four things worth
+   stopping for. Its power is entirely in its scarcity, so
+   resist adding a fifth.
+   ========================================================= */
+
+var momentQ=[], momentLive=false, momentTimer=null;
+
+function reducedMotion(){
+  try{return window.matchMedia('(prefers-reduced-motion:reduce)').matches;}
+  catch(e){return false;}
+}
+function celebrate(m){
+  if(!m)return;
+  momentQ.push(m);
+  if(!momentLive)runMoment();
+}
+function closeMoment(){
+  if(momentTimer){clearTimeout(momentTimer);momentTimer=null;}
+  var el=document.getElementById('moment');
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+  momentLive=false;
+  if(momentQ.length)runMoment();
+  else pageUnlock();
+}
+function runMoment(){
+  var m=momentQ.shift();
+  if(!m){momentLive=false;return;}
+  if(!momentLive)pageLock();
+  momentLive=true;
+
+  var p=me();
+  var still=reducedMotion();
+  var sparks='';
+  if(!still){
+    for(var i=0;i<12;i++){
+      var ang=(i/12)*360;
+      sparks+='<span class="mspark s'+(i%3)+'" style="--a:'+ang+'deg;--d:'+(i*40)+'ms"></span>';
+    }
+  }
+  var el=document.createElement('div');
+  el.id='moment';
+  el.className='moment'+(still?' still':'');
+  el.innerHTML=
+    '<div class="mstage">'+
+      (still?'':'<div class="mrays" aria-hidden="true"></div>')+
+      '<div class="mburst" aria-hidden="true">'+sparks+'</div>'+
+      '<div class="mpip">'+pipSVG(pipLook(p),m.pose||'cheer',176)+'</div>'+
+      (m.token?'<div class="mtoken">'+m.token+'</div>':'')+
+      '<div class="mwords">'+
+        '<div class="mkicker">'+esc(m.kicker||'')+'</div>'+
+        '<div class="mtitle">'+esc(m.title||'')+'</div>'+
+        (m.line?'<div class="mline">'+esc(m.line)+'</div>':'')+
+        (m.prize?'<div class="mprize">'+m.prize+'</div>':'')+
+      '</div>'+
+      '<div class="mtap">tap to carry on</div>'+
+    '</div>';
+  document.body.appendChild(el);
+  el.addEventListener('click',closeMoment);
+  momentTimer=setTimeout(closeMoment,still?1800:3200);
+}
+
+/* ---------- the four ---------- */
+function momentBookFinished(m){
+  celebrate({
+    kicker:'Finished',
+    title:m.title,
+    line:m.author?'by '+m.author:'',
+    pose:'cheer',
+    token:'<span class="mspine" style="background:'+spineColour(m.id)+'"><i></i></span>',
+    prize:'It is on the shelf in your room now.'
+  });
+}
+function momentStreak(rule,points){
+  celebrate({
+    kicker:'Streak',
+    title:rule.title||'A run complete',
+    line:rule.periods+' '+(rule.unit==='week'?'week':'day')+
+      (rule.periods===1?'':'s')+' in a row',
+    pose:'cheer',
+    prize:'+'+pts(points)+' points'
+  });
+}
+function momentWish(item,back){
+  celebrate({
+    kicker:'Wish granted',
+    title:item.title,
+    line:'Saved for, and yours',
+    pose:'cheer',
+    token:renderIcon(item.icon),
+    prize:back?pts(back)+' points came back for saving up':''
+  });
+}
+function momentTopLook(look){
+  var preview={};
+  look.grants.forEach(function(g){var pt=pipPart(g);if(pt)preview[pt.slot]=pt.v;});
+  var ab=lookAbility(look);
+  celebrate({
+    kicker:'Top tier',
+    title:look.name,
+    line:'Every piece of it, unlocked',
+    pose:'cheer',
+    prize:(ab.kind!=='none'&&ab.value)?PIP_ABILITIES[ab.kind].blurb(ab.value):''
+  });
+}
+/* Did this record complete the title? Counted without it, so the beat
+   fires once and only on the paper that finished the job. */
+function completedTitle(m,p,rec){
+  if(!m)return false;
+  var chapters=(m.chapters||[]).length;
+  var total=chapters+(hasBookTest(m)?1:0);
+  if(!total)return false;
+  function passedPaper(chId,skipId){
+    return (p.records||[]).some(function(r){
+      return r.id!==skipId&&r.moduleId===m.id&&(r.chapterId||null)===(chId||null)&&r.passed;
+    });
+  }
+  var before=0,after=0;
+  (m.chapters||[]).forEach(function(ch){
+    if(passedPaper(ch.id,rec.id))before++;
+    if(passedPaper(ch.id,null))after++;
+  });
+  if(hasBookTest(m)){
+    if(passedPaper(null,rec.id))before++;
+    if(passedPaper(null,null))after++;
+  }
+  return after===total&&before===total-1;
 }
 
 /* =========================================================
