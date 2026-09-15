@@ -364,6 +364,22 @@ Wings beat, a cape sways, a jetpack flickers, an aura pulses, sparks twinkle out
 
 Motion is scoped to the part that should move rather than the whole figure, and only full-size Pips animate — a grid of thirty swatches in the dressing room stays still. Reduced-motion settings stop all of it.
 
+## Pip reacting
+
+Tap Pip — in his room, on the dressing stage, or in any empty state — and he hops and says something. Tapping again walks through what else he has to say. He also fidgets on his own every so often, and greets you once when you walk into his room.
+
+**Every line is true.** Nothing is random chatter; each is read from what is actually going on, in rough order of what matters:
+
+> "You can afford Cinema trip. Go on."
+> "1 day running. Do 2 activities today to keep it."
+> "One thing is waiting to be looked at."
+> "Alice's Adventures in Wonderland — 3 to go."
+> "The shelf is empty. Let us fix that."
+
+If nothing is pressing he falls back to a couple of warm lines that are still true — how many points are burning a hole in your pocket, or simply asking to be read to.
+
+Idling pauses while a moment is playing, while the tab is in the background, and entirely under reduced-motion settings.
+
 ## Moments
 
 Everything else announces itself with the same small toast, which makes nothing feel bigger than anything else. Four things get a proper beat instead: the screen dims, Pip arrives, a token of what was earned rises under him, and it is over in about three seconds. Tap to carry on, or let it go by itself.
@@ -388,6 +404,8 @@ A store item, an activity or an event can carry a Pip part along with it. The co
 **A pool, not one part.** Anything a reader already owns is never picked, so a bonus does not quietly stop meaning anything once they have the hat.
 
 **Win-only parts.** A part taken off sale in Settings → Pip can still sit in a bonus pool — that is how something becomes obtainable only by earning it. The pool marks those, so you can see what you are making exclusive.
+
+**The pool is sorted by tier**, so it is obvious what you are handing out: parts sold on their own, parts that also sit inside a complete look, and parts that sit inside Dragonheart or Starborn. Each shows its price and names the looks it belongs to, and a line underneath lists what this item is currently giving away.
 
 **It is shown before anyone acts**, as a strip along the bottom of the card with the actual part drawn on a Pip and named: *"Comes with Wings — a bonus for Pip, today only."* The base reward is never reduced to pay for it, and nothing is ever bought in the hope of a bonus. For events the bonus lands with the **rating**, which is also the moment worth celebrating; for approval-gated activities it lands on approval; for store items, on redemption.
 
