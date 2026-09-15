@@ -1377,6 +1377,58 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   100%{transform:scale(.92,1.14)}
 }
 .pip-live .pw-galaxy{animation:pipShimmer 5s ease-in-out infinite}
+
+/* ============ events ============ */
+.evlist{display:grid;gap:10px}
+.evcard{
+  position:relative;display:flex;gap:15px;align-items:flex-start;
+  padding:18px 17px 16px;border-radius:14px;overflow:visible;
+  background:linear-gradient(var(--surface),var(--sunk));
+  border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
+}
+.evcard.shut{opacity:.62}
+.evmain{flex:1;min-width:0}
+.evmain h4{font-family:var(--serif);font-size:1.1rem;color:var(--text-hi);margin:0 0 5px}
+.evmain p{font-size:.85rem;color:var(--text-2);line-height:1.5}
+.evmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.evside{display:grid;gap:8px;justify-items:end;flex:none;text-align:right}
+.evside .upto{font-family:var(--serif);font-size:1.05rem;color:var(--gold-hi);white-space:nowrap}
+@media(max-width:480px){
+  .evcard{flex-wrap:wrap}
+  .evside{justify-items:flex-start;text-align:left;width:100%}
+}
+
+.shotbox{
+  display:flex;justify-content:center;align-items:center;min-height:170px;
+  border-radius:14px;border:1px dashed var(--edge);background:var(--sunk);overflow:hidden;
+}
+.shotbox img{max-width:100%;max-height:260px;border-radius:12px;display:block}
+.shotempty{display:grid;justify-items:center;gap:8px;color:var(--text-3);font-size:.84rem}
+.shotempty svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6}
+.entrythumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none}
+
+.reviews{display:grid;gap:11px}
+.revcard{
+  padding:15px 16px;border-radius:14px;
+  background:linear-gradient(var(--surface),var(--sunk));
+  border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
+}
+.revtop{display:flex;gap:14px;align-items:flex-start}
+.revshot{
+  flex:none;display:grid;gap:4px;justify-items:center;padding:0;border:0;background:none;
+}
+.revshot img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--edge)}
+.revshot span{font-size:.66rem;color:var(--text-3)}
+.revtext{font-size:.9rem;color:var(--text);margin-top:4px;white-space:pre-wrap}
+.revrate{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:13px;
+  border-top:1px solid var(--edge-soft);padding-top:12px}
+.fullshot{display:flex;justify-content:center}
+.fullshot img{max-width:100%;max-height:62vh;border-radius:12px}
+
+.rubric{display:grid;gap:7px}
+.rubrow{display:flex;gap:7px;align-items:center}
+.rubrow input[data-rl]{flex:1}
+.rubrow input[data-rp]{width:84px;text-align:right;flex:none}
 </style>
 </head>
 <body>
@@ -1391,6 +1443,7 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
       <button data-go="catalog">Reading Catalogue</button>
       <button data-go="activities">Activities</button>
       <button data-go="store">Store</button>
+      <button class="hide" data-go="events">Events</button>
       <button class="admin-only hide" data-go="titles">Titles</button>
       <button class="admin-only hide" data-go="settings">Settings</button>
     </nav>
@@ -1430,7 +1483,7 @@ var SCHEMA='pip-module/1';
 var IDLE_MS=15*60*1000;
 
 var S={
-  profiles:[],active:null,modules:[],store:[],activities:[],streaks:[],settings:{},
+  profiles:[],active:null,modules:[],store:[],activities:[],streaks:[],events:[],settings:{},
   snaps:[],lastSnapCheck:null,nagged:false,
   admin:false,idleAt:0,
   view:'catalog',arg:null,run:null,last:null,
@@ -1498,10 +1551,12 @@ function load(){
   S.store=Array.isArray(d.store)?d.store:[];
   S.activities=Array.isArray(d.activities)?d.activities:[];
   S.streaks=Array.isArray(d.streaks)?d.streaks:[];
+  S.events=Array.isArray(d.events)?d.events:[];
   S.active=d.active||null;
   S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',
     wish:{on:true,shortfall:25,payback:10,cap:0},
-    pipshop:{on:true,prices:{},off:{}},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
+    pipshop:{on:true,prices:{},off:{}},
+    events:{on:false},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
   /* Earlier builds kept these in subfolders. GitHub's uploader flattens
      folders, so the layout moved and stored paths need bringing along. */
@@ -1521,6 +1576,7 @@ function load(){
     if(!p.pipLook)p.pipLook={body:'sun',eyes:'dot'};
     /* Readers who already had a picture keep it until they say otherwise. */
     if(!p.face)p.face=p.avatar?'picture':'pip';
+    if(!Array.isArray(p.entries))p.entries=[];
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1543,7 +1599,7 @@ function save(){
   try{
     localStorage.setItem(KEY,JSON.stringify({
       v:2,profiles:S.profiles,active:S.active,modules:S.modules,store:S.store,
-      activities:S.activities,streaks:S.streaks,settings:S.settings
+      activities:S.activities,streaks:S.streaks,events:S.events,settings:S.settings
     }));
   }catch(e){
     storageOK=false;
@@ -1556,7 +1612,8 @@ function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
     avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
     streaks:[],wish:null,
-    pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'},face:'pip'};
+    pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'},face:'pip',
+    entries:[]};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -2220,7 +2277,7 @@ function exportAll(){
   download('pip-backup-'+new Date().toISOString().slice(0,10)+'.json',
     JSON.stringify({schema:'pip-backup/1',exported:nowISO(),
       profiles:S.profiles,modules:S.modules,store:S.store,
-      activities:S.activities,streaks:S.streaks,settings:S.settings},null,2));
+      activities:S.activities,streaks:S.streaks,events:S.events,settings:S.settings},null,2));
 }
 function restoreBackup(d){
   var counts=countsOf(d);
@@ -3004,6 +3061,14 @@ function viewSettings(){
   });
   h+='</tbody></table></div></div>';
 
+  h+='<div class="panel"><h3>Events</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Ask readers to make, write or do '+
+    'something and send it in. You rate what comes back and the rating decides the points. '+
+    'Pictures are shrunk on the way in and kept out of the ordinary storage, so a run of photographs '+
+    'cannot fill it up.</p>'+
+    '<label class="check stack"><input type="checkbox" id="ev-on"'+(eventsOn()?' checked':'')+
+    '><span>Show the Events tab to readers</span></label>'+
+    '<button class="btn btn-primary" data-act="save-events">Save</button></div>';
   h+=viewPipShop();
   h+=viewIncentives();
   h+=viewBackups();
@@ -3315,7 +3380,8 @@ function emptyPip(pose){
 var VIEWS={gate:viewGate,catalog:viewCatalog,title:viewTitle,results:viewResults,
   records:viewRecords,profile:viewProfile,titles:viewTitles,settings:viewSettings,
   store:viewStore,redemptions:viewRedemptions,
-  activities:viewActivities,approvals:viewApprovals};
+  activities:viewActivities,approvals:viewApprovals,
+  events:viewEvents,reviews:viewReviews};
 
 function go(v,arg){
   S.view=v;S.arg=(arg===undefined?null:arg);
@@ -3326,7 +3392,8 @@ function go(v,arg){
 function render(){
   if(!me()&&S.view!=='gate')S.view='gate';
   if(S.view==='quiz'&&!S.run)S.view='catalog';
-  if(['titles','settings','redemptions','approvals'].indexOf(S.view)>=0&&!S.admin)S.view='catalog';
+  if(['titles','settings','redemptions','approvals','reviews'].indexOf(S.view)>=0&&!S.admin)S.view='catalog';
+  if(S.view==='events'&&!eventsOn()&&!S.admin)S.view='catalog';
 
   var inQuiz=(S.view==='quiz'&&S.run);
   $('#view').innerHTML=inQuiz?viewCatalog():((VIEWS[S.view]||viewCatalog)());
@@ -3336,7 +3403,7 @@ function render(){
   $('#chrome').classList.toggle('hide',onGate);
   $('#footbar').classList.toggle('hide',onGate);
   var active={title:'catalog',quiz:'catalog',results:'catalog',
-    redemptions:'store',approvals:'activities',
+    redemptions:'store',approvals:'activities',reviews:'events',
     profile:'',records:''}[S.view];
   if(active===undefined)active=S.view;
   $$('#nav button').forEach(function(b){
@@ -3344,6 +3411,8 @@ function render(){
     else b.removeAttribute('aria-current');
   });
   $$('#nav .admin-only').forEach(function(b){b.classList.toggle('hide',!S.admin);});
+  var evb=$('#nav [data-go="events"]');
+  if(evb)evb.classList.toggle('hide',!eventsOn()&&!S.admin);
 
   var th=$('#themebtn');
   var dark=(resolvedTheme()==='dark');
@@ -3436,6 +3505,65 @@ document.addEventListener('click',function(e){
   else if(act==='theme-set'){setTheme(b.dataset.t);}
   else if(act==='export-csv'){exportCSV();}
   else if(act==='buy'){buyItem(id);}
+  else if(act==='ev-do'){var ev=eventById(id);if(ev)entryModal(ev);}
+  else if(act==='ev-new'){requireAdmin('Adding an event needs the instructor key.',function(){eventEditor(null);});}
+  else if(act==='ev-edit'){requireAdmin('Editing an event needs the instructor key.',function(){
+    var e2=eventById(id);if(e2)eventEditor(e2);});}
+  else if(act==='ev-del'){
+    requireAdmin('Removing an event needs the instructor key.',function(){
+      var e3=eventById(id);if(!e3)return;
+      confirmModal('Remove "'+e3.title+'"?','What readers already sent in is kept.',
+        'Remove',function(){
+          guard('before removing '+e3.title,function(){
+            S.events=eventList().filter(function(x){return x.id!==id;});
+            save();toast('"'+e3.title+'" removed.');render();
+          });
+        },true);
+    });
+  }
+  else if(act==='ev-photo'){showEntryPhoto(id);}
+  else if(act==='ev-save-photo'){
+    getPhoto(id).then(function(data){
+      if(!data){toast('Not on this device.','bad');return;}
+      var f=findEntry(id);
+      var name='piphub-'+slug((f?f.p.name+'-'+f.e.eventTitle:'picture'))+'.jpg';
+      var a=document.createElement('a');a.href=data;a.download=name;
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);},500);
+    });
+  }
+  else if(act==='ev-rate'){requireAdmin('Rating needs the instructor key.',function(){
+    rateEntry(id,b.dataset.r);});}
+  else if(act==='ev-back'){
+    requireAdmin('Instructor key needed.',function(){
+      var f=findEntry(id);if(!f)return;
+      f.e.status='declined';save();
+      toast('Sent back to '+f.p.name+'.');render();
+    });
+  }
+  else if(act==='ev-undo'){
+    requireAdmin('Instructor key needed.',function(){
+      var f=findEntry(id);if(!f)return;
+      f.e.status='pending';f.e.points=0;f.e.ratingLabel='';f.e.ratingId='';
+      save();render();
+    });
+  }
+  else if(act==='ev-drop'){
+    requireAdmin('Instructor key needed.',function(){
+      var f=findEntry(id);if(!f)return;
+      confirmModal('Delete this submission?','The picture goes with it, and so do its points.',
+        'Delete',function(){
+          guard('before deleting a submission',function(){
+            f.p.entries.splice(f.i,1);
+            dropPhoto(id);save();render();
+          });
+        },true);
+    });
+  }
+  else if(act==='save-events'){
+    S.settings.events={on:$('#ev-on').checked};
+    save();toast('Events '+(S.settings.events.on?'switched on.':'switched off.'),'good');render();
+  }
   else if(act==='dress'){dressingRoom();}
   else if(act==='pip-buy'){buyPip(id);}
   else if(act==='wish-set'){setWish(id);}
@@ -4151,7 +4279,7 @@ function balance(p){
   p=p||me();
   if(!p)return 0;
   return Math.round((earnedTotal(p.records)+activityPoints(p)+adjustedTotal(p)
-    +bonusTotal(p)-spentTotal(p))*10)/10;
+    +bonusTotal(p)+eventPoints(p)-spentTotal(p))*10)/10;
 }
 
 /* ---------- dates ---------- */
@@ -4372,6 +4500,7 @@ function viewStore(){
     (adjustedTotal(p)?(adjustedTotal(p)>0?'+':'')+pts(adjustedTotal(p))+' from your instructor<br>':'')+
     (paybackTotal(p)?'+'+pts(paybackTotal(p))+' paid back on wishes<br>':'')+
     (streakTotal(p)?'+'+pts(streakTotal(p))+' from streaks<br>':'')+
+    (eventPoints(p)?'+'+pts(eventPoints(p))+' from events<br>':'')+
     (abilityValue('boost',p)?'+'+abilityValue('boost',p)+'% while worn<br>':'')+
     pts(spentTotal(p))+' spent</div></div>';
 
@@ -5296,7 +5425,7 @@ function activityEditor(existing){
    the app also keeps track of how long it has been.
    ========================================================= */
 
-var DBNAME='piphub', DBVER=1;
+var DBNAME='piphub', DBVER=2;
 var SNAP_MIN_GAP=90*1000;        /* a floor on automatic snapshots; the content
                                     check below already stops duplicates */
 var EXPORT_NAG_DAYS=14;
@@ -5310,6 +5439,7 @@ function idb(){
       var db=e.target.result;
       if(!db.objectStoreNames.contains('snapmeta'))db.createObjectStore('snapmeta',{keyPath:'id'});
       if(!db.objectStoreNames.contains('snapdata'))db.createObjectStore('snapdata',{keyPath:'id'});
+      if(!db.objectStoreNames.contains('photos'))db.createObjectStore('photos',{keyPath:'id'});
     };
     r.onsuccess=function(){res(r.result);};
     r.onerror=function(){rej(r.error||new Error('IndexedDB refused'));};
@@ -5390,7 +5520,7 @@ function statePayload(scope){
   var out={schema:'pip-backup/2',exported:nowISO(),scope:scope,app:'PipHub'};
   if(scope!=='content')out.profiles=S.profiles;
   if(scope!=='readers'){
-    out.modules=S.modules;out.store=S.store;out.activities=S.activities;out.streaks=S.streaks;
+    out.modules=S.modules;out.store=S.store;out.activities=S.activities;out.streaks=S.streaks;out.events=S.events;
     var st={};
     for(var k in S.settings)if(Object.prototype.hasOwnProperty.call(S.settings,k))st[k]=S.settings[k];
     out.settings=st;
@@ -5563,6 +5693,7 @@ function applyPayload(d,mode){
       if(Array.isArray(d.store))S.store=d.store;
       if(Array.isArray(d.activities))S.activities=d.activities;
       if(Array.isArray(d.streaks))S.streaks=d.streaks;
+      if(Array.isArray(d.events))S.events=d.events;
     }
   }
   if(d.settings){
@@ -6508,6 +6639,613 @@ function abilityLine(p){
   if(a.kind==='none'||!a.value)return '';
   return '<span class="abil">'+ico('flame')+esc(a.look.name)+' &nbsp;·&nbsp; '+
     esc(PIP_ABILITIES[a.kind].blurb(a.value))+'</span>';
+}
+
+/* =========================================================
+   Events.
+
+   A reader is asked to do something and show it: make a
+   picture, write a paragraph, report a number, or simply
+   say they did it. The instructor looks at what came back
+   and rates it against a rubric, and the rating decides
+   the points.
+
+   Photos are shrunk on the way in and the full image is
+   kept in IndexedDB, not localStorage — a phone photo is
+   megabytes and browser storage is not.
+   ========================================================= */
+
+var EVENT_KINDS={
+  photo:{name:'Arts and crafts',verb:'Take a picture',
+    blurb:'Make or draw something and photograph it.',glyph:'paint'},
+  text:{name:'Writing',verb:'Write it',
+    blurb:'Write something and send it in.',glyph:'book'},
+  count:{name:'Tally',verb:'Report the number',
+    blurb:'Report a number — minutes, pages, laps.',glyph:'clock'},
+  checkin:{name:'Challenge',verb:'Mark it done',
+    blurb:'Say you did it, with a note if you like.',glyph:'star'}
+};
+var DEFAULT_RUBRIC=[
+  {id:'r1',label:'Gave it a go',points:2},
+  {id:'r2',label:'Nicely done',points:4},
+  {id:'r3',label:'Outstanding',points:8}
+];
+var PHOTO_MAX=1200, PHOTO_Q=0.72, THUMB_MAX=240, THUMB_Q=0.6;
+var PENDING_CAP=5;
+
+function eventsCfg(){
+  var e=S.settings.events||{};
+  return{on:e.on===true};
+}
+function eventsOn(){return eventsCfg().on;}
+function eventList(){return Array.isArray(S.events)?S.events:[];}
+function eventById(id){
+  var l=eventList();
+  for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];
+  return null;
+}
+function entriesOf(p){p=p||me();return (p&&p.entries)?p.entries:[];}
+
+/* ---------- photos ---------- */
+function shrinkSrc(src,maxPx,quality){
+  return new Promise(function(res,rej){
+      var img=new Image();
+      img.onload=function(){
+        var w=img.naturalWidth,h=img.naturalHeight;
+        var k=Math.min(1,maxPx/Math.max(w,h));
+        var cw=Math.max(1,Math.round(w*k)),ch=Math.max(1,Math.round(h*k));
+        var cv=document.createElement('canvas');
+        cv.width=cw;cv.height=ch;
+        var cx=cv.getContext('2d');
+        cx.fillStyle='#fff';cx.fillRect(0,0,cw,ch);
+        cx.drawImage(img,0,0,cw,ch);
+        try{res(cv.toDataURL('image/jpeg',quality));}
+        catch(e){rej(new Error('that picture could not be read'));}
+      };
+      img.onerror=function(){rej(new Error('that file is not a picture'));};
+      img.src=String(src);
+  });
+}
+function shrink(file,maxPx,quality){
+  return new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(){res(String(r.result));};
+    r.onerror=function(){rej(new Error('that file could not be opened'));};
+    r.readAsDataURL(file);
+  }).then(function(src){return shrinkSrc(src,maxPx,quality);});
+}
+function putPhoto(id,data){return idbPut('photos',{id:id,data:data});}
+function getPhoto(id){return idbGet('photos',id).then(function(r){return r?r.data:null;});}
+function dropPhoto(id){return idbDel('photos',id);}
+
+/* ---------- may this reader enter ---------- */
+function eventState(ev,p){
+  p=p||me();
+  var mine=entriesOf(p).filter(function(e){return e.eventId===ev.id;});
+  var pending=mine.filter(function(e){return e.status==='pending';}).length;
+  var av=availability(ev);
+  if(!assignedTo(ev,p))return{can:false,label:'Not for you',tone:'cold',mine:mine,pending:pending};
+  if(!av.open)return{can:false,label:av.label||'Not open',tone:'cold',mine:mine,pending:pending,window:av};
+  var cap=(ev.entries&&ev.entries.mode==='once')?1:Math.max(1,num(ev.entries&&ev.entries.limit,3));
+  if(mine.length>=cap)
+    return{can:false,label:cap===1?'Sent in':'All '+cap+' sent in',tone:'good',mine:mine,pending:pending,window:av};
+  if(pending)
+    return{can:false,label:pending+' waiting to be looked at',tone:'warm',mine:mine,pending:pending,window:av};
+  return{can:true,label:av.label||'',tone:av.tone||'cold',mine:mine,pending:pending,window:av,left:cap-mine.length};
+}
+function totalPending(p){
+  return entriesOf(p).filter(function(e){return e.status==='pending';}).length;
+}
+
+/* ---------- sending something in ---------- */
+function submitEntry(ev,payload){
+  var p=me();if(!p)return;
+  if(totalPending(p)>=PENDING_CAP){
+    toast('You have '+PENDING_CAP+' things waiting to be looked at already. Hold on until some come back.','bad',7000);
+    return;
+  }
+  var id=uid();
+  var entry={id:id,eventId:ev.id,eventTitle:ev.title,kind:ev.kind,
+    at:nowISO(),status:'pending',note:payload.note||'',
+    text:payload.text||'',count:payload.count||null,thumb:payload.thumb||'',
+    hasPhoto:!!payload.photo};
+  function finish(){
+    p.entries=entriesOf(p).concat([entry]);
+    save();
+    snapshot('after '+p.name+' sent in '+ev.title);
+    closeModal();
+    toast('Sent in. Your instructor will take a look.','good',6000);
+    render();
+  }
+  if(payload.photo)putPhoto(id,payload.photo).then(finish,finish);
+  else finish();
+}
+
+function entryModal(ev){
+  var kind=EVENT_KINDS[ev.kind]||EVENT_KINDS.checkin;
+  var photo=null,thumb='';
+  function body(){
+    return '<h3>'+esc(ev.title)+'</h3>'+
+      (ev.brief?'<p class="lede">'+esc(ev.brief)+'</p>':'')+
+      (ev.kind==='photo'
+        ? '<div class="shotbox stack" id="shotbox">'+
+            (thumb?'<img src="'+thumb+'" alt="">':
+              '<div class="shotempty">'+ico('camera')+'<span>No picture yet</span></div>')+
+          '</div>'+
+          '<div class="row" style="justify-content:center"><button class="btn btn-primary" id="shot">'+
+          ico('camera')+(thumb?'Take another':'Take a picture')+'</button></div>'
+        :'')+
+      (ev.kind==='text'
+        ? '<label class="field stack"><span>Your writing</span>'+
+          '<textarea id="e-text" data-focus placeholder="Type it here"></textarea></label>'
+        :'')+
+      (ev.kind==='count'
+        ? '<label class="field stack"><span>'+esc(ev.unit||'How many')+'</span>'+
+          '<input class="inp" id="e-count" data-focus type="number" min="0" step="1"></label>'
+        :'')+
+      '<label class="field"><span>Anything to say about it — optional</span>'+
+      '<input class="inp" id="e-note" maxlength="140"></label>'+
+      '<div class="err" id="e-err"></div>'+
+      '<p class="tiny muted">Your instructor decides the points once they have looked at it.</p>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+      '<button class="btn btn-primary" id="e-send">Send it in</button></div>';
+  }
+  function mount(scrim){
+    var shot=scrim.querySelector('#shot');
+    if(shot)shot.addEventListener('click',function(){
+      var inp=document.createElement('input');
+      inp.type='file';inp.accept='image/*';inp.capture='environment';
+      inp.addEventListener('change',function(){
+        var f=inp.files&&inp.files[0];
+        if(!f)return;
+        var send=scrim.querySelector('#e-send');
+        scrim.querySelector('#e-err').textContent='Shrinking the picture…';
+        if(send)send.disabled=true;
+        /* The thumbnail comes from the shrunk copy, not a second read of the
+           original, so the two can never be half-done when Send is pressed. */
+        shrink(f,PHOTO_MAX,PHOTO_Q).then(function(full){
+          return shrinkSrc(full,THUMB_MAX,THUMB_Q).then(function(t){
+            photo=full;thumb=t;
+          });
+        }).then(function(){
+          redrawModal(body(),mount);
+        }).catch(function(err){
+          if(send)send.disabled=false;
+          scrim.querySelector('#e-err').textContent='Sorry — '+err.message+'.';
+        });
+      });
+      inp.click();
+    });
+    scrim.querySelector('#e-send').addEventListener('click',function(){
+      var err=scrim.querySelector('#e-err');
+      var note=scrim.querySelector('#e-note').value.trim();
+      if(ev.kind==='photo'&&(!photo||!thumb)){err.textContent='Take a picture first.';return;}
+      var text='',count=null;
+      if(ev.kind==='text'){
+        text=scrim.querySelector('#e-text').value.trim();
+        if(text.length<4){err.textContent='Write a little more first.';return;}
+      }
+      if(ev.kind==='count'){
+        count=num(scrim.querySelector('#e-count').value,null);
+        if(count===null||count<0){err.textContent='Put a number in.';return;}
+      }
+      submitEntry(ev,{photo:photo,thumb:thumb,text:text,count:count,note:note});
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+
+/* ---------- reader view ---------- */
+function viewEvents(){
+  var p=me();
+  var list=eventList().filter(function(ev){
+    if(S.admin)return true;
+    if(ev.hidden)return false;
+    if(!assignedTo(ev,p))return false;
+    if(ev.hideWhenClosed&&!availability(ev).open)return false;
+    return true;
+  });
+  var h='<div class="pagehead"><div><h2>Events</h2>'+
+    '<div class="sub">Make something, send it in, see what it earns</div></div>'+
+    '<div class="row"><div class="stat" style="min-width:120px"><div class="k">Points to spend</div>'+
+    '<div class="v" style="color:var(--gold-hi)">'+pts(balance(p))+'</div></div></div></div>';
+
+  if(S.admin){
+    var waiting=0;
+    S.profiles.forEach(function(pp){waiting+=totalPending(pp);});
+    h+='<div class="row stack">'+
+      '<button class="btn btn-primary" data-act="ev-new">'+ico('plus')+'Add an event</button>'+
+      '<button class="btn" data-go="reviews">'+ico('camera')+'Review'+(waiting?' ('+waiting+')':'')+'</button>'+
+      '</div>';
+  }
+
+  var mine=entriesOf(p);
+  if(mine.length){
+    var recent=mine.slice().sort(function(a,b){return a.at<b.at?1:-1;}).slice(0,4);
+    h+='<div class="panel stack"><h3 style="font-size:1rem">What you have sent in</h3><div class="stack">';
+    recent.forEach(function(e){
+      h+='<div class="receipt">'+
+        (e.thumb?'<img class="entrythumb" src="'+e.thumb+'" alt="">':
+          '<span class="ic" style="background:var(--surf-2)">'+ico(EVENT_KINDS[e.kind]?'file':'file')+'</span>')+
+        '<div style="flex:1;min-width:0"><div class="tiny">'+esc(e.eventTitle)+'</div>'+
+        '<div class="tiny muted">'+sinceWords(e.at)+
+          (e.status==='rated'?' &nbsp;·&nbsp; '+esc(e.ratingLabel||'rated')+', '+pts(e.points)+' points':'')+
+          (e.status==='declined'?' &nbsp;·&nbsp; sent back':'')+
+        '</div></div>'+
+        '<span class="pill '+(e.status==='rated'?'good':(e.status==='declined'?'cold':'warm'))+'">'+
+          (e.status==='rated'?'rated':(e.status==='declined'?'sent back':'waiting'))+'</span>'+
+        '</div>';
+    });
+    h+='</div></div>';
+  }
+
+  if(!list.length){
+    return h+'<div class="empty stack">'+emptyPip('wait')+
+      '<h3>'+(S.admin?'No events yet':'Nothing on just now')+'</h3>'+
+      '<p class="muted">'+(S.admin
+        ? 'Set something to make, write or do, and decide what each rating is worth.'
+        : 'Check back — your instructor puts things here now and then.')+'</p>'+
+      (S.admin?'<div class="stack"><button class="btn btn-primary" data-act="ev-new">'+
+        ico('plus')+'Add an event</button></div>':'')+'</div>';
+  }
+
+  h+='<div class="evlist stack">';
+  list.forEach(function(ev){
+    var st=eventState(ev,p);
+    var av=st.window||availability(ev);
+    var kind=EVENT_KINDS[ev.kind]||EVENT_KINDS.checkin;
+    var top=(av.open&&av.label&&/day|Last/.test(av.label));
+    var best=(ev.rubric||DEFAULT_RUBRIC).reduce(function(m,r){return Math.max(m,num(r.points,0));},0);
+    h+='<div class="evcard'+(st.can?' open':' shut')+'">'+
+      (top?'<span class="badges" aria-hidden="true"><span class="btime '+
+        (/Last/.test(av.label)||parseInt(av.label,10)<=1?'last':(parseInt(av.label,10)<=5?'soon':''))+
+        '"><span class="dot"></span>'+esc(/Last/.test(av.label)?'LAST DAY':av.label.toUpperCase())+
+        '</span></span>':'')+
+      renderIcon(ev.icon)+
+      '<div class="evmain"><h4>'+esc(ev.title)+'</h4>'+
+      (ev.brief?'<p>'+esc(ev.brief)+'</p>':'')+
+      '<div class="evmeta">'+
+        '<span class="pill cold">'+esc(kind.name)+'</span>'+
+        '<span class="pill '+st.tone+'">'+esc(st.label||'Open')+'</span>'+
+        (ev.hidden?'<span class="pill cold">hidden</span>':'')+
+      '</div></div>'+
+      '<div class="evside">'+
+        '<span class="upto">up to '+pts(best)+'</span>'+
+        (st.can?'<button class="btn btn-sm btn-primary" data-act="ev-do" data-id="'+esc(ev.id)+'">'+
+          esc(kind.verb)+'</button>':'')+
+        (S.admin?'<span class="row" style="gap:5px;justify-content:flex-end">'+
+          '<button class="btn btn-sm btn-ghost" data-act="ev-edit" data-id="'+esc(ev.id)+'">Edit</button>'+
+          '<button class="btn btn-sm btn-danger" data-act="ev-del" data-id="'+esc(ev.id)+'">Remove</button>'+
+        '</span>':'')+
+      '</div></div>';
+  });
+  return h+'</div>';
+}
+
+/* ---------- instructor review ---------- */
+function allEntries(){
+  var rows=[];
+  S.profiles.forEach(function(p){
+    entriesOf(p).forEach(function(e){rows.push({p:p,e:e});});
+  });
+  rows.sort(function(a,b){
+    if((a.e.status==='pending')!==(b.e.status==='pending'))return a.e.status==='pending'?-1:1;
+    return a.e.at<b.e.at?1:-1;
+  });
+  return rows;
+}
+function findEntry(id){
+  for(var i=0;i<S.profiles.length;i++){
+    var l=entriesOf(S.profiles[i]);
+    for(var j=0;j<l.length;j++)if(l[j].id===id)return{p:S.profiles[i],e:l[j],i:j};
+  }
+  return null;
+}
+function viewReviews(){
+  var rows=allEntries();
+  var waiting=rows.filter(function(r){return r.e.status==='pending';});
+  var h='<div class="pagehead"><div><h2>Review</h2>'+
+    '<div class="sub">What readers have sent in</div></div>'+
+    '<button class="btn btn-sm" data-go="events">Back to events</button></div>'+adminBar();
+  if(!rows.length){
+    return h+'<div class="empty"><h3>Nothing sent in yet</h3>'+
+      '<p class="muted">Submissions land here for you to look at and rate.</p></div>';
+  }
+  h+='<div class="stats"><div class="stat gold"><div class="k">Waiting on you</div>'+
+    '<div class="v">'+waiting.length+'</div></div>'+
+    '<div class="stat"><div class="k">Sent in all told</div><div class="v">'+rows.length+'</div></div>'+
+    '<div class="stat"><div class="k">Points awarded</div><div class="v">'+
+      pts(rows.reduce(function(s,r){return s+(r.e.status==='rated'?num(r.e.points,0):0);},0))+
+    '</div></div></div>';
+
+  h+='<div class="reviews stack">';
+  rows.slice(0,30).forEach(function(r){
+    var ev=eventById(r.e.eventId);
+    var rubric=(ev&&ev.rubric)||DEFAULT_RUBRIC;
+    h+='<div class="revcard">'+
+      '<div class="revtop">'+
+        (r.e.thumb?'<button class="revshot" data-act="ev-photo" data-id="'+esc(r.e.id)+'">'+
+          '<img src="'+r.e.thumb+'" alt=""><span>see it full size</span></button>':'')+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="tiny muted">'+esc(r.p.name)+' &nbsp;·&nbsp; '+esc(r.e.eventTitle)+
+          ' &nbsp;·&nbsp; '+sinceWords(r.e.at)+'</div>'+
+          (r.e.text?'<p class="revtext">'+esc(r.e.text)+'</p>':'')+
+          (r.e.count!==null&&r.e.count!==undefined&&r.e.count!==''?
+            '<p class="revtext"><b>'+esc(r.e.count)+'</b></p>':'')+
+          (r.e.note?'<p class="tiny muted">"'+esc(r.e.note)+'"</p>':'')+
+        '</div>'+
+      '</div>'+
+      (r.e.status==='pending'
+        ? '<div class="revrate">'+rubric.map(function(rb){
+            return '<button class="btn btn-sm btn-primary" data-act="ev-rate" data-id="'+esc(r.e.id)+
+              '" data-r="'+esc(rb.id)+'">'+esc(rb.label)+' &nbsp;+'+pts(num(rb.points,0))+'</button>';
+          }).join('')+
+          '<button class="btn btn-sm btn-ghost" data-act="ev-back" data-id="'+esc(r.e.id)+
+          '">Send back</button></div>'
+        : '<div class="revrate"><span class="pill '+(r.e.status==='rated'?'good':'cold')+'">'+
+          (r.e.status==='rated'?esc(r.e.ratingLabel||'rated')+' · '+pts(r.e.points)+' points':'sent back')+
+          '</span>'+
+          '<button class="btn btn-sm btn-ghost" data-act="ev-undo" data-id="'+esc(r.e.id)+'">Undo</button>'+
+          '<button class="btn btn-sm btn-danger" data-act="ev-drop" data-id="'+esc(r.e.id)+'">Delete</button>'+
+          '</div>')+
+      '</div>';
+  });
+  return h+'</div>';
+}
+function rateEntry(id,ratingId){
+  var f=findEntry(id);if(!f)return;
+  var ev=eventById(f.e.eventId);
+  var rubric=(ev&&ev.rubric)||DEFAULT_RUBRIC;
+  var rb=null;
+  rubric.forEach(function(x){if(x.id===ratingId)rb=x;});
+  if(!rb)return;
+  var boosted=withBoost(num(rb.points,0),f.p);
+  f.e.status='rated';f.e.ratingId=rb.id;f.e.ratingLabel=rb.label;
+  f.e.points=boosted.points;f.e.boost=boosted.boost;f.e.ratedAt=nowISO();
+  save();
+  toast(f.p.name+' earned '+pts(f.e.points)+' for '+f.e.eventTitle+'.','good',6000);
+  render();
+}
+function eventPoints(p){
+  return Math.round(entriesOf(p).reduce(function(s,e){
+    return s+(e.status==='rated'?(num(e.points,0)):0);
+  },0)*10)/10;
+}
+function showEntryPhoto(id){
+  getPhoto(id).then(function(data){
+    var f=findEntry(id);
+    if(!data){toast('The full picture is not on this device.','bad');return;}
+    openModal('<h3>'+esc(f?f.e.eventTitle:'Picture')+'</h3>'+
+      '<p class="lede">'+esc(f?f.p.name:'')+' &nbsp;·&nbsp; '+(f?sinceWords(f.e.at):'')+'</p>'+
+      '<div class="fullshot stack"><img src="'+data+'" alt=""></div>'+
+      '<div class="foot"><button class="btn" data-act="ev-save-photo" data-id="'+esc(id)+'">'+
+      ico('down')+'Save the picture</button>'+
+      '<button class="btn btn-primary" data-close>Close</button></div>');
+  },function(){toast('That picture could not be opened.','bad');});
+}
+
+/* ---------- the event editor ---------- */
+function eventEditor(existing){
+  var d=existing?JSON.parse(JSON.stringify(existing)):{
+    id:uid(),kind:'photo',title:'',brief:'',unit:'How many',
+    icon:{glyph:'paint',fg:'#F4B53F',bg:'#1C2340',scale:100},
+    avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
+    assign:{mode:'all',ids:[]},
+    entries:{mode:'limit',limit:3},
+    rubric:JSON.parse(JSON.stringify(DEFAULT_RUBRIC)),
+    hidden:false,hideWhenClosed:false,created:nowISO()
+  };
+  if(!d.rubric||!d.rubric.length)d.rubric=JSON.parse(JSON.stringify(DEFAULT_RUBRIC));
+  if(!d.icon)d.icon={glyph:'paint',fg:'#F4B53F',bg:'#1C2340',scale:100};
+  if(d.icon.scale==null)d.icon.scale=100;
+
+  function seg(field,opts,cur){
+    return '<div class="seg">'+opts.map(function(o){
+      return '<button type="button" data-seg="'+field+'" data-v="'+o[0]+'" aria-pressed="'+
+        (cur===o[0])+'">'+esc(o[1])+'</button>';
+    }).join('')+'</div>';
+  }
+  function body(){
+    var k=EVENT_KINDS[d.kind];
+    return '<h3>'+(existing?'Edit event':'New event')+'</h3>'+
+      '<p class="lede">Ask for something, then decide what it was worth once you have seen it.</p>'+
+
+      '<h4 style="font-size:.95rem;color:var(--text-hi);margin-top:18px">What kind</h4>'+
+      '<div class="stack">'+seg('kind',Object.keys(EVENT_KINDS).map(function(key){
+        return [key,EVENT_KINDS[key].name];
+      }),d.kind)+'</div>'+
+      '<p class="tiny muted" style="margin-top:6px">'+esc(k.blurb)+'</p>'+
+
+      '<div class="row" style="gap:16px;margin-top:16px;align-items:flex-start">'+
+        renderIcon(d.icon)+
+        '<div style="flex:1;min-width:190px">'+
+          '<label class="field"><span>Title</span><input class="inp" id="v-title" data-focus '+
+          'maxlength="48" value="'+esc(d.title)+'" placeholder="Draw your favourite character"></label>'+
+        '</div>'+
+      '</div>'+
+      '<label class="field"><span>What to do</span>'+
+      '<input class="inp" id="v-brief" maxlength="160" value="'+esc(d.brief)+'" '+
+      'placeholder="Draw or make the character you liked best, then photograph it"></label>'+
+      (d.kind==='count'?'<label class="field"><span>What is being counted</span>'+
+        '<input class="inp" id="v-unit" maxlength="30" value="'+esc(d.unit||'')+'" '+
+        'placeholder="Minutes read"></label>':'')+
+
+      '<div class="divider"></div>'+iconEditorHTML(d.icon)+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">What each rating is worth</h4>'+
+      '<p class="tiny muted" style="margin-top:4px">You pick one of these when you look at what came in.</p>'+
+      '<div class="rubric stack" id="rubric">'+d.rubric.map(function(r,i){
+        return '<div class="rubrow">'+
+          '<input class="inp" data-rl="'+i+'" maxlength="28" value="'+esc(r.label)+'">'+
+          '<input class="inp" data-rp="'+i+'" type="number" min="0" step="0.5" value="'+esc(r.points)+'">'+
+          (d.rubric.length>1?'<button class="btn btn-sm btn-danger" type="button" data-rdel="'+i+
+            '">&times;</button>':'')+
+        '</div>';
+      }).join('')+'</div>'+
+      (d.rubric.length<6?'<button class="btn btn-sm" type="button" id="v-addr">'+ico('plus')+
+        'Add a rating</button>':'')+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">How many times</h4>'+
+      '<div class="stack">'+seg('ent',[['once','Once only'],['limit','A few times']],
+        (d.entries&&d.entries.mode)||'limit')+'</div>'+
+      ((d.entries&&d.entries.mode)!=='once'?'<div class="subfields">'+
+        '<label class="field"><span>Most entries per reader</span>'+
+        '<input class="inp" id="v-limit" type="number" min="1" max="20" value="'+
+        esc((d.entries&&d.entries.limit)||3)+'"></label></div>':'')+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">When it runs</h4>'+
+      '<div class="stack">'+seg('av',[['always','Always'],['window','Between two dates'],
+        ['season','Returns on a cycle']],d.avail.mode)+'</div>'+
+      (d.avail.mode==='window'?'<div class="subfields"><div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>From</span>'+
+        '<input class="inp" id="a-start" type="date" value="'+esc(d.avail.start)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Until</span>'+
+        '<input class="inp" id="a-end" type="date" value="'+esc(d.avail.end)+'"></label>'+
+        '</div></div>':'')+
+      (d.avail.mode==='season'?'<div class="subfields">'+
+        '<label class="field"><span>First appears on</span>'+
+        '<input class="inp" id="a-start" type="date" value="'+esc(d.avail.start)+'"></label>'+
+        '<div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>Stays for this many days</span>'+
+        '<input class="inp" id="a-days" type="number" min="1" value="'+esc(d.avail.days)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Comes back every this many months</span>'+
+        '<input class="inp" id="a-every" type="number" min="1" value="'+esc(d.avail.everyMonths)+'"></label>'+
+        '</div><p class="tiny" id="a-preview" style="color:var(--gold-hi)"></p></div>':'')+
+      (d.avail.mode!=='always'?'<label class="check"><input type="checkbox" id="v-hideclosed"'+
+        (d.hideWhenClosed?' checked':'')+'><span>Hide it completely when it is not running</span></label>':'')+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">Who it is for</h4>'+
+      '<div class="stack">'+seg('as',[['all','Every reader'],['some','Chosen readers']],d.assign.mode)+'</div>'+
+      (d.assign.mode==='some'?'<div class="subfields"><div class="who-for">'+
+        S.profiles.map(function(pp){
+          var on=(d.assign.ids||[]).indexOf(pp.id)>=0;
+          return '<button type="button" class="btn btn-sm'+(on?' btn-primary':'')+
+            '" data-who="'+pp.id+'">'+esc(pp.name)+'</button>';
+        }).join('')+'</div></div>':'')+
+      '<label class="check"><input type="checkbox" id="v-hidden"'+(d.hidden?' checked':'')+
+      '><span>Hidden from readers</span></label>'+
+      '<div class="err" id="v-err"></div>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+      '<button class="btn btn-primary" id="v-save">'+(existing?'Save event':'Add event')+'</button></div>';
+  }
+  function grab(scrim){
+    var g=function(s){var el=scrim.querySelector(s);return el?el.value:null;};
+    if(g('#v-title')!==null)d.title=g('#v-title').trim();
+    if(g('#v-brief')!==null)d.brief=g('#v-brief').trim();
+    if(g('#v-unit')!==null)d.unit=g('#v-unit').trim();
+    if(g('#v-limit')!==null)d.entries.limit=Math.max(1,Math.min(20,num(g('#v-limit'),3)));
+    if(g('#a-start')!==null)d.avail.start=g('#a-start');
+    if(g('#a-end')!==null)d.avail.end=g('#a-end');
+    if(g('#a-days')!==null)d.avail.days=Math.max(1,num(g('#a-days'),7));
+    if(g('#a-every')!==null)d.avail.everyMonths=Math.max(1,num(g('#a-every'),12));
+    if(g('#i-scale')!==null)d.icon.scale=Math.max(50,Math.min(180,num(g('#i-scale'),100)));
+    if(g('#i-emoji')!==null){
+      var em=g('#i-emoji').trim();
+      if(em){d.icon.emoji=em;delete d.icon.image;}else delete d.icon.emoji;
+    }
+    $$('[data-rl]',scrim).forEach(function(el){
+      var i=+el.dataset.rl; if(d.rubric[i])d.rubric[i].label=el.value.trim();
+    });
+    $$('[data-rp]',scrim).forEach(function(el){
+      var i=+el.dataset.rp; if(d.rubric[i])d.rubric[i].points=Math.max(0,num(el.value,0));
+    });
+    var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:false;};
+    d.hidden=cb('#v-hidden');
+    if(scrim.querySelector('#v-hideclosed'))d.hideWhenClosed=cb('#v-hideclosed');
+  }
+  function redraw(){redrawModal(body(),mount);}
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      grab(scrim);
+      if(iconEditorClick(e,d.icon)){redraw();return;}
+      var s=e.target.closest('[data-seg]');
+      if(s){
+        if(s.dataset.seg==='kind'){
+          d.kind=s.dataset.v;
+          var gl=EVENT_KINDS[d.kind].glyph;
+          if(!d.icon.image&&!d.icon.emoji)d.icon.glyph=gl;
+        }
+        else if(s.dataset.seg==='av')d.avail.mode=s.dataset.v;
+        else if(s.dataset.seg==='ent')d.entries.mode=s.dataset.v;
+        else d.assign.mode=s.dataset.v;
+        redraw();return;
+      }
+      var w=e.target.closest('[data-who]');
+      if(w){
+        var ids=d.assign.ids||[];
+        var at=ids.indexOf(w.dataset.who);
+        if(at>=0)ids.splice(at,1);else ids.push(w.dataset.who);
+        d.assign.ids=ids;redraw();return;
+      }
+      var rd=e.target.closest('[data-rdel]');
+      if(rd){d.rubric.splice(+rd.dataset.rdel,1);redraw();return;}
+    });
+    var addr=scrim.querySelector('#v-addr');
+    if(addr)addr.addEventListener('click',function(){
+      grab(scrim);
+      d.rubric.push({id:'r'+uid(),label:'',points:0});
+      redraw();
+    });
+    var pic=scrim.querySelector('#i-pic');
+    if(pic)pic.addEventListener('click',function(){
+      grab(scrim);closeModal();
+      avatarPicker(function(uri){d.icon.image=uri;openModal(body(),mount,{dismissable:false});});
+    });
+    var nopic=scrim.querySelector('#i-nopic');
+    if(nopic)nopic.addEventListener('click',function(){
+      grab(scrim);delete d.icon.image;delete d.icon.emoji;redraw();
+    });
+    var sc=scrim.querySelector('#i-scale');
+    if(sc){
+      var out=scrim.querySelector('#i-scale-v'),tile=scrim.querySelector('.ic');
+      sc.addEventListener('input',function(){
+        d.icon.scale=num(sc.value,100);
+        if(out)out.textContent=d.icon.scale+'%';
+        if(tile)tile.style.setProperty('--is',Math.max(0.5,Math.min(1.8,d.icon.scale/100)));
+      });
+    }
+    var ap=scrim.querySelector('#a-preview');
+    if(ap){
+      var refresh=function(){
+        grab(scrim);
+        var pav=availability(d);
+        ap.textContent=d.avail.start
+          ?(pav.open?'Running now — '+pav.label:'Not running — '+pav.label)
+          :'Pick a first date to see when it comes and goes.';
+      };
+      refresh();
+      ['#a-start','#a-days','#a-every'].forEach(function(sel){
+        var el=scrim.querySelector(sel);
+        if(el)el.addEventListener('input',refresh);
+      });
+    }
+    scrim.querySelector('#v-save').addEventListener('click',function(){
+      grab(scrim);
+      var err=scrim.querySelector('#v-err');
+      if(!d.title){err.textContent='Give it a title.';return;}
+      d.rubric=d.rubric.filter(function(r){return r.label;});
+      if(!d.rubric.length){err.textContent='Keep at least one rating, with a name.';return;}
+      if(d.avail.mode==='window'&&(!d.avail.start||!d.avail.end)){
+        err.textContent='A date window needs both dates.';return;}
+      if(d.avail.mode==='window'&&dnum(d.avail.end)<dnum(d.avail.start)){
+        err.textContent='The end date is before the start date.';return;}
+      if(d.avail.mode==='season'&&!d.avail.start){
+        err.textContent='A cycle needs a first date.';return;}
+      if(d.assign.mode==='some'&&!(d.assign.ids||[]).length){
+        err.textContent='Pick at least one reader, or make it for everyone.';return;}
+      var i=-1,l=eventList();
+      for(var k=0;k<l.length;k++)if(l[k].id===d.id)i=k;
+      if(i>=0)S.events[i]=d;else S.events.push(d);
+      save();closeModal();
+      toast(existing?'Event saved.':'"'+d.title+'" added.','good');
+      go('events');
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
 }
 
 /* =========================================================

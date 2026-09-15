@@ -354,6 +354,29 @@ Wings beat, a cape sways, a jetpack flickers, an aura pulses, sparks twinkle out
 
 Motion is scoped to the part that should move rather than the whole figure, and only full-size Pips animate — a grid of thirty swatches in the dressing room stays still. Reduced-motion settings stop all of it.
 
+## Events
+
+Off by default. Settings → Events switches the tab on for readers.
+
+An event asks for something and is rated once it comes back. Four templates:
+
+- **Arts and crafts** — make or draw something and photograph it.
+- **Writing** — a review, a paragraph, a list.
+- **Tally** — report a number: minutes read, pages, laps.
+- **Challenge** — say you did it, with a note if you like.
+
+**The rating decides the points.** Each event carries a rubric you write yourself — three by default, *Gave it a go* 2, *Nicely done* 4, *Outstanding* 8 — with up to six rows. Nothing is awarded until you have looked at it, and the card tells readers what the top rating is worth.
+
+Scheduling reuses what the store and activities already use: always, between two dates, or returning on a cycle. So a one-off half-term competition, a fortnight-long challenge and something that comes back every December are all the same three controls. Events can be for everyone or for named readers, and limited to one entry or a few.
+
+**Review** lists everything sent in, newest and unrated first, with the picture, the writing or the number and any note. Rate it, send it back for another go, or undo. Ratings run through Pip's point boost like everything else.
+
+### Photographs
+
+A phone photo is several megabytes and browser storage is a few megabytes in total, so pictures are shrunk on the way in: the long edge comes down to 1200px as JPEG, which took a 9.9 MB test image to 116 KB. The full picture is kept in IndexedDB, well away from the ordinary storage everything else uses, and only a small thumbnail travels with the profile. You can open any submission full size and save it as a file.
+
+A reader may have five submissions waiting at once. Past that they are asked to wait until some come back, which stops an afternoon of enthusiasm filling the device.
+
 ## The wishlist
 
 A reader marks **one** item as their wish — the thing they are saving for.
