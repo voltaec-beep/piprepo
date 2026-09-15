@@ -1,0 +1,942 @@
+{
+  "schema": "pip-module/1",
+  "id": "golems-eye",
+  "title": "The Golem's Eye",
+  "author": "Jonathan Stroud",
+  "summary": "Bartimaeus Sequence, book 2. A section-by-section title following Bartimaeus, Nathaniel and Kitty as a clay golem terrorizes London. Pass each story section as you read, then sit the whole-book test at the end.",
+  "ar": {
+    "level": null,
+    "points": 10.0,
+    "wordCount": null,
+    "interest": "MG"
+  },
+  "quiz": {
+    "passing": 70,
+    "ask": 0,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "award": "proportional",
+    "reviewMisses": true,
+    "lockRetakes": true,
+    "chaptersInOrder": true
+  },
+  "chapters": [
+    {
+      "id": "s1",
+      "title": "1. Prologue: The Fall of Prague",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Where does the book's opening scene take place?",
+          "options": [
+            "Alexandria",
+            "Prague",
+            "London",
+            "Paris"
+          ],
+          "answer": 1,
+          "why": "The prologue goes back in time to Prague, long before the main story.",
+          "tag": "setting"
+        },
+        {
+          "q": "Who is Bartimaeus serving in the opening scene?",
+          "options": [
+            "A Czech magician",
+            "Gladstone",
+            "The Prime Minister of Britain",
+            "Nathaniel"
+          ],
+          "answer": 0,
+          "why": "Bartimaeus is working for a magician of Prague when the city is attacked.",
+          "tag": "character"
+        },
+        {
+          "q": "Which army is attacking Prague in the prologue?",
+          "options": [
+            "An American army",
+            "A British army led by Gladstone",
+            "An army of werewolves",
+            "A Resistance army of commoners"
+          ],
+          "answer": 1,
+          "why": "Gladstone's British forces are storming the city, which shows how Britain's magicians built their empire.",
+          "tag": "plot"
+        },
+        {
+          "q": "What happens to Bartimaeus's master during the attack?",
+          "options": [
+            "He turns into a golem",
+            "He surrenders and joins Gladstone",
+            "He escapes to London",
+            "He is killed"
+          ],
+          "answer": 3,
+          "why": "His master dies, which frees Bartimaeus from that service.",
+          "tag": "plot"
+        },
+        {
+          "q": "Why does the story start with a scene set so long before Nathaniel's time?",
+          "options": [
+            "To explain how Nathaniel got his name",
+            "To show the history behind Britain's power and Prague's magic",
+            "To introduce Kitty's grandparents",
+            "It has no connection to the rest of the book"
+          ],
+          "answer": 1,
+          "why": "Prague and Gladstone both matter later: the golem comes from Prague's magic, and Gladstone's tomb is a key location.",
+          "tag": "inference"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "2. John Mandrake, Junior Minister",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "About how old is Nathaniel at the start of the main story?",
+          "options": [
+            "Fourteen",
+            "Seventeen",
+            "Ten",
+            "Twelve"
+          ],
+          "answer": 0,
+          "why": "The book picks up a couple of years after The Amulet of Samarkand, with Nathaniel at fourteen.",
+          "tag": "character"
+        },
+        {
+          "q": "What name does Nathaniel use in public as a magician?",
+          "options": [
+            "Julius Tallow",
+            "Rupert Devereaux",
+            "Henry Duvall",
+            "John Mandrake"
+          ],
+          "answer": 3,
+          "why": "Magicians hide their birth names, so Nathaniel works as John Mandrake.",
+          "tag": "character"
+        },
+        {
+          "q": "Which magician is Nathaniel's mentor and master in this book?",
+          "options": [
+            "Sholto Pinn",
+            "Arthur Underwood",
+            "Jane Farrar",
+            "Jessica Whitwell"
+          ],
+          "answer": 3,
+          "why": "Jessica Whitwell, the Minister of Security, has taken him under her wing.",
+          "tag": "character"
+        },
+        {
+          "q": "Who is Nathaniel's boss at the Ministry of Internal Affairs?",
+          "options": [
+            "Quentin Makepeace",
+            "Mr. Pennyfeather",
+            "Julius Tallow",
+            "Henry Duvall"
+          ],
+          "answer": 2,
+          "why": "Nathaniel works under Tallow, who resents his talented young assistant.",
+          "tag": "character"
+        },
+        {
+          "q": "What task has Nathaniel been given that he is struggling to complete?",
+          "options": [
+            "Catching the Resistance",
+            "Training the Night Police",
+            "Building a new government office",
+            "Finding a lost amulet"
+          ],
+          "answer": 0,
+          "why": "His career depends on stopping the commoner Resistance, and his lack of progress makes him look bad.",
+          "tag": "plot"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "3. Kitty's Story: The Black Tumbler",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "What game are Kitty and Jakob playing when their trouble with magicians begins?",
+          "options": [
+            "Tag",
+            "Football",
+            "Cricket",
+            "Chess"
+          ],
+          "answer": 2,
+          "why": "A cricket ball from their game hits a magician's car.",
+          "tag": "plot"
+        },
+        {
+          "q": "Whose car is hit by the ball?",
+          "options": [
+            "Gladstone's",
+            "Nathaniel's",
+            "Rupert Devereaux's",
+            "Julius Tallow's"
+          ],
+          "answer": 3,
+          "why": "The car belongs to Julius Tallow, who takes cruel revenge.",
+          "tag": "plot"
+        },
+        {
+          "q": "What curse does Tallow's djinni use on the children?",
+          "options": [
+            "The Silver Chain",
+            "The Shrinking Spell",
+            "The Black Tumbler",
+            "The Inferno"
+          ],
+          "answer": 2,
+          "why": "The Black Tumbler is the curse that falls on Kitty and Jakob.",
+          "tag": "vocab"
+        },
+        {
+          "q": "What is surprising about how the curse affects Kitty?",
+          "options": [
+            "It doesn't hurt her, while Jakob is badly harmed",
+            "It hurts her but not Jakob",
+            "It turns her invisible",
+            "It makes her a magician"
+          ],
+          "answer": 0,
+          "why": "Kitty is resistant to magic, and this unusual gift shapes the rest of her story.",
+          "tag": "inference"
+        },
+        {
+          "q": "What happens when Kitty takes Tallow to court?",
+          "options": [
+            "She loses and is fined",
+            "The case is never heard",
+            "Tallow is sent to prison",
+            "She wins a large reward"
+          ],
+          "answer": 0,
+          "why": "The court sides with the magician, a clear example of how unfair the system is to commoners.",
+          "tag": "theme"
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "4. Kitty Joins the Resistance",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Who pays Kitty's fine after the court case?",
+          "options": [
+            "Mr. Pennyfeather",
+            "Jakob's father",
+            "Nathaniel",
+            "Julius Tallow"
+          ],
+          "answer": 0,
+          "why": "Mr. Pennyfeather covers the fine and then invites her into his group.",
+          "tag": "plot"
+        },
+        {
+          "q": "What is the Resistance trying to do?",
+          "options": [
+            "Help the magicians rule",
+            "Rebuild Prague",
+            "Fight back against the magicians' power",
+            "Find the golem's creator"
+          ],
+          "answer": 2,
+          "why": "The Resistance is a small group of commoners working against the magicians who govern Britain.",
+          "tag": "theme"
+        },
+        {
+          "q": "Why is Kitty especially valuable to the Resistance?",
+          "options": [
+            "She owns a large shop",
+            "She can summon demons",
+            "She is resistant to magic",
+            "She works for the government"
+          ],
+          "answer": 2,
+          "why": "Magic that would harm others has little effect on her, which makes her useful on dangerous missions.",
+          "tag": "character"
+        },
+        {
+          "q": "Which of these people is a member of Kitty's Resistance group?",
+          "options": [
+            "Harlequin",
+            "Queezle",
+            "Nemaides",
+            "Stanley"
+          ],
+          "answer": 3,
+          "why": "Stanley, Fred, Anne and Nick are among Kitty's fellow Resistance members.",
+          "tag": "character"
+        },
+        {
+          "q": "What role does Mr. Hopkins play for the Resistance?",
+          "options": [
+            "He guards the Resistance hideout",
+            "He is a scholar who passes them information",
+            "He is Kitty's father",
+            "He is their leader in battle"
+          ],
+          "answer": 1,
+          "why": "Hopkins brings the group information, including where to find valuable magical objects.",
+          "tag": "character"
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "5. The Attacks Begin",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Where does the first mysterious attack happen?",
+          "options": [
+            "Pinn's Accoutrements, a shop in Piccadilly",
+            "Westminster Abbey",
+            "The Tower of London",
+            "The Prime Minister's house"
+          ],
+          "answer": 0,
+          "why": "The first attack destroys Sholto Pinn's shop.",
+          "tag": "plot"
+        },
+        {
+          "q": "On what special day does the Piccadilly attack happen?",
+          "options": [
+            "Founder's Day",
+            "Christmas Day",
+            "Midsummer's Eve",
+            "Empire Day"
+          ],
+          "answer": 0,
+          "why": "The attack happens during the Founder's Day celebrations.",
+          "tag": "setting"
+        },
+        {
+          "q": "Who does the government blame for the attacks?",
+          "options": [
+            "Nathaniel",
+            "The American rebels",
+            "The Czech government",
+            "The Resistance"
+          ],
+          "answer": 3,
+          "why": "The newspapers and officials blame the Resistance, even though the truth is very different.",
+          "tag": "plot"
+        },
+        {
+          "q": "Why does Nathaniel summon Bartimaeus again?",
+          "options": [
+            "Ms. Whitwell orders him to send Bartimaeus home",
+            "He needs a powerful, clever servant to help solve the attacks",
+            "He wants to learn Bartimaeus's history",
+            "He wants to apologize"
+          ],
+          "answer": 1,
+          "why": "Under pressure to get results, Nathaniel calls up the djinni who helped him before.",
+          "tag": "character"
+        },
+        {
+          "q": "What does Bartimaeus eventually figure out about the attacker?",
+          "options": [
+            "It is an afrit",
+            "It is a werewolf",
+            "It is a golem",
+            "It is a Resistance member"
+          ],
+          "answer": 2,
+          "why": "After fighting it, Bartimaeus identifies the creature as a golem, a clay giant that magic can hardly touch.",
+          "tag": "plot"
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "6. Gladstone's Tomb",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Where is Gladstone buried?",
+          "options": [
+            "The Tower of London",
+            "The British Museum",
+            "Prague Castle",
+            "Westminster Abbey"
+          ],
+          "answer": 3,
+          "why": "The Resistance breaks into Gladstone's tomb in Westminster Abbey.",
+          "tag": "setting"
+        },
+        {
+          "q": "Why does the Resistance break into the tomb?",
+          "options": [
+            "To steal Gladstone's powerful treasures",
+            "To hide from the Night Police",
+            "To find the golem",
+            "To bury Timothy"
+          ],
+          "answer": 0,
+          "why": "Their information says the tomb holds magical treasures they could use against the magicians.",
+          "tag": "plot"
+        },
+        {
+          "q": "What guards Gladstone's remains?",
+          "options": [
+            "The afrit Honorius, bound into his bones",
+            "A pack of werewolves",
+            "A golem",
+            "Nothing at all"
+          ],
+          "answer": 0,
+          "why": "Honorius was bound to Gladstone's bones and rises when the tomb is opened.",
+          "tag": "plot"
+        },
+        {
+          "q": "What object does Kitty escape with?",
+          "options": [
+            "An amulet",
+            "The golem's eye",
+            "A scrying glass",
+            "Gladstone's staff"
+          ],
+          "answer": 3,
+          "why": "Kitty gets away with Gladstone's staff, which becomes very important later.",
+          "tag": "plot"
+        },
+        {
+          "q": "What is the result of the raid for the Resistance?",
+          "options": [
+            "Most of the group is killed",
+            "A total victory",
+            "They take over the government",
+            "They are all arrested unharmed"
+          ],
+          "answer": 0,
+          "why": "Honorius kills Pennyfeather and several others, which destroys the group. The raid shows the heavy cost of meddling with old magic.",
+          "tag": "theme"
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "7. The Journey to Prague",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Why do Nathaniel and Bartimaeus go to Prague?",
+          "options": [
+            "To bury Gladstone",
+            "To escape the Resistance",
+            "To attend a party",
+            "To find out who made the golem"
+          ],
+          "answer": 3,
+          "why": "Golems are a Prague magic, so the trail of the attacks leads there.",
+          "tag": "plot"
+        },
+        {
+          "q": "Who is the British spy they meet in Prague?",
+          "options": [
+            "Harlequin",
+            "Simpkin",
+            "Hopkins",
+            "Queezle"
+          ],
+          "answer": 0,
+          "why": "Harlequin, a British agent working undercover, helps them in Prague.",
+          "tag": "character"
+        },
+        {
+          "q": "Who is Kavka?",
+          "options": [
+            "Gladstone's servant",
+            "Kitty's cousin",
+            "The Prague magician who made the golem's parchment",
+            "A Night Police officer"
+          ],
+          "answer": 2,
+          "why": "Kavka made the parchment that brings the golem to life.",
+          "tag": "character"
+        },
+        {
+          "q": "Why did Kavka help create the golem?",
+          "options": [
+            "He wanted to rule London",
+            "It was an accident",
+            "He was forced through blackmail",
+            "He was paid by the Resistance"
+          ],
+          "answer": 2,
+          "why": "A British traitor blackmailed him into making it.",
+          "tag": "inference"
+        },
+        {
+          "q": "What happens to the parchment evidence in Prague?",
+          "options": [
+            "It is sent to the Prime Minister",
+            "Kitty steals it",
+            "It is destroyed",
+            "It is framed in a museum"
+          ],
+          "answer": 2,
+          "why": "The evidence that might have exposed the traitor is lost, so Nathaniel returns without proof.",
+          "tag": "plot"
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "8. Honorius Loose in London",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "How does Julius Tallow die?",
+          "options": [
+            "Being hit by a cricket ball",
+            "In the raid on Gladstone's tomb",
+            "Summoning a spirit from books that had been secretly altered",
+            "In a golem attack at Piccadilly"
+          ],
+          "answer": 2,
+          "why": "The Hyrnek family, who print magicians' books, had secretly altered his, and his summoning goes wrong.",
+          "tag": "plot"
+        },
+        {
+          "q": "Why is the Hyrnek family's secret act important?",
+          "options": [
+            "It shows commoners finding quiet ways to strike back",
+            "It frees Bartimaeus",
+            "It helps Tallow win promotion",
+            "It creates the golem"
+          ],
+          "answer": 0,
+          "why": "Jakob's family got back at Tallow without open rebellion.",
+          "tag": "theme"
+        },
+        {
+          "q": "Who is in charge of the Night Police?",
+          "options": [
+            "Mr. Pennyfeather",
+            "Jessica Whitwell",
+            "Kavka",
+            "Henry Duvall"
+          ],
+          "answer": 3,
+          "why": "Police chief Duvall commands the Night Police and uses the crisis to gain power.",
+          "tag": "character"
+        },
+        {
+          "q": "What are the Night Police?",
+          "options": [
+            "Werewolves",
+            "Djinn",
+            "Golems",
+            "Commoner volunteers"
+          ],
+          "answer": 0,
+          "why": "Duvall's Night Police are werewolves, which makes them frightening enforcers.",
+          "tag": "character"
+        },
+        {
+          "q": "How does Nathaniel try to find Kitty?",
+          "options": [
+            "He uses Jakob to lure her",
+            "He reads her diary",
+            "He follows Bartimaeus",
+            "He asks the Prime Minister"
+          ],
+          "answer": 0,
+          "why": "Nathaniel uses Kitty's friend Jakob as bait, a sign of how ruthless he is becoming.",
+          "tag": "character"
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "title": "9. Kitty and Bartimaeus",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "Who rescues Kitty from the Night Police?",
+          "options": [
+            "Bartimaeus",
+            "Hopkins",
+            "Nathaniel",
+            "Jakob"
+          ],
+          "answer": 0,
+          "why": "Bartimaeus saves Kitty, which leads to an unexpected conversation between them.",
+          "tag": "plot"
+        },
+        {
+          "q": "Whose form does Bartimaeus take when he talks with Kitty?",
+          "options": [
+            "Queezle's",
+            "Nathaniel's",
+            "Ptolemy's",
+            "Gladstone's"
+          ],
+          "answer": 2,
+          "why": "He appears as Ptolemy, a past master he remembers with respect.",
+          "tag": "character"
+        },
+        {
+          "q": "What does Bartimaeus talk to Kitty about?",
+          "options": [
+            "Nathaniel's childhood",
+            "Cricket rules",
+            "The rise and fall of empires",
+            "How to become a magician"
+          ],
+          "answer": 2,
+          "why": "He explains that empires rise and fall and that magicians' power doesn't last forever.",
+          "tag": "theme"
+        },
+        {
+          "q": "Why is the conversation important for Kitty?",
+          "options": [
+            "It makes her forget Jakob",
+            "It teaches her the Black Tumbler",
+            "It helps her see her struggle as part of history",
+            "It convinces her to join the government"
+          ],
+          "answer": 2,
+          "why": "Bartimaeus's view of history gives her a bigger picture of what the magicians' rule really is.",
+          "tag": "inference"
+        },
+        {
+          "q": "What does this section show about Bartimaeus?",
+          "options": [
+            "Under the jokes he thinks deeply about humans and power",
+            "He is loyal to Duvall",
+            "He wants to become human",
+            "He cares only about food"
+          ],
+          "answer": 0,
+          "why": "The sarcastic djinni shows serious, thoughtful knowledge from thousands of years of service.",
+          "tag": "character"
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "title": "10. The Golem's Last Stand",
+      "points": 1.0,
+      "questions": [
+        {
+          "q": "What destroys Honorius?",
+          "options": [
+            "The Night Police",
+            "Kitty's pendant",
+            "Gladstone's staff",
+            "The golem"
+          ],
+          "answer": 3,
+          "why": "In the climax, the golem destroys the afrit Honorius.",
+          "tag": "plot"
+        },
+        {
+          "q": "How does Kitty stop the golem?",
+          "options": [
+            "She pulls the parchment from its mouth",
+            "She breaks its eye",
+            "She throws it into the Thames",
+            "She shouts its true name"
+          ],
+          "answer": 0,
+          "why": "The parchment in its mouth brings it to life; without it, the golem stops.",
+          "tag": "plot"
+        },
+        {
+          "q": "Where does the crumbling golem go after it is stopped?",
+          "options": [
+            "To the Resistance hideout",
+            "Back to its master, Henry Duvall",
+            "Into Gladstone's tomb",
+            "Back to Prague"
+          ],
+          "answer": 1,
+          "why": "It returns to its controller, revealing Duvall as the traitor.",
+          "tag": "plot"
+        },
+        {
+          "q": "What does Bartimaeus tell Nathaniel about Kitty?",
+          "options": [
+            "That she was destroyed, though it isn't true",
+            "That she joined the government",
+            "That she stole the staff again",
+            "Nothing at all"
+          ],
+          "answer": 0,
+          "why": "Bartimaeus lies to protect Kitty, who survives and stays in London to study magic's history.",
+          "tag": "inference"
+        },
+        {
+          "q": "By the end, what does Bartimaeus calling Nathaniel 'John Mandrake' suggest?",
+          "options": [
+            "Nathaniel has become more like the ruthless magicians around him",
+            "Nathaniel has quit magic",
+            "They are now best friends",
+            "Bartimaeus forgot his real name"
+          ],
+          "answer": 0,
+          "why": "Nathaniel is promoted, but the djinni's words show he is losing the boy he used to be.",
+          "tag": "theme"
+        }
+      ]
+    }
+  ],
+  "verdicts": {
+    "high": "Even Bartimaeus would be impressed. Brilliant reading!",
+    "pass": "Well done. On to the next section.",
+    "fail": "Below the passing mark. Read it again and come back."
+  },
+  "questions": [
+    {
+      "q": "Who are the three main narrators or viewpoint characters?",
+      "options": [
+        "Bartimaeus, Queezle and Honorius",
+        "Nathaniel, Duvall and Kavka",
+        "Kitty, Jakob and Tallow",
+        "Bartimaeus, Nathaniel and Kitty"
+      ],
+      "answer": 3,
+      "why": "Chapters switch between the djinni, the young magician and the commoner.",
+      "tag": "character"
+    },
+    {
+      "q": "How are Bartimaeus's chapters different from the others?",
+      "options": [
+        "They are written as letters",
+        "They have no dialogue",
+        "They are told backwards",
+        "They are told in first person with funny footnotes"
+      ],
+      "answer": 3,
+      "why": "Bartimaeus narrates his own chapters and adds witty footnotes.",
+      "tag": "vocab"
+    },
+    {
+      "q": "What brings the golem to life?",
+      "options": [
+        "The Powder of Life",
+        "A parchment placed in its mouth",
+        "Gladstone's staff",
+        "A drop of blood"
+      ],
+      "answer": 1,
+      "why": "Removing that parchment is how Kitty stops it.",
+      "tag": "plot"
+    },
+    {
+      "q": "Who secretly controls the golem?",
+      "options": [
+        "Jessica Whitwell",
+        "Kitty",
+        "Mr. Pennyfeather",
+        "Henry Duvall"
+      ],
+      "answer": 3,
+      "why": "The golem returning to Duvall reveals him as the man behind it.",
+      "tag": "plot"
+    },
+    {
+      "q": "What special trait does Kitty have?",
+      "options": [
+        "The ability to fly",
+        "Perfect memory",
+        "She can see through the golem's eye",
+        "Resistance to magic"
+      ],
+      "answer": 3,
+      "why": "Her resilience protects her in dangerous scenes.",
+      "tag": "character"
+    },
+    {
+      "q": "Who is Jakob Hyrnek to Kitty?",
+      "options": [
+        "Her teacher",
+        "Her enemy",
+        "Her brother",
+        "Her childhood friend"
+      ],
+      "answer": 3,
+      "why": "Jakob's injury from the Black Tumbler starts Kitty's fight against the magicians.",
+      "tag": "character"
+    },
+    {
+      "q": "Which afrit is freed from Gladstone's tomb?",
+      "options": [
+        "Nemaides",
+        "Faquarl",
+        "Simpkin",
+        "Honorius"
+      ],
+      "answer": 3,
+      "why": "Honorius was bound into Gladstone's bones.",
+      "tag": "character"
+    },
+    {
+      "q": "Where do the golem's attacks happen?",
+      "options": [
+        "Pinn's shop, the National Gallery and the British Museum",
+        "Nathaniel's house",
+        "Westminster Abbey only",
+        "Only in Prague"
+      ],
+      "answer": 0,
+      "why": "The golem strikes several London sites while the Resistance is blamed.",
+      "tag": "plot"
+    },
+    {
+      "q": "Why is the Resistance blamed for the golem's attacks?",
+      "options": [
+        "It is a convenient scapegoat for powerful magicians",
+        "They admit to it",
+        "Nathaniel finds proof",
+        "Kitty is seen controlling it"
+      ],
+      "answer": 0,
+      "why": "Blaming commoners hides the traitor inside the government.",
+      "tag": "theme"
+    },
+    {
+      "q": "What happens to Queezle?",
+      "options": [
+        "She becomes Nathaniel's master",
+        "She joins the Resistance",
+        "She is killed by the golem",
+        "She escapes to Prague"
+      ],
+      "answer": 2,
+      "why": "Bartimaeus's fellow spirit Queezle dies in a golem attack.",
+      "tag": "plot"
+    },
+    {
+      "q": "What position does Nathaniel win at the end?",
+      "options": [
+        "Minister of Internal Affairs",
+        "Chief of Police",
+        "Prime Minister",
+        "Head of the Resistance"
+      ],
+      "answer": 0,
+      "why": "Stopping the crisis gets him promoted.",
+      "tag": "plot"
+    },
+    {
+      "q": "What does Kitty decide to do at the end?",
+      "options": [
+        "Become a magician's servant",
+        "Stay in London and study the history of magic",
+        "Move to Prague",
+        "Join the Night Police"
+      ],
+      "answer": 1,
+      "why": "She survives and sets out to understand magic's past.",
+      "tag": "character"
+    },
+    {
+      "q": "What happens to Jakob at the end?",
+      "options": [
+        "He joins Nathaniel's ministry",
+        "He is arrested",
+        "He leaves for Bruges with forged papers",
+        "He becomes a magician"
+      ],
+      "answer": 2,
+      "why": "His family helps him get away safely.",
+      "tag": "plot"
+    },
+    {
+      "q": "Which statement best describes how Nathaniel changes in this book?",
+      "options": [
+        "He stays exactly the same",
+        "He grows more ambitious and ruthless",
+        "He gives up magic",
+        "He joins the Resistance"
+      ],
+      "answer": 1,
+      "why": "Using Jakob as bait and chasing promotion show him hardening.",
+      "tag": "theme"
+    },
+    {
+      "q": "What big idea does the book explore through the magicians and commoners?",
+      "options": [
+        "That rules never matter",
+        "That magic is always good",
+        "That history never changes",
+        "How power can be unfair and corrupt"
+      ],
+      "answer": 3,
+      "why": "The unfair court case, the blame game and Duvall's plot show power being abused.",
+      "tag": "theme"
+    },
+    {
+      "q": "How is Nathaniel different from Kitty?",
+      "options": [
+        "They share the same goals",
+        "He works inside the system; she fights against it",
+        "They are both magicians",
+        "They are both Resistance members"
+      ],
+      "answer": 1,
+      "why": "Their opposite sides drive much of the book's tension.",
+      "tag": "theme"
+    },
+    {
+      "q": "What is Gladstone's importance in this world?",
+      "options": [
+        "He is Kitty's father",
+        "He is the founder of magicians' rule in Britain",
+        "He is Bartimaeus's current master",
+        "He is a golem"
+      ],
+      "answer": 1,
+      "why": "Founder's Day honors him, and his tomb holds powerful treasures.",
+      "tag": "character"
+    },
+    {
+      "q": "Why is a golem such a dangerous enemy for magicians and spirits?",
+      "options": [
+        "Magic has little effect on it",
+        "It can fly",
+        "It multiplies",
+        "It is invisible"
+      ],
+      "answer": 0,
+      "why": "Spirits like Queezle can't stand against it, which makes the attacks so frightening.",
+      "tag": "inference"
+    },
+    {
+      "q": "What is Nemaides?",
+      "options": [
+        "A Prague magician",
+        "Tallow's djinni who carries out the Black Tumbler",
+        "A Resistance member",
+        "Kitty's pet cat"
+      ],
+      "answer": 1,
+      "why": "Tallow's servant delivered the curse that hurt Jakob.",
+      "tag": "character"
+    },
+    {
+      "q": "What does the book suggest about Bartimaeus's view of human empires?",
+      "options": [
+        "They last forever",
+        "They all rise and eventually fall",
+        "Empires never use spirits",
+        "Only Britain matters"
+      ],
+      "answer": 1,
+      "why": "His history lesson to Kitty shows he has seen many empires come and go.",
+      "tag": "theme"
+    }
+  ]
+}

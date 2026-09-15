@@ -1,10 +1,13 @@
 {
   "schema": "pip-manifest/1",
   "name": "Reading Room Catalogue",
-  "updated": "2026-09-14",
+  "updated": "2026-09-15",
   "modules": [
     "amulet-of-samarkand.json",
     "the-tortoise-and-the-hare.json",
-    "alice-in-wonderland.json"
+    "alice-in-wonderland.json",
+    "wonderful-wizard-of-oz.json",
+    "marvelous-land-of-oz.json",
+    "golems-eye.json"
   ]
 }
