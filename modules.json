@@ -1,9 +1,0 @@
-{
-  "schema": "pip-manifest/1",
-  "name": "Reading Room Catalogue",
-  "updated": "2026-09-14",
-  "modules": [
-    "amulet-of-samarkand.json",
-    "the-tortoise-and-the-hare.json"
-  ]
-}
