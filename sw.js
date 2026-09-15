@@ -3,7 +3,7 @@
    network-first so an instructor who edits the folder sees the change,
    with the cached copy as the offline fallback. */
 
-var VERSION = 'pip-2026-09-20-2';
+var VERSION = 'pip-2026-09-21-1';
 var CACHE = VERSION;
 
 var PRECACHE = [

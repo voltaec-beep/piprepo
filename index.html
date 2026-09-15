@@ -1309,6 +1309,74 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 .faceopt .l{font-size:.8rem;color:var(--text-2)}
 .faceopt.on .l{color:var(--text-hi)}
 @media (hover:hover) and (pointer:fine){.faceopt:hover{border-color:var(--brand-hi)}}
+
+/* ============ top tier and abilities ============ */
+.pipcard.top{
+  border-color:var(--gold);
+  background:linear-gradient(var(--raise),var(--surface));
+  box-shadow:0 0 0 1px var(--gold-faint),0 0 26px -10px var(--gold),var(--sh-2);
+  position:relative;
+}
+.tierflag{
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  font-size:.58rem;font-weight:700;letter-spacing:.16em;
+  padding:3px 10px;border-radius:999px;white-space:nowrap;
+  background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi),var(--gold-lo));
+  background-size:220% 100%;color:var(--on-gold);
+  animation:drift 5s linear infinite;
+}
+.abilnote{
+  font-size:.7rem;color:var(--gold-hi);text-align:center;line-height:1.35;
+  padding:0 4px;
+}
+.abilbar{
+  display:flex;justify-content:center;margin:10px 0 2px;
+}
+.abil{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 14px;border-radius:999px;font-size:.8rem;
+  border:1px solid var(--gold-soft);background:var(--gold-faint);color:var(--gold-hi);
+}
+.abil svg{width:15px;height:15px;fill:currentColor;stroke:none}
+
+/* premium animations */
+.pip-live .pw-orbit{
+  transform-box:fill-box;transform-origin:50% 50%;
+  animation:pipSpin 14s linear infinite;
+}
+.pip-live .pw-crownstar{
+  transform-box:fill-box;transform-origin:50% 50%;
+  animation:pipTwinkle 2.4s ease-in-out infinite;
+}
+.pip-live .pw-star{
+  transform-box:fill-box;transform-origin:50% 50%;
+  animation:pipTwinkle 2.6s ease-in-out infinite;
+}
+.pip-live .pw-star.s1{animation-delay:-.6s}
+.pip-live .pw-star.s2{animation-delay:-1.2s}
+.pip-live .pw-star.s3{animation-delay:-1.8s}
+.pip-live .pw-field{animation:pipDrift 22s linear infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes pipDrift{to{transform:rotate(360deg)}}
+.pip-live .pw-ember{
+  transform-box:fill-box;transform-origin:50% 100%;
+  animation:pipRise 2.4s ease-out infinite;
+}
+.pip-live .pw-ember.e1{animation-delay:-.8s}
+.pip-live .pw-ember.e2{animation-delay:-1.6s}
+@keyframes pipRise{
+  0%{transform:translateY(6px) scale(.6);opacity:0}
+  25%{opacity:.95}
+  100%{transform:translateY(-26px) scale(.35);opacity:0}
+}
+.pip-live .pw-fire{
+  transform-box:fill-box;transform-origin:50% 100%;
+  animation:pipFire .34s steps(2,end) infinite;
+}
+@keyframes pipFire{
+  0%{transform:scale(1,1)}
+  100%{transform:scale(.92,1.14)}
+}
+.pip-live .pw-galaxy{animation:pipShimmer 5s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -2273,7 +2341,10 @@ function finish(){
     if(paper.award==='proportional')earned=Math.round(paper.points*pct/100*10)/10;
     else if(paper.award==='full')earned=paper.points;
   }
+  var boosted=withBoost(earned,p);
+  earned=boosted.points;
   var rec={id:uid(),moduleId:m.id,title:m.title,author:m.author,date:nowISO(),
+    boost:boosted.boost,
     chapterId:paper.id||null,chapterTitle:paper.id?paper.title:'',
     pct:pct,correct:correct,total:total,points:earned,possible:paper.points,
     passed:passed,award:paper.award,ms:Date.now()-run.started};
@@ -2649,6 +2720,8 @@ function viewResults(){
     '</div>'+
     '<div><div class="verdict">'+esc(verdictFor(m,rec))+'</div>'+
     (rec.chapterTitle?'<div class="tiny" style="color:var(--paper-text-2);margin-bottom:4px">'+esc(rec.chapterTitle)+'</div>':'')+
+    (rec.boost?'<div class="tiny" style="color:var(--gold-ink);margin-bottom:2px">'+
+      'Pip added '+rec.boost+'%</div>':'')+
     '<div class="scoreline">'+rec.pct+'% &nbsp;·&nbsp; '+rec.correct+' of '+rec.total+' correct'+
     (none?'':' &nbsp;·&nbsp; '+(rec.passed?pts(rec.points)+' points added':'no points'))+'</div></div>'+
     '</div>';
@@ -2944,15 +3017,26 @@ function viewPipShop(){
     '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Cosmetics readers buy with points. '+
     'They cost you nothing, apply instantly, and never appear in Redemptions waiting to be handed '+
     'over — somewhere for points to go that is not a real-world reward.</p>'+
+    '<p class="tiny muted" style="max-width:72ch">A complete look can carry a power, and it only '+
+    'counts while every piece of it is worn. A point boost is applied as points are earned, so the '+
+    'record shows what was actually awarded.</p>'+
     '<label class="check stack"><input type="checkbox" id="ps-on"'+(cfg.on?' checked':'')+
     '><span>Show the Pip shelf in the store</span></label>'+
     '<div class="scroll stack"><table><thead><tr><th>Item</th><th>Kind</th>'+
-    '<th class="n">Points</th><th class="n">Offered</th></tr></thead><tbody>';
+    '<th class="n">Points</th><th>Power</th><th class="n">Amount</th>'+
+    '<th class="n">Offered</th></tr></thead><tbody>';
   PIP_LOOKS.concat(PIP_PARTS.filter(function(x){return x.price>0;})).forEach(function(t){
-    h+='<tr><td>'+esc(t.name)+'</td>'+
+    var ab=t.grants?lookAbility(t):null;
+    h+='<tr><td>'+esc(t.name)+(t.tier==='top'?' <span class="pill warm">top</span>':'')+'</td>'+
       '<td class="tiny muted">'+(t.grants?'complete look':esc(PIP_SLOT_NAMES[t.slot]||t.slot))+'</td>'+
-      '<td class="n"><input class="inp" style="width:84px;text-align:right" data-price="'+esc(t.id)+
+      '<td class="n"><input class="inp" style="width:78px;text-align:right" data-price="'+esc(t.id)+
         '" type="number" min="0" step="0.5" value="'+pipPrice(t)+'"></td>'+
+      '<td>'+(ab?'<select class="inp" style="width:auto" data-abil="'+esc(t.id)+'">'+
+        Object.keys(PIP_ABILITIES).map(function(k){
+          return '<option value="'+k+'"'+(ab.kind===k?' selected':'')+'>'+PIP_ABILITIES[k].name+'</option>';
+        }).join('')+'</select>':'<span class="tiny muted">&mdash;</span>')+'</td>'+
+      '<td class="n">'+(ab?'<input class="inp" style="width:64px;text-align:right" data-abilv="'+
+        esc(t.id)+'" type="number" min="0" max="100" value="'+ab.value+'">':'')+'</td>'+
       '<td class="n"><input type="checkbox" data-offer="'+esc(t.id)+'"'+
         (pipOffered(t)?' checked':'')+'></td></tr>';
   });
@@ -3375,7 +3459,12 @@ document.addEventListener('click',function(e){
       if(el.value!=='')prices[el.dataset.price]=Math.max(0,num(el.value,0));
     });
     $$('[data-offer]').forEach(function(el){if(!el.checked)off[el.dataset.offer]=1;});
-    S.settings.pipshop={on:$('#ps-on').checked,prices:prices,off:off};
+    var abil={};
+    $$('[data-abil]').forEach(function(el){
+      var v=$('[data-abilv="'+el.dataset.abil+'"]');
+      abil[el.dataset.abil]={kind:el.value,value:v?Math.max(0,num(v.value,0)):0};
+    });
+    S.settings.pipshop={on:$('#ps-on').checked,prices:prices,off:off,abilities:abil};
     save();toast('Pip prices saved.','good');render();
   }
   else if(act==='save-wishcfg'){
@@ -4169,10 +4258,12 @@ function discountState(item,now){
 function priceOf(item){
   var d=discountState(item);
   var base=Math.max(0,num(item.cost,0));
-  if(!d.active)return{base:base,now:base,pct:0,active:false,sale:d};
-  var now=Math.max(0,Math.round(base*(100-d.pct))/100);
-  now=Math.round(now*10)/10;
-  return{base:base,now:now,pct:d.pct,active:true,sale:d};
+  var off=d.active?d.pct:0;
+  var wear=abilityValue('discount');          /* a worn look can cut prices too */
+  var total=Math.min(90,off+wear);
+  if(!total)return{base:base,now:base,pct:0,active:false,sale:d,wear:0};
+  var now=Math.round(Math.max(0,base*(100-total))/100*10)/10;
+  return{base:base,now:now,pct:total,active:true,sale:d,wear:wear};
 }
 function isFeatured(item){
   if(item.featured)return true;
@@ -4281,6 +4372,7 @@ function viewStore(){
     (adjustedTotal(p)?(adjustedTotal(p)>0?'+':'')+pts(adjustedTotal(p))+' from your instructor<br>':'')+
     (paybackTotal(p)?'+'+pts(paybackTotal(p))+' paid back on wishes<br>':'')+
     (streakTotal(p)?'+'+pts(streakTotal(p))+' from streaks<br>':'')+
+    (abilityValue('boost',p)?'+'+abilityValue('boost',p)+'% while worn<br>':'')+
     pts(spentTotal(p))+' spent</div></div>';
 
   if(S.admin){
@@ -4850,7 +4942,8 @@ function logActivity(id){
   if(!a||!p)return;
   var st=activityState(a,p);
   if(!st.can){toast(st.label,'bad');return;}
-  var entry={id:uid(),activityId:a.id,title:a.title,points:num(a.points,0),
+  var ab=withBoost(num(a.points,0),p);
+  var entry={id:uid(),activityId:a.id,title:a.title,points:ab.points,boost:ab.boost,
     icon:a.icon,date:nowISO(),approved:!a.approval};
   p.activities=logOf(p).concat([entry]);
   save();
@@ -5633,7 +5726,8 @@ function wishProgress(p){
 }
 function wishPayback(price){
   var cfg=wishCfg();
-  var n=Math.round(price*cfg.payback/100*10)/10;
+  var pct=cfg.payback+abilityValue('payback');
+  var n=Math.round(price*pct/100*10)/10;
   if(cfg.cap)n=Math.min(n,cfg.cap);
   return n;
 }
@@ -5811,8 +5905,9 @@ function settleStreaks(){
     var st=streakState(rule,p);
     st.milestones.forEach(function(key){
       if(given[rule.id+'|'+key])return;
-      var pointsFor=Math.max(0,num(rule.points,0));
-      p.streaks.push({id:uid(),ruleId:rule.id,key:key,points:pointsFor,
+      var sb=withBoost(Math.max(0,num(rule.points,0)),p);
+      var pointsFor=sb.points;
+      p.streaks.push({id:uid(),ruleId:rule.id,key:key,points:pointsFor,boost:sb.boost,
         at:nowISO(),title:rule.title||'Streak'});
       given[rule.id+'|'+key]=1;
       paid+=pointsFor;names.push(rule.title||'a streak');
@@ -5960,7 +6055,7 @@ function streakEditor(existing){
    poses that already exist. Every reader has their own.
    ========================================================= */
 
-var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle class=\"pw-gem\" cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path class=\"pw-wandstar\" d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g class=\"pw-balloon\"><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>"},"backs":{"wings":"<g class=\"pw-wing pw-l\"><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g><g class=\"pw-wing pw-r\"><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<g class=\"pw-cape\"><path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/></g>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><g class=\"pw-flame\"><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/></g>"},"auras":{"glow":"<circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect class=\"pw-spark s0\" x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect class=\"pw-spark s1\" x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect class=\"pw-spark s2\" x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g class=\"pw-twinkle\" clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>"}};
+var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"],"inferno":["#FFD08A","#FF6A2C","#8E1408"],"aurora":["#B8FFEC","#7FC7FF","#8B5CF6"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle class=\"pw-gem\" cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>","horns":"<g transform=\"translate(0,0)\"><path d=\"M48 26 C35 22 24 8 28 -10 C31 -3 37 4 45 10 Z\" fill=\"#EFE4D2\"/><path d=\"M48 26 C37 22 28 9 30 -6 C35 2 41 8 46 12 Z\" fill=\"#C3B096\"/><path d=\"M42 18 C35 13 30 4 30 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/><path d=\"M80 26 C93 22 104 8 100 -10 C97 -3 91 4 83 10 Z\" fill=\"#EFE4D2\"/><path d=\"M80 26 C91 22 100 9 98 -6 C93 2 87 8 82 12 Z\" fill=\"#C3B096\"/><path d=\"M86 18 C93 13 98 4 98 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/></g>","starcrown":"<g transform=\"translate(0,0)\"><ellipse cx=\"64\" cy=\"8\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#FFD84D\" stroke-width=\"3\" opacity=\".9\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0s\" d=\"M38 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0.6s\" d=\"M64 -8 l3.2 6.5 7.2 .1 -5.6 5.2 2.2 7.2 -7.0 -4.1 -7.0 4.1 2.2 -7.2 -5.6 -5.2 7.2 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-1.2s\" d=\"M90 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path class=\"pw-wandstar\" d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g class=\"pw-balloon\"><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>","flame":"<g transform=\"translate(0,0)\"><g class=\"pw-fire\"><path d=\"M-2 0 C-14 -10 -10 -26 0 -34 C-2 -22 8 -22 6 -10 C10 -14 12 -8 10 -2 C8 6 -2 8 -2 0 Z\" fill=\"#FF8A2B\"/><path d=\"M-1 -2 C-8 -9 -6 -19 0 -25 C-1 -16 5 -16 4 -8 C3 -2 -1 2 -1 -2 Z\" fill=\"#FFE07A\"/></g></g>","trophy":"<g transform=\"translate(0,0)\"><g><rect x=\"-9\" y=\"16\" width=\"18\" height=\"5\" rx=\"2\" fill=\"#B37A10\"/><rect x=\"-4\" y=\"8\" width=\"8\" height=\"9\" fill=\"#D49A28\"/><path d=\"M-11 -12 h22 v9 a11 11 0 0 1 -22 0 z\" fill=\"#F4B53F\"/><path d=\"M-11 -9 h-6 v4 a7 7 0 0 0 7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/><path d=\"M11 -9 h6 v4 a7 7 0 0 1 -7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/></g></g>"},"backs":{"wings":"<g class=\"pw-wing pw-l\"><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g><g class=\"pw-wing pw-r\"><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<g class=\"pw-cape\"><path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/></g>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><g class=\"pw-flame\"><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/></g>","dragon":"<g class=\"pw-wing pw-l\"><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#C4342A\"/><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M30 56 L-25.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-33.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-25.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g><g class=\"pw-wing pw-r\"><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#C4342A\"/><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M90 56 L145.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L153.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L145.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g>","orbit":"<g class=\"pw-orbit\"><ellipse cx=\"60\" cy=\"60\" rx=\"62\" ry=\"22\" fill=\"none\" stroke=\"#9FD8FF\" stroke-width=\"2.6\" opacity=\".8\" transform=\"rotate(-18 60 60)\"/><path d=\"M122 42 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M-2 66 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M62 33 l1.8 3.6 4.0 .1 -3.1 2.9 1.2 4.0 -3.9 -2.3 -3.9 2.3 1.2 -4.0 -3.1 -2.9 4.0 -.1 z\" fill=\"#FFE9A8\"/></g>"},"auras":{"glow":"<circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect class=\"pw-spark s0\" x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect class=\"pw-spark s1\" x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect class=\"pw-spark s2\" x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>","starfield":"<g class=\"pw-field\"><circle class=\"pw-star s0\" cx=\"118.0\" cy=\"58.0\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"78.3\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"104.9\" cy=\"98.5\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.5\" cy=\"113.5\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"47.0\" cy=\"98.7\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.4\" cy=\"94.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"-4.9\" cy=\"80.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"-19.0\" cy=\"57.9\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"7.8\" cy=\"39.8\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.6\" cy=\"21.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"44.1\" cy=\"7.4\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.7\" cy=\"2.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"96.3\" cy=\"25.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"37.8\" r=\"3.2\" fill=\"#FFF3C4\"/></g>","embers":"<g><circle class=\"pw-ember e0\" cx=\"30\" cy=\"92\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"46\" cy=\"100\" r=\"2.4\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"76\" cy=\"98\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e0\" cx=\"92\" cy=\"88\" r=\"2.6\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"22\" cy=\"76\" r=\"2.2\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"98\" cy=\"72\" r=\"2.4\" fill=\"#FF8A2B\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g class=\"pw-twinkle\" clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>","scales":"<g clip-path=\"url(#skinclip)\"><path d=\"M18 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/></g>","galaxy":"<g clip-path=\"url(#skinclip)\" class=\"pw-galaxy\"><ellipse cx=\"54\" cy=\"58\" rx=\"46\" ry=\"16\" fill=\"__HI__\" opacity=\".40\" transform=\"rotate(-24 54 58)\"/><ellipse cx=\"66\" cy=\"66\" rx=\"38\" ry=\"11\" fill=\"#fff\" opacity=\".22\" transform=\"rotate(-24 66 66)\"/><circle cx=\"40\" cy=\"48\" r=\"2.4\" fill=\"#fff\"/><circle cx=\"76\" cy=\"70\" r=\"2\" fill=\"#fff\"/><circle cx=\"58\" cy=\"40\" r=\"1.8\" fill=\"#fff\"/><circle cx=\"84\" cy=\"52\" r=\"2.2\" fill=\"#fff\"/></g>"}};
 
 function pipSlots(){return ['body','pattern','eyes','hat','back','held','aura'];}
 
@@ -6126,7 +6221,20 @@ var PIP_PARTS=[
   {id:'back-jet',slot:'back',v:'jet',name:'Jetpack',price:16},
 
   {id:'aura-sparks',slot:'aura',v:'sparks',name:'Sparks',price:6},
-  {id:'aura-glow',slot:'aura',v:'glow',name:'Glow',price:10}
+  {id:'aura-glow',slot:'aura',v:'glow',name:'Glow',price:10},
+
+  {id:'body-inferno',slot:'body',v:'inferno',name:'Inferno',price:18},
+  {id:'body-aurora',slot:'body',v:'aurora',name:'Aurora',price:18},
+  {id:'pattern-scales',slot:'pattern',v:'scales',name:'Scales',price:14},
+  {id:'pattern-galaxy',slot:'pattern',v:'galaxy',name:'Galaxy',price:14},
+  {id:'hat-horns',slot:'hat',v:'horns',name:'Horns',price:16},
+  {id:'hat-starcrown',slot:'hat',v:'starcrown',name:'Star crown',price:18},
+  {id:'back-dragon',slot:'back',v:'dragon',name:'Dragon wings',price:24},
+  {id:'back-orbit',slot:'back',v:'orbit',name:'Orbit',price:24},
+  {id:'held-flame',slot:'held',v:'flame',name:'Flame',price:12},
+  {id:'held-trophy',slot:'held',v:'trophy',name:'Trophy',price:14},
+  {id:'aura-embers',slot:'aura',v:'embers',name:'Embers',price:14},
+  {id:'aura-starfield',slot:'aura',v:'starfield',name:'Starfield',price:16}
 ];
 var PIP_LOOKS=[
   {id:'look-bookworm',name:'Bookworm',price:16,
@@ -6140,7 +6248,15 @@ var PIP_LOOKS=[
   {id:'look-starcaster',name:'Starcaster',price:38,
    grants:['body-grape','hat-wizard','held-wand','aura-glow','eyes-star','pattern-starry']},
   {id:'look-legend',name:'Legend',price:52,
-   grants:['body-gold','hat-crown','back-wings','aura-glow','eyes-star','pattern-starry']}
+   grants:['body-gold','hat-crown','back-wings','aura-glow','eyes-star','pattern-starry']},
+  {id:'look-dragonheart',name:'Dragonheart',price:90,tier:'top',
+   ability:{kind:'boost',value:10},
+   grants:['body-inferno','hat-horns','back-dragon','pattern-scales','held-flame',
+           'aura-embers','eyes-star']},
+  {id:'look-starborn',name:'Starborn',price:110,tier:'top',
+   ability:{kind:'boost',value:15},
+   grants:['body-aurora','hat-starcrown','back-orbit','pattern-galaxy',
+           'aura-starfield','eyes-star']}
 ];
 function pipPart(id){
   for(var i=0;i<PIP_PARTS.length;i++)if(PIP_PARTS[i].id===id)return PIP_PARTS[i];
@@ -6241,7 +6357,10 @@ function dressingRoom(){
     var look=pipLook(p);
     var h='<h3>Pip</h3><p class="lede">Everything you have unlocked. Tap to put it on, '+
       'tap again to take it off.</p>'+
-      '<div class="dressstage">'+pipSVG(look,'cheer',150)+'</div>';
+      '<div class="dressstage">'+pipSVG(look,'cheer',150)+'</div>'+
+      (abilityLine(p)?'<div class="abilbar">'+abilityLine(p)+'</div>':
+        '<p class="tiny muted" style="text-align:center">Wearing every piece of a top-tier look '+
+        'switches its power on.</p>');
     pipSlots().forEach(function(slot){
       var mine=PIP_PARTS.filter(function(pt){return pt.slot===slot&&ownsPip(pt.id,p);});
       if(!mine.length)return;
@@ -6299,9 +6418,13 @@ function pipShelf(){
       l.grants.forEach(function(g){var pt=pipPart(g);if(pt)preview[pt.slot]=pt.v;});
       var price=pipPrice(l);
       var afford=balance(p)>=price;
-      h+='<div class="pipcard'+(afford?' buyable':'')+'">'+
+      var ab=lookAbility(l);
+      h+='<div class="pipcard'+(afford?' buyable':'')+(l.tier==='top'?' top':'')+'">'+
+        (l.tier==='top'?'<span class="tierflag">TOP TIER</span>':'')+
         '<div class="pv">'+pipSVG(preview,'cheer',96)+'</div>'+
         '<div class="nm">'+esc(l.name)+'</div>'+
+        (ab.kind!=='none'&&ab.value?'<div class="abilnote">'+
+          esc(PIP_ABILITIES[ab.kind].blurb(ab.value))+'</div>':'')+
         '<div class="pc">'+pts(price)+' <small>points</small></div>'+
         '<button class="btn btn-sm '+(afford?'btn-primary':'btn-ghost')+
           '" data-act="pip-buy" data-id="'+esc(l.id)+'">'+
@@ -6325,6 +6448,66 @@ function pipShelf(){
     h+='</div>';
   }
   return h;
+}
+
+/* =========================================================
+   Abilities
+
+   A complete look can carry a power, but only while the reader is
+   actually wearing all of it. Taking one piece off turns it off,
+   which is what makes the full set worth keeping on.
+   ========================================================= */
+var PIP_ABILITIES={
+  none:    {name:'None',      unit:'',  blurb:function(v){return 'No special power.';}},
+  boost:   {name:'Point boost',unit:'%', blurb:function(v){return '+'+v+'% on every point earned while worn.';}},
+  discount:{name:'Store discount',unit:'%',blurb:function(v){return v+'% off everything in the store while worn.';}},
+  payback: {name:'Extra wish payback',unit:'%',blurb:function(v){return v+'% more paid back on a granted wish.';}}
+};
+function lookAbility(l){
+  var over=(S.settings.pipshop&&S.settings.pipshop.abilities)||{};
+  var a=over[l.id]||l.ability||{kind:'none',value:0};
+  var kind=PIP_ABILITIES[a.kind]?a.kind:'none';
+  return{kind:kind,value:Math.max(0,num(a.value,0))};
+}
+/* Worn means every single piece of the look is on. */
+function wearingLook(l,p){
+  p=p||me();
+  if(!p)return false;
+  var look=pipLook(p);
+  return l.grants.every(function(g){
+    var part=pipPart(g);
+    return part&&look[part.slot]===part.v;
+  });
+}
+function activeAbility(p){
+  p=p||me();
+  var best={kind:'none',value:0,look:null};
+  if(!p)return best;
+  PIP_LOOKS.forEach(function(l){
+    var a=lookAbility(l);
+    if(a.kind==='none'||!a.value)return;
+    if(!wearingLook(l,p))return;
+    if(a.value>best.value)best={kind:a.kind,value:a.value,look:l};
+  });
+  return best;
+}
+function abilityValue(kind,p){
+  var a=activeAbility(p);
+  return a.kind===kind?a.value:0;
+}
+/* Applied when points are earned, not to the running total — so the record
+   shows what was actually awarded and changing outfit later rewrites nothing. */
+function withBoost(points,p){
+  var b=abilityValue('boost',p);
+  if(!b||!points)return{points:points,boost:0,added:0};
+  var out=Math.round(points*(1+b/100)*10)/10;
+  return{points:out,boost:b,added:Math.round((out-points)*10)/10};
+}
+function abilityLine(p){
+  var a=activeAbility(p);
+  if(a.kind==='none'||!a.value)return '';
+  return '<span class="abil">'+ico('flame')+esc(a.look.name)+' &nbsp;·&nbsp; '+
+    esc(PIP_ABILITIES[a.kind].blurb(a.value))+'</span>';
 }
 
 /* =========================================================

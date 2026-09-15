@@ -332,6 +332,22 @@ Pip or a picture is an **explicit choice**, not a matter of which field happens 
 
 Dressing Pip or unlocking a cosmetic switches the choice to Pip automatically, since otherwise you would be dressing a face nobody could see.
 
+### Top tier and powers
+
+Two looks sit above the rest. **Dragonheart** — inferno body, swept horns, membraned wings, scales, a lit flame and rising embers. **Starborn** — an aurora body under a galaxy, a crown of turning stars, a tilted orbit ring and a drifting starfield.
+
+A complete look can carry a **power**, and it only counts while **every piece of it is worn**. Take the orbit off and Starborn's boost switches off with it, which is what makes keeping the whole set on worth something.
+
+Three kinds, set per look in Settings → Pip:
+
+- **Point boost** — a percentage added to everything earned: tests, activities, streak payouts.
+- **Store discount** — a percentage off everything, stacking with sales up to a 90% floor.
+- **Extra wish payback** — added to what a granted wish pays back.
+
+The boost is applied **as points are earned**, not to the running total. The record stores what was actually awarded and the percentage that produced it, so changing outfit later never rewrites history, and the results card says "Pip added 15%".
+
+Dragonheart ships at 10% and Starborn at 15%, both editable — including down to none, if you would rather cosmetics stayed purely cosmetic.
+
 ### Cosmetics that move
 
 Wings beat, a cape sways, a jetpack flickers, an aura pulses, sparks twinkle out of step with each other, a wand's star turns, a balloon bobs, a crown's gem catches the light. Pip himself breathes, and blinks every seven seconds.
