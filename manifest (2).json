@@ -1,9 +1,40 @@
 {
-  "schema": "pip-manifest/1",
-  "name": "Reading Room Catalogue",
-  "updated": "2026-09-14",
-  "modules": [
-    "amulet-of-samarkand.json",
-    "the-tortoise-and-the-hare.json"
+  "name": "Pip \u2014 reading catalogue",
+  "short_name": "Pip",
+  "description": "A reading catalogue and comprehension tester. Take a test on a book you have read and earn points.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#151B2E",
+  "theme_color": "#151B2E",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "books"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

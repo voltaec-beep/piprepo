@@ -1,0 +1,175 @@
+{
+  "schema": "pip-module/1",
+  "id": "amulet-of-samarkand",
+  "title": "The Amulet of Samarkand",
+  "author": "Jonathan Stroud",
+  "series": "The Bartimaeus Sequence",
+  "volume": 1,
+  "summary": "Spirit hierarchies, character motivation, and the plot turns of Book 1. Twenty advanced questions.",
+
+  "ar": {
+    "level": 6.6,
+    "points": 16.0,
+    "wordCount": null,
+    "interest": "MG+"
+  },
+
+  "quiz": {
+    "passing": 70,
+    "ask": 0,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "award": "proportional",
+    "reviewMisses": true,
+    "lockRetakes": true
+  },
+
+  "verdicts": {
+    "high": "Exceptional. You could challenge a Marid.",
+    "pass": "Well done. A competent Djinni master.",
+    "fail": "Below the passing mark. No points awarded."
+  },
+
+  "questions": [
+    {
+      "q": "What is Nathaniel's birth name, which he must keep secret to protect his identity?",
+      "options": ["Arthur", "John", "Ptolemy", "Simon"],
+      "answer": 0,
+      "why": "A magician's birth name is the one thing a spirit can use against them, which is why it is hidden from the moment of apprenticeship.",
+      "tag": "character"
+    },
+    {
+      "q": "Who is Nathaniel's official master in the magician's hierarchy?",
+      "options": ["Simon Lovelace", "Arthur Underwood", "Jessica Whitwell", "Rupert Devereaux"],
+      "answer": 1,
+      "why": "Underwood takes Nathaniel on as apprentice, though he badly underestimates him.",
+      "tag": "character"
+    },
+    {
+      "q": "What specific class of spirit is Bartimaeus?",
+      "options": ["Foliot", "Afrit", "Marid", "Djinni"],
+      "answer": 3,
+      "why": "Bartimaeus is a djinni, the middle rank of the hierarchy, and is touchy about being mistaken for anything lower.",
+      "tag": "worldbuilding"
+    },
+    {
+      "q": "Which human form does Bartimaeus most frequently favor when summoned?",
+      "options": ["An Egyptian boy named Ptolemy", "A gargoyle", "A British aristocrat", "A silver fox"],
+      "answer": 0,
+      "why": "The form belongs to a magician Bartimaeus knew long ago, and he returns to it out of attachment rather than convenience.",
+      "tag": "character"
+    },
+    {
+      "q": "What is the primary reason Nathaniel illegally summons Bartimaeus?",
+      "options": ["To steal a spellbook", "To exact revenge on Simon Lovelace", "To escape his master", "To become Prime Minister"],
+      "answer": 1,
+      "why": "The summoning is personal. Lovelace humiliated Nathaniel publicly, and the theft is the opening move of his revenge.",
+      "tag": "motivation"
+    },
+    {
+      "q": "What is the primary magical function of the Amulet of Samarkand?",
+      "options": ["It grants invisibility", "It summons Marids", "It absorbs all magical attacks", "It controls time"],
+      "answer": 2,
+      "why": "Its defensive power is what makes it worth a coup: the wearer can stand inside an attack that would kill anyone else.",
+      "tag": "plot"
+    },
+    {
+      "q": "Where does Simon Lovelace keep the Amulet hidden before it is stolen?",
+      "options": ["In the Tower of London", "Under his bed", "At his estate, Heddleham Hall", "Inside a magical vault in Parliament"],
+      "answer": 2,
+      "why": "Heddleham Hall is also where the conference is held, which is no coincidence.",
+      "tag": "setting"
+    },
+    {
+      "q": "What is the name of Arthur Underwood's wife, who shows Nathaniel slight kindness?",
+      "options": ["Martha", "Jessica", "Amanda", "Kitty"],
+      "answer": 0,
+      "why": "Martha's small kindnesses are the only warmth in the Underwood household, which sharpens what happens to her later.",
+      "tag": "character"
+    },
+    {
+      "q": "What object does Nathaniel use to spy on Bartimaeus while the djinni is away?",
+      "options": ["A scrying glass", "A crystal ball", "A silver mirror", "A water basin"],
+      "answer": 0,
+      "why": "The scrying glass holds a captive imp, and it is one of the first pieces of real magic Nathaniel builds himself.",
+      "tag": "plot"
+    },
+    {
+      "q": "Who holds the position of Prime Minister of Britain during the events of the novel?",
+      "options": ["Julius Tallow", "Simon Lovelace", "Rupert Devereaux", "Jessica Whitwell"],
+      "answer": 2,
+      "why": "Devereaux leads the magicians' government, which makes him the target of the plot at Heddleham Hall.",
+      "tag": "worldbuilding"
+    },
+    {
+      "q": "Which mercenary entity is bound to Simon Lovelace and acts as his heavy enforcer?",
+      "options": ["Jabor", "Ramuthra", "Queezle", "Nettles"],
+      "answer": 0,
+      "why": "Jabor is relentless rather than clever, which is exactly why Bartimaeus has to outthink him instead of outfight him.",
+      "tag": "character"
+    },
+    {
+      "q": "Who is the Head of Internal Security for the magicians' government?",
+      "options": ["Amanda Cathcart", "Arthur Underwood", "Jessica Whitwell", "John Mandrake"],
+      "answer": 2,
+      "why": "Whitwell's position puts her at the centre of the investigation, and matters a great deal for Nathaniel's future.",
+      "tag": "worldbuilding"
+    },
+    {
+      "q": "How does Nathaniel manage to learn advanced summoning magic at such a young age?",
+      "options": ["By attending a secret academy", "By reading Underwood's locked books in his study", "Bartimaeus teaches him", "He inherits the knowledge"],
+      "answer": 1,
+      "why": "He teaches himself in secret from his master's own library, years ahead of what his lessons allow.",
+      "tag": "plot"
+    },
+    {
+      "q": "In the spirit hierarchy, which of the following is considered the lowest and weakest form?",
+      "options": ["Mites", "Foliots", "Afrits", "Djinn"], 
+      "answer": 0,
+      "why": "The ranking runs upward from imps and mites through foliots and djinn to afrits and marids.",
+      "tag": "worldbuilding"
+    },
+    {
+      "q": "How does Bartimaeus initially escape Lovelace's magical trap after stealing the amulet?",
+      "options": ["By killing Lovelace", "By shapeshifting into a bird and flying out a window", "By tunneling through the floor", "By freezing time"],
+      "answer": 1,
+      "why": "Shapeshifting is his standard escape, and the bird form is small enough to take an exit a person could not.",
+      "tag": "plot"
+    },
+    {
+      "q": "Who tragically perishes when Lovelace's spirits attack the Underwood household?",
+      "options": ["Only Arthur Underwood", "Arthur and Martha Underwood", "Nathaniel and Martha", "Simon Lovelace"],
+      "answer": 1,
+      "why": "Both Underwoods die, and Nathaniel's part in bringing that on the house is the turning point of his character.",
+      "tag": "plot"
+    },
+    {
+      "q": "At what major event is Lovelace planning to use the Amulet to stage a coup?",
+      "options": ["The Prime Minister's Birthday", "The Magicians' Conference at Heddleham Hall", "The Winter Solstice", "The Parliament Opening"],
+      "answer": 1,
+      "why": "The conference puts the entire government in one room, which is the point of holding it at his own estate.",
+      "tag": "plot"
+    },
+    {
+      "q": "What is the name of the resistance group made up of non-magical commoners?",
+      "options": ["The True Britons", "The Resistance", "The Underground", "The Free Folk"],
+      "answer": 1,
+      "why": "The Resistance is made up of commoners with a natural resilience to magic, and grows in importance across the series.",
+      "tag": "worldbuilding"
+    },
+    {
+      "q": "What new, official 'master name' does Nathaniel adopt at the end of the book?",
+      "options": ["John Mandrake", "Arthur Underwood Jr.", "Simon Lovelace", "Ptolemy"],
+      "answer": 0,
+      "why": "Taking the name John Mandrake closes the book on the boy and opens it on the government magician he becomes.",
+      "tag": "plot"
+    },
+    {
+      "q": "What is the ultimate leverage that can break a magician's control over a summoned spirit?",
+      "options": ["Breaking their wand", "Stealing their amulet", "Knowing the magician's true birth name", "Banishing them with silver"],
+      "answer": 2,
+      "why": "Knowing the birth name reverses the balance of power entirely, which is why the secret is guarded so fiercely.",
+      "tag": "theme"
+    }
+  ]
+}

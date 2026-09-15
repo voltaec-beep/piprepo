@@ -1791,6 +1791,17 @@ function viewSettings(){
     '<div class="err" id="pw-err"></div>'+
     '<button class="btn" data-act="change-pw">Change password</button></div></div>';
 
+  h+='<div class="panel"><h3>App status</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">What this device thinks Pip is. '+
+    'If Android offered a plain shortcut instead of an install, the answer is in here — '+
+    'a red line is the reason.</p>'+
+    '<div class="scroll stack"><table><tbody id="appstatus">'+
+    '<tr><td class="tiny muted">checking…</td><td></td></tr></tbody></table></div>'+
+    '<div class="row stack"><button class="btn btn-sm" data-act="recheck">'+ico('sync')+'Check again</button>'+
+    '<button class="btn btn-sm btn-ghost" data-act="copy-status">Copy report</button>'+
+    (deferredInstall?'<button class="btn btn-sm btn-primary" data-act="install">'+ico('down')+'Install Pip</button>':'')+
+    '</div></div>';
+
   h+='<div class="panel"><h3>Readers and data</h3>'+
     '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Everything lives in this browser on this device. '+
     'A backup file carries readers, avatars, points and titles to another one.</p>'+
@@ -1890,6 +1901,13 @@ function signIn(id){
   );
 }
 
+function showStatusText(txt){
+  openModal('<h3>App status</h3><p class="lede">Select this and copy it.</p>'+
+    '<label class="field" style="margin-top:14px"><textarea readonly data-focus '+
+    'style="min-height:220px">'+esc(txt)+'</textarea></label>'+
+    '<div class="foot"><button class="btn btn-primary" data-close>Close</button></div>');
+}
+
 /* =========================================================
    Router
    ========================================================= */
@@ -1943,6 +1961,7 @@ function render(){
   $('#foot-right').textContent=p?(p.name+' has earned '+pts(earnedTotal())):'';
 
   if(S.view==='quiz'&&S.run)wakeOn();else wakeOff();
+  if(S.view==='settings')fillStatus();
   if(S.view==='results')animateResults();
   var q=$('#q');
   if(q&&S.filter.q){q.focus();q.setSelectionRange(q.value.length,q.value.length);}
@@ -1978,6 +1997,14 @@ document.addEventListener('click',function(e){
   }
   else if(act==='print'){window.print();}
   else if(act==='apply-update'){applyUpdate();}
+  else if(act==='recheck'){fillStatus();toast('Rechecked.');}
+  else if(act==='copy-status'){
+    var txt=LAST_STATUS?statusText(LAST_STATUS):'Not checked yet.';
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){toast('Report copied.','good');},
+        function(){showStatusText(txt);});
+    }else showStatusText(txt);
+  }
   else if(act==='install'){installPip();}
   else if(act==='ios-install'){iosInstallSheet();}
   else if(act==='hide-install-hint'){S.settings.hideInstallHint=true;save();closeModal();render();}
@@ -2132,6 +2159,7 @@ function canInstallHint(){
 function registerSW(){
   if(!('serviceWorker' in navigator))return;
   if(location.protocol==='file:')return;   /* no offline copy from a local file */
+  var hadController=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('./sw.js').then(function(reg){
     swReg=reg;
     reg.addEventListener('updatefound',function(){
@@ -2148,7 +2176,9 @@ function registerSW(){
 
   var reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',function(){
-    if(reloading)return;
+    /* On a first visit the worker claims the page and this fires straight
+       away — reloading then would bounce the reader for no reason. */
+    if(!hadController||reloading)return;
     reloading=true;
     location.reload();
   });
@@ -2269,8 +2299,87 @@ window.addEventListener('beforeunload',function(e){
   e.returnValue='';
 });
 
+function askPersistence(){
+  if(!navigator.storage||!navigator.storage.persist)return;
+  navigator.storage.persisted().then(function(already){
+    if(!already)navigator.storage.persist().catch(function(){});
+  }).catch(function(){});
+}
+
+function diagnose(){
+  var out={
+    address:location.href,
+    secure:(window.isSecureContext?'yes':'NO — install needs https'),
+    displayMode:(isStandalone()?'installed (standalone)':'browser tab'),
+    manifestLink:(document.querySelector('link[rel=manifest]')?'present':'MISSING'),
+    manifest:'checking…',
+    serviceWorker:('serviceWorker' in navigator)?'checking…':'NOT SUPPORTED by this browser',
+    controlling:('serviceWorker' in navigator)?'checking…':'n/a',
+    installPrompt:(deferredInstall?'offered':(isStandalone()?'already installed':'not offered yet')),
+    storage:'checking…'
+  };
+  var jobs=[];
+
+  jobs.push(fetch('./manifest.json',{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(m){
+    var sizes=(m.icons||[]).map(function(i){return i.sizes;});
+    var has192=sizes.indexOf('192x192')>=0, has512=sizes.indexOf('512x512')>=0;
+    out.manifest='ok — '+m.name+' | display '+m.display+
+      ' | start_url '+m.start_url+' | icons '+sizes.join(', ')+
+      ((has192&&has512)?'':'  ← needs both 192x192 and 512x512');
+  }).catch(function(err){out.manifest='FAILED — '+err.message;}));
+
+  if('serviceWorker' in navigator){
+    jobs.push(navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg){out.serviceWorker='NOT REGISTERED';out.controlling='no';return;}
+      out.serviceWorker='registered at scope '+reg.scope;
+      out.controlling=navigator.serviceWorker.controller?'yes':'no — reload once';
+    }).catch(function(err){out.serviceWorker='error — '+err.message;}));
+  }
+
+  if(navigator.storage&&navigator.storage.estimate){
+    jobs.push(Promise.all([
+      navigator.storage.estimate(),
+      navigator.storage.persisted?navigator.storage.persisted():Promise.resolve(null)
+    ]).then(function(r){
+      var used=Math.round((r[0].usage||0)/1024);
+      out.storage=used+' KB used'+(r[1]===null?'':(r[1]?', protected from eviction':', NOT protected — data can be cleared'));
+    }).catch(function(){out.storage='unknown';}));
+  }else{
+    out.storage='unknown';
+  }
+
+  return Promise.all(jobs).then(function(){return out;});
+}
+
+function statusText(o){
+  return Object.keys(o).map(function(k){
+    return k.replace(/([A-Z])/g,' $1').toLowerCase()+': '+o[k];
+  }).join('\n');
+}
+
+function fillStatus(){
+  var box=$('#appstatus');
+  if(!box)return;
+  diagnose().then(function(o){
+    if(!$('#appstatus'))return;
+    var bad=/MISSING|FAILED|NOT |NO —|no —/;
+    $('#appstatus').innerHTML=Object.keys(o).map(function(k){
+      var label=k.replace(/([A-Z])/g,' $1').toLowerCase();
+      var v=String(o[k]);
+      return '<tr><td class="tiny muted" style="white-space:nowrap">'+esc(label)+'</td>'+
+        '<td class="tiny"'+(bad.test(v)?' style="color:var(--fail)"':'')+'>'+esc(v)+'</td></tr>';
+    }).join('');
+    LAST_STATUS=o;
+  });
+}
+var LAST_STATUS=null;
+
 function initPlatform(){
   registerSW();
+  askPersistence();
   pushView();
   if(isStandalone())document.documentElement.classList.add('standalone');
 }

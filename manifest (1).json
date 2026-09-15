@@ -1,37 +1,9 @@
 {
-  "schema": "pip-avatars/1",
-  "avatars": [
-    {
-      "file": "owl.svg",
-      "name": "Owl"
-    },
-    {
-      "file": "fox.svg",
-      "name": "Fox"
-    },
-    {
-      "file": "cat.svg",
-      "name": "Cat"
-    },
-    {
-      "file": "whale.svg",
-      "name": "Whale"
-    },
-    {
-      "file": "bee.svg",
-      "name": "Bee"
-    },
-    {
-      "file": "mushroom.svg",
-      "name": "Mushroom"
-    },
-    {
-      "file": "moon.svg",
-      "name": "Moon"
-    },
-    {
-      "file": "rocket.svg",
-      "name": "Rocket"
-    }
+  "schema": "pip-manifest/1",
+  "name": "Reading Room Catalogue",
+  "updated": "2026-09-14",
+  "modules": [
+    "amulet-of-samarkand.json",
+    "the-tortoise-and-the-hare.json"
   ]
 }
