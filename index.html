@@ -216,7 +216,6 @@ a{color:var(--gold-hi)}
   padding:7px 13px;border-radius:8px;font-size:.88rem;color:var(--text-2);
   transition:color .16s,background .16s;
 }
-.nav button:hover{color:var(--text);background:rgba(255,255,255,.045)}
 .nav button[aria-current]{
   color:var(--on-brand);font-weight:600;box-shadow:var(--sh-1);
   background:linear-gradient(var(--brand-hi),var(--brand) 60%,var(--brand-lo));
@@ -229,7 +228,6 @@ a{color:var(--gold-hi)}
   width:36px;height:36px;border-radius:9px;display:grid;place-items:center;
   border:1px solid var(--edge);color:var(--text-2);transition:.16s;
 }
-.iconbtn:hover{border-color:var(--text-3);color:var(--text);background:rgba(255,255,255,.04)}
 .iconbtn.on{border-color:var(--gold);color:var(--gold-hi);background:var(--gold-faint)}
 .iconbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
@@ -237,7 +235,6 @@ a{color:var(--gold-hi)}
   display:flex;align-items:center;gap:9px;padding:4px 12px 4px 4px;
   border:1px solid var(--edge);border-radius:999px;transition:.16s;
 }
-.chip:hover{border-color:var(--text-3);background:rgba(255,255,255,.04)}
 .chip.on{
   border-color:var(--brand-hi);
   background:var(--brand-faint);
@@ -252,7 +249,6 @@ a{color:var(--gold-hi)}
   border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
   transition:border-color .16s,transform .16s var(--ease);
 }
-.mecard:hover{border-color:var(--brand-hi);transform:translateY(-1px)}
 .mecard .ic{width:42px;height:42px;border-radius:12px;background:var(--brand-faint)}
 .mecard .ic svg{width:21px;height:21px;stroke:var(--brand-hi);fill:none;stroke-width:1.8;
   stroke-linecap:round;stroke-linejoin:round}
@@ -297,7 +293,6 @@ a{color:var(--gold-hi)}
   background:linear-gradient(var(--raise),var(--surface));
   box-shadow:var(--sh-1);transition:.15s var(--ease);
 }
-.btn:hover{border-color:var(--text-3);color:var(--text-hi);transform:translateY(-1px)}
 .btn:active{transform:translateY(0)}
 .btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
 .btn-primary{
@@ -305,12 +300,10 @@ a{color:var(--gold-hi)}
   background:linear-gradient(var(--brand-hi),var(--brand) 58%,var(--brand-lo));
   box-shadow:0 1px 0 rgba(255,255,255,.30) inset,var(--sh-2);
 }
-.btn-primary:hover{border-color:var(--brand-hi);color:var(--on-brand)}
 /* the yellow accent: icons inside a blue button pick up the app icon's chick */
 .btn-primary svg{stroke:var(--gold-hi)}
 .btn-ghost{background:none;box-shadow:none}
 .btn-danger{color:var(--fail)}
-.btn-danger:hover{border-color:var(--fail);background:rgba(176,74,62,.14);color:var(--fail)}
 .btn-sm{padding:6px 11px;font-size:.81rem;border-radius:7px}
 .btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
@@ -368,7 +361,6 @@ a{color:var(--gold-hi)}
   box-shadow:0 1px 0 rgba(255,255,255,.45) inset,var(--sh-1);
   transition:transform .16s var(--ease),box-shadow .16s var(--ease);
 }
-.bookcard:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.45) inset,var(--sh-2)}
 .bookcard .spine{width:7px;flex:none;background:linear-gradient(var(--paper-rule),var(--paper-rule-2))}
 .bookcard[data-st="passed"] .spine{background:linear-gradient(var(--pass),var(--pass-ink))}
 .bookcard[data-st="failed"] .spine{background:linear-gradient(var(--fail),var(--fail-ink))}
@@ -418,13 +410,11 @@ a{color:var(--gold-hi)}
   background:rgba(255,255,255,.4);border:1px solid var(--paper-rule);
   transition:.14s var(--ease);
 }
-.opt:hover{background:var(--paper-hi);border-color:var(--paper-edge-hi);transform:translateX(3px)}
 .opt .key{
   width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;
   font-family:var(--serif);font-size:.92rem;color:var(--paper-text-2);
   border:1px solid var(--paper-rule);background:rgba(255,255,255,.6);transition:.14s;
 }
-.opt:hover .key{background:var(--gold);border-color:var(--gold-lo);color:var(--on-gold)}
 .opt.picked{background:var(--gold);border-color:var(--gold-lo);transform:none}
 .opt.picked .key{background:var(--on-gold);color:var(--gold-hi);border-color:var(--on-gold)}
 
@@ -457,7 +447,6 @@ table{width:100%;border-collapse:collapse;font-size:.88rem}
 th{text-align:left;font-weight:600;color:var(--text-2);font-size:.76rem;padding:11px 14px;border-bottom:1px solid var(--edge)}
 td{padding:11px 14px;border-bottom:1px solid var(--edge-soft)}
 tr:last-child td{border-bottom:0}
-tbody tr:hover{background:rgba(255,255,255,.022)}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .pass{color:var(--pass)}
 .fail{color:var(--fail)}
@@ -513,7 +502,6 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   border:1px solid var(--edge-soft);background:linear-gradient(var(--surface),var(--sunk));
   display:grid;justify-items:center;gap:11px;transition:.18s var(--ease);box-shadow:var(--sh-1);
 }
-.person:hover{transform:translateY(-3px);border-color:var(--brand-hi);box-shadow:var(--sh-2)}
 .person .nm{font-size:.94rem;color:var(--text-hi);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .person .sub{font-size:.72rem;color:var(--text-2)}
 .person.add{border-style:dashed;background:none}
@@ -577,7 +565,6 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .swatches button[aria-pressed="true"]{outline:2px solid var(--gold);outline-offset:2px}
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:9px;margin-top:6px}
 .pick{border-radius:12px;padding:5px;border:1px solid transparent;transition:.15s}
-.pick:hover{border-color:var(--brand-hi);background:var(--brand-faint)}
 .pick img{width:100%;aspect-ratio:1;border-radius:9px;object-fit:cover}
 
 /* ============ toast ============ */
@@ -733,11 +720,9 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
   transition:transform .16s var(--ease),border-color .16s;
 }
-.item.buyable:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:var(--sh-2)}
 .item.shut{opacity:.62}
 /* an item you cannot afford yet is still worth looking at */
 .item:not(.shut):not(.buyable){opacity:1}
-.item:not(.shut):not(.buyable):hover{border-color:var(--edge);transform:none}
 .ic{
   --ib:36px;                 /* how big the mark is in this context */
   --is:1;                    /* the item's own scale on top of that */
@@ -756,7 +741,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   font-size:22px;line-height:1;display:grid;place-items:center;
   font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
 }
-.emogrid button:hover{border-color:var(--brand-hi)}
 .emogrid button[aria-pressed="true"]{border-color:var(--brand-hi);background:var(--brand-faint);box-shadow:0 0 0 1px var(--brand-hi)}
 .item h4{font-family:var(--serif);font-size:1.08rem;color:var(--text-hi);margin:0;font-weight:600}
 .item p{font-size:.84rem;color:var(--text-2);line-height:1.5}
@@ -788,7 +772,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   background:var(--sunk);transition:.14s;
 }
 .glyphgrid button svg{width:26px;height:26px}
-.glyphgrid button:hover{border-color:var(--brand-hi)}
 .glyphgrid button[aria-pressed="true"]{border-color:var(--brand-hi);background:var(--brand-faint);box-shadow:0 0 0 1px var(--brand-hi)}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{
@@ -810,7 +793,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
   transition:border-color .16s,transform .16s var(--ease);
 }
-.actrow.open:hover{border-color:var(--gold);transform:translateY(-1px)}
 .actrow.shut{opacity:.6}
 .actrow .ic{--ib:28px;width:48px;height:48px;border-radius:13px}
 .actrow .body{flex:1;min-width:0}
@@ -887,6 +869,9 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   display:flex;flex-direction:column;align-items:flex-end;gap:7px;
   pointer-events:none;
 }
+/* When a card carries both, they take opposite corners. Stacked, the
+   second one lands on the title. */
+.badges.left{right:auto;left:-12px;align-items:flex-start}
 .item{padding-top:20px}
 
 /* the sale rosette */
@@ -1010,6 +995,19 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .item.hero .badges{top:-16px}
 .item .itemtop{gap:15px}
 
+/* Reserve the corner the rosette occupies, so a long title cannot run
+   underneath it. */
+.item.has-sale .itemtop{padding-right:58px}
+.item.has-sale.sale-big .itemtop{padding-right:68px}
+.item.badge-left{padding-top:30px}
+.item.badge-left .itemtop{padding-left:0}
+/* a featured card still needs its banner clearance, which is larger */
+.item.hero.badge-left{padding-top:52px}
+.item.hero.badge-left .ribbon{padding-left:92px}
+@media(max-width:360px){
+  .item.has-sale .itemtop,.item.has-sale.sale-big .itemtop{padding-right:52px}
+}
+
 /* ============ chapters ============ */
 .progline{display:flex;align-items:center;gap:12px;margin-top:20px}
 .progline .bar{
@@ -1043,6 +1041,49 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 @media(max-width:480px){
   .paper-row{flex-wrap:wrap}
   .paper-row .btn{margin-left:37px}
+}
+
+/* ============ hover, only where a pointer actually hovers ============
+   On a touch screen :hover sticks to whatever was last tapped. In the
+   quiz that made the option at the same position on the NEXT question
+   look already chosen. */
+@media (hover:hover) and (pointer:fine){
+
+.nav button:hover{color:var(--text);background:rgba(255,255,255,.045)}
+
+.iconbtn:hover{border-color:var(--text-3);color:var(--text);background:rgba(255,255,255,.04)}
+
+.chip:hover{border-color:var(--text-3);background:rgba(255,255,255,.04)}
+
+.mecard:hover{border-color:var(--brand-hi);transform:translateY(-1px)}
+
+.btn:hover{border-color:var(--text-3);color:var(--text-hi);transform:translateY(-1px)}
+
+.btn-primary:hover{border-color:var(--brand-hi);color:var(--on-brand)}
+
+.btn-danger:hover{border-color:var(--fail);background:rgba(176,74,62,.14);color:var(--fail)}
+
+.bookcard:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.45) inset,var(--sh-2)}
+
+.opt:hover{background:var(--paper-hi);border-color:var(--paper-edge-hi);transform:translateX(3px)}
+
+.opt:hover .key{background:var(--gold);border-color:var(--gold-lo);color:var(--on-gold)}
+
+tbody tr:hover{background:rgba(255,255,255,.022)}
+
+.person:hover{transform:translateY(-3px);border-color:var(--brand-hi);box-shadow:var(--sh-2)}
+
+.pick:hover{border-color:var(--brand-hi);background:var(--brand-faint)}
+
+.item.buyable:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:var(--sh-2)}
+
+.item:not(.shut):not(.buyable):hover{border-color:var(--edge);transform:none}
+
+.emogrid button:hover{border-color:var(--brand-hi)}
+
+.glyphgrid button:hover{border-color:var(--brand-hi)}
+
+.actrow.open:hover{border-color:var(--gold);transform:translateY(-1px)}
 }
 </style>
 </head>
@@ -1745,7 +1786,8 @@ function validate(raw){
       award:['proportional','full','none'].indexOf(qz.award)>=0?qz.award:'proportional',
       reviewMisses:qz.reviewMisses!==false,
       lockRetakes:qz.lockRetakes!==false,
-      chaptersInOrder:qz.chaptersInOrder===true
+      chaptersInOrder:qz.chaptersInOrder===true,
+      revealOnFail:qz.revealOnFail===true
     },
     verdicts:{high:String(vd.high||''),pass:String(vd.pass||''),fail:String(vd.fail||'')},
     questions:questions,chapters:chapters,added:raw.added||nowISO()
@@ -1959,6 +2001,9 @@ function answer(i,node){
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   setTimeout(function(){
     run.busy=false;run.idx++;
+    /* Drop focus from the button that was tapped, so nothing on the next
+       question inherits a highlight. */
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
     if(run.idx>=run.items.length)finish();else render();
   },reduce?0:170);
 }
@@ -2352,15 +2397,31 @@ function viewResults(){
     (none?'':' &nbsp;·&nbsp; '+(rec.passed?pts(rec.points)+' points added':'no points'))+'</div></div>'+
     '</div>';
 
+  /* Giving the answers away after a failed attempt undercuts the advice to
+     go and read it again, and hands over the key for the retake. Below the
+     pass mark the reader gets the questions back, not the answers. */
+  var reveal=rec.passed||(m&&m.quiz.revealOnFail);
   if(m&&m.quiz.reviewMisses&&missed.length){
-    h+='<hr><h3 style="font-size:1.06rem;margin-bottom:6px">What to look at again</h3><div class="review">';
+    h+='<hr><h3 style="font-size:1.06rem;margin-bottom:6px">'+
+      (reveal?'What to look at again':'Go back to these')+'</h3>';
+    if(!reveal){
+      h+='<p class="tiny" style="color:var(--paper-text-2);margin-bottom:4px">'+
+        'The answers stay hidden while the test can be taken again. '+
+        'These are the parts of the book to read once more.</p>';
+    }
+    h+='<div class="review">';
     missed.forEach(function(it){
-      var right='',mine='';
-      it.options.forEach(function(o,i){if(o.correct)right=o.t;if(i===it.chosen)mine=o.t;});
-      h+='<div class="item"><div class="q">'+esc(it.q)+'</div><div class="a">'+
-        (mine?'<span class="bad">'+esc(mine)+'</span>':'')+
-        '<span class="good">'+esc(right)+'</span></div>'+
-        (it.why?'<div class="why">'+esc(it.why)+'</div>':'')+'</div>';
+      if(reveal){
+        var right='',mine='';
+        it.options.forEach(function(o,i){if(o.correct)right=o.t;if(i===it.chosen)mine=o.t;});
+        h+='<div class="item"><div class="q">'+esc(it.q)+'</div><div class="a">'+
+          (mine?'<span class="bad">'+esc(mine)+'</span>':'')+
+          '<span class="good">'+esc(right)+'</span></div>'+
+          (it.why?'<div class="why">'+esc(it.why)+'</div>':'')+'</div>';
+      }else{
+        h+='<div class="item"><div class="q">'+esc(it.q)+'</div>'+
+          (it.tag?'<div class="why">about the '+esc(it.tag)+'</div>':'')+'</div>';
+      }
     });
     h+='</div>';
   }else if(m&&m.quiz.reviewMisses){
@@ -3774,23 +3835,31 @@ function itemCard(it,p,hero){
   var av=availability(it);
   var fx=featureOf(it);
 
-  /* Corner badges: the sale rosette on top, the countdown under it. */
-  var badges='';
+  /* Corner badges. A sale takes the right corner; a countdown takes
+     whichever corner is free, so the two never stack onto the title. */
+  var saleBadge='',timeBadge='',extra='';
   if(pr.active){
-    badges+='<span class="bsale'+(pr.pct>=30?' big':'')+'">'+
+    saleBadge='<span class="bsale'+(pr.pct>=30?' big':'')+'">'+
       '<span><span class="n">'+pr.pct+'%</span><br><span class="u">OFF</span></span></span>';
+    extra+=' has-sale'+(pr.pct>=30?' sale-big':'');
   }
   if(av.open&&av.label&&/day|Last/.test(av.label)){
     var isLast=/Last/.test(av.label);
     var left=isLast?0:parseInt(av.label,10);
     var urgency=(isLast||left<=1?'last':(left<=5?'soon':''));
-    badges+='<span class="btime '+urgency+'"><span class="dot"></span>'+
+    timeBadge='<span class="btime '+urgency+'"><span class="dot"></span>'+
       esc(isLast?'LAST DAY':av.label.toUpperCase())+'</span>';
   }
-  if(badges)badges='<span class="badges" aria-hidden="true">'+badges+'</span>';
+  var badges='';
+  if(saleBadge)badges+='<span class="badges" aria-hidden="true">'+saleBadge+'</span>';
+  if(timeBadge){
+    var onLeft=!!saleBadge;
+    if(onLeft)extra+=' badge-left';
+    badges+='<span class="badges'+(onLeft?' left':'')+'" aria-hidden="true">'+timeBadge+'</span>';
+  }
 
   var dim=(!el.can&&el.why!=='cost');
-  return '<div class="item'+(el.can?' buyable':'')+(dim?' shut':'')+
+  return '<div class="item'+(el.can?' buyable':'')+(dim?' shut':'')+extra+
       (hero?' hero'+(fx.wide?' wide':'')+(fx.glow?' glow':''):'')+'"'+
       (hero?' data-fx="'+fx.style+'"':'')+'>'+
     (hero?'<span class="ribbon">'+esc(fx.label)+'</span>':'')+

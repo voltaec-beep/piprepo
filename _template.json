@@ -20,7 +20,8 @@
     "award": "proportional",
     "reviewMisses": true,
     "lockRetakes": true,
-    "chaptersInOrder": false
+    "chaptersInOrder": false,
+    "revealOnFail": false
   },
   "verdicts": {
     "high": "",
@@ -65,7 +66,8 @@
     "questions[].tag": "Free text. Used to group the results breakdown, e.g. plot, character, setting, vocabulary, theme.",
     "chapters": "Optional. Each chapter is its own test with its own points and its own pass mark. A title can have chapters, a whole-book test, or both \u2014 'questions' is the whole-book test. Points shown in the catalogue are the chapters plus the book test added up.",
     "quiz.chaptersInOrder": "true = a chapter stays locked until the one before it is passed.",
-    "chapters[].points": "What passing this chapter is worth. Chapters pay separately, and each pays once from its best attempt."
+    "chapters[].points": "What passing this chapter is worth. Chapters pay separately, and each pays once from its best attempt.",
+    "quiz.revealOnFail": "false (default) = a failed attempt lists the questions missed but not the answers, so a retake still means something. true = show the correct answers however the attempt went."
   },
   "chapters": [
     {

@@ -134,6 +134,7 @@ Only `title` and `questions` are required.
 - **`ask`** — questions drawn per attempt. `0` asks all. Set it to 10 against a bank of 40 and every attempt is a different test.
 - **`award`** — `proportional` (points × percent), `full` (any pass earns the full value), `none` (score tracked, no points).
 - **`lockRetakes`** — a second attempt needs the key. The first is always free.
+- **`revealOnFail`** — off by default. A failed attempt lists the questions that were missed, with a one-word topic hint, but **not** the answers: telling a reader the answers and then advising them to go and read it again works against itself, and hands over the key for the retake. Passing shows the full review, answers and explanations included. Set it `true` to show answers however the attempt went.
 - **`verdicts`** — the lines on the results card. The Amulet module carries your originals.
 - **`answer`** is a zero-based index into `options`. A module where it points outside the list is rejected on import with the question number named.
 
