@@ -100,7 +100,9 @@ The top-level `questions` array stays exactly what it was, so every existing mod
 
 **Order.** Set `"chaptersInOrder": true` in `quiz` and each chapter stays locked until the one before it is passed, which keeps a reader honest about reading in sequence. The whole-book test is never gated — a reader who has finished the book can sit it.
 
-**Progress** shows on the title page as a bar and on the catalogue card as "2/4 chapters". The quiz names the chapter in its header, results name it, and every record keeps the chapter it belonged to.
+**Progress** shows on the title page as a bar and on the catalogue card as "2/4 passed".
+
+Every catalogue card leads with a badge naming what kind of test it is — **Full book quiz**, **Chapter quizzes**, or **Chapters + book** — so a reader can tell at a glance whether a title is read-then-test or read-along. The quiz names the chapter in its header, results name it, and every record keeps the chapter it belonged to.
 
 `alice-in-wonderland.json` ships as a working example: three chapters at 1.5 points each, gated in order, plus a 3-point whole-book test.
 
@@ -135,7 +137,9 @@ Only `title` and `questions` are required.
 - **`verdicts`** — the lines on the results card. The Amulet module carries your originals.
 - **`answer`** is a zero-based index into `options`. A module where it points outside the list is rejected on import with the question number named.
 
-Three ways in. **Add from folder** picks a directory and reads every module inside; it works even from a `file://` page. **Add files** and drag-and-drop take one or more. **Read from a manifest** fetches `modules/manifest.json` and everything it lists, and needs a web server — turn on auto-sync in Settings and it runs on every open. A module whose `id` matches one already installed replaces it, which is what makes the manifest a real sync rather than a duplicator.
+**PipHub reads the module folder every time it opens.** Drop a new `.json` beside `index.html`, add its name to `modules.json`, push, and it appears on the next load with nobody pressing anything. A module whose `id` matches one already installed is replaced, so editing a title and pushing updates it in place. The read is silent when nothing has changed and silent when offline; it can be switched off under Settings.
+
+Three ways to add by hand as well. **Add from folder** picks a directory and reads every module inside; it works even from a `file://` page. **Add files** and drag-and-drop take one or more. **Read from a manifest** fetches `modules/manifest.json` and everything it lists, and needs a web server — turn on auto-sync in Settings and it runs on every open. A module whose `id` matches one already installed replaces it, which is what makes the manifest a real sync rather than a duplicator.
 
 
 ---
@@ -221,7 +225,7 @@ A closing item wears a swinging tag — "3 DAYS LEFT" — with a blinking dot. U
 
 Both respect reduced-motion settings.
 
-**Featured.** Any item can be pinned to a Featured band at the top of the store, and its look is configurable: a banner colour (gold, blue, mint, rose or plum), your own banner text — "STAFF PICK", "NEW", whatever fits — an optional glow, and a switch to give it the full width of the shelf. Toggle featuring from the item's Feature button or the editor; the look controls appear as soon as Featured is ticked.
+**Featured.** The store is one shelf, not two. A featured item sorts to the front of it rather than moving into a separate section, so an item that becomes featured — or promotes itself by going on sale — simply slides forward among its neighbours. Its look is configurable: a banner colour (gold, blue, mint, rose or plum), your own banner text — "STAFF PICK", "NEW", whatever fits — an optional glow, and a switch to give it the full width of the shelf. Toggle featuring from the item's Feature button or the editor; the look controls appear as soon as Featured is ticked.
 
 **Sales.** An item can go on sale for a random amount off, on a repeating schedule:
 

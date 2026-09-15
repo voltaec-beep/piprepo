@@ -381,6 +381,12 @@ a{color:var(--gold-hi)}
   font-size:.7rem;padding:2px 8px;border-radius:999px;
   border:1px solid var(--paper-rule);color:var(--paper-text-2);background:rgba(255,255,255,.35);
 }
+.tag.mode{
+  border-color:var(--brand-lo);
+  color:#0B3E96;
+  background:linear-gradient(rgba(46,140,255,.20),rgba(17,99,240,.12));
+  font-weight:600;
+}
 .tag.pass{border-color:var(--pass-ink);color:var(--pass-ink);background:var(--pass-faint)}
 .tag.fail{border-color:var(--fail-ink);color:var(--fail-ink);background:var(--fail-faint)}
 .worth{text-align:center;flex:none;min-width:58px}
@@ -719,7 +725,7 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .balance .k{font-size:.74rem;color:var(--text-2)}
 .balance .v{font-family:var(--serif);font-size:1.5rem;line-height:1.1;color:var(--text-hi);font-variant-numeric:tabular-nums}
 
-.shelf{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(228px,1fr))}
+.shelf{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));align-items:stretch}
 .item{
   position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;
   padding:16px;border-radius:14px;
@@ -874,11 +880,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .crest::before,.crest::after{
   content:"";height:1px;width:14px;background:var(--gold-soft);
 }
-.shelfhead{
-  display:flex;align-items:center;gap:10px;margin:22px 0 11px;
-  font-family:var(--serif);font-size:1.05rem;color:var(--text-hi);
-}
-.shelfhead .line{flex:1;height:1px;background:var(--edge-soft)}
 
 /* ============ corner badges ============ */
 .badges{
@@ -1161,10 +1162,13 @@ function load(){
   S.store=Array.isArray(d.store)?d.store:[];
   S.activities=Array.isArray(d.activities)?d.activities:[];
   S.active=d.active||null;
-  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:false,seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
+  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
   /* Earlier builds kept these in subfolders. GitHub's uploader flattens
      folders, so the layout moved and stored paths need bringing along. */
+  /* Installs made before this was the default had it off, and the manual
+     "read that folder" button was easy to miss. Turn it on once. */
+  if(!S.settings.syncDefaulted){S.settings.autoSync=true;S.settings.syncDefaulted=true;}
   if(S.settings.folder==='modules/manifest.json')S.settings.folder='modules.json';
   if(S.settings.assets==='assets/manifest.json')S.settings.assets='avatars.json';
   /* Profiles made before the store existed have no purchase list. */
@@ -2153,11 +2157,16 @@ function viewCatalog(){
   list.forEach(function(m){
     var st=statusFor(m.id),best=attemptsFor(m.id)[0];
     var tags='';
-    if(m.ar.level!=null)tags+='<span class="tag">Level '+m.ar.level+'</span>';
+    var chapters=(m.chapters||[]).length;
     var pg=papersDone(m);
-    if((m.chapters||[]).length)
+    tags+='<span class="tag mode">'+
+      (chapters&&hasBookTest(m)?'Chapters + book'
+        :chapters?'Chapter quizzes'
+        :'Full book quiz')+'</span>';
+    if(m.ar.level!=null)tags+='<span class="tag">Level '+m.ar.level+'</span>';
+    if(chapters)
       tags+='<span class="tag'+(pg.done&&pg.done===pg.total?' pass':'')+'">'+
-        pg.done+'/'+pg.total+' chapters</span>';
+        pg.done+'/'+pg.total+' passed</span>';
     else tags+='<span class="tag">'+(m.quiz.ask||m.questions.length)+' questions</span>';
     if(best)tags+='<span class="tag '+(best.passed?'pass':'fail')+'">'+
       (best.passed?'Passed at '+best.pct+'%':'Best '+best.pct+'%')+'</span>';
@@ -3727,6 +3736,9 @@ function viewStore(){
       '</div>';
   }
 
+  /* One shelf. Featured items simply sort to the front of it, so an item
+     that becomes featured — or goes on sale with auto-feature on — moves
+     up rather than jumping into a separate section. */
   function rank(it){
     var e=eligibility(it);
     if(e.can)return 0;
@@ -3734,22 +3746,16 @@ function viewStore(){
     return 2;
   }
   function order(a,b){
+    var fa=isFeatured(a)?0:1, fb=isFeatured(b)?0:1;
+    if(fa!==fb)return fa-fb;
     var ra=rank(a),rb=rank(b);
     if(ra!==rb)return ra-rb;
     return priceOf(a).now-priceOf(b).now;
   }
-  var hero=visible.filter(isFeatured).sort(order);
-  var rest=visible.filter(function(it){return !isFeatured(it);}).sort(order);
-
-  if(hero.length){
-    h+='<div class="shelfhead"><span class="crest">FEATURED</span><span class="line"></span></div>'+
-       '<div class="shelf">'+hero.map(function(it){return itemCard(it,p,true);}).join('')+'</div>';
-    if(rest.length)h+='<div class="shelfhead">Everything else<span class="line"></span></div>';
-  }
-  if(rest.length){
-    h+='<div class="shelf'+(hero.length?'':' stack')+'">'+
-       rest.map(function(it){return itemCard(it,p,false);}).join('')+'</div>';
-  }
+  h+='<div class="shelf stack">'+
+     visible.slice().sort(order).map(function(it){
+       return itemCard(it,p,isFeatured(it));
+     }).join('')+'</div>';
   return h;
 }
 
