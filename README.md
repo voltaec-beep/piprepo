@@ -310,6 +310,24 @@ The top bar carries three sections — Catalogue, Activities, Store — and that
 
 The profile page is the hub: your picture and name, quick cards through to **Records** (tests taken, points from reading) and **Points** (balance and what you have redeemed), appearance settings, and the reader switcher. Records has a link straight back.
 
+## Pip
+
+Every reader has their own Pip, and Pip is their face everywhere in the app — the sign-in tile, the chip in the top right, their profile, the results card. He also fills the places that used to be blank sentences: an empty shelf, a store with nothing in it, records before a first test.
+
+**He is drawn, not stored.** A look is a set of slot choices — colour, pattern, eyes, hat, back, holding, aura — assembled at render time against a rig whose anchor points move with the pose. That is why a crown sits correctly whether Pip is cheering or asleep, why he is sharp at 28 pixels and at 150, and why adding a new hat costs one shape rather than one per pose. A single light source governs every layer, so nothing looks pasted on.
+
+Seven slots with 30 parts already give tens of thousands of combinations, and each new part multiplies rather than adds.
+
+### Cosmetics
+
+Bought with points from the **Pip** shelf in the store. Single parts are cheap; six complete looks — Bookworm, Royal, Winged, Astro, Starcaster, Legend — are bundles worth saving for, which makes them natural wishlist targets.
+
+Two things make them different from ordinary store items. They are **yours for good** once unlocked, and they **never appear in Redemptions** — the app hands them over itself, so nothing waits for an instructor to mark it given. That makes them somewhere for points to go that costs you nothing, which lets the real-world rewards stay priced honestly.
+
+Unlocking one puts it on immediately. **Dress Pip**, on the profile page or the store shelf, shows everything owned with a live preview; tap to wear, tap again to take off.
+
+Settings → Pip lets you set the price of every part and look, take any of them off sale, or hide the shelf entirely. A reader who would rather have a photograph still can — **Use a picture instead** keeps the old avatar and cropper, and **Back to Pip** returns.
+
 ## The wishlist
 
 A reader marks **one** item as their wish — the thing they are saving for.

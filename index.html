@@ -1183,6 +1183,61 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .streak{flex-wrap:wrap}
   .streak .now{margin-left:56px;text-align:left}
 }
+
+/* ============ Pip ============ */
+.av-pip{
+  display:grid;place-items:center;overflow:hidden;
+  background:linear-gradient(160deg,var(--surf-2),var(--sunk));
+}
+.av-pip .pip{display:block;width:104%;height:104%}
+.emptypip{display:flex;justify-content:center;margin-bottom:4px}
+.emptypip .pip{opacity:.95}
+.pipreact{flex:none;display:flex;align-items:flex-end}
+@media(max-width:560px){.pipreact{display:none}}
+
+.dressstage{
+  display:flex;justify-content:center;padding:14px 0 18px;margin-bottom:6px;
+  border-radius:16px;background:radial-gradient(circle at 50% 38%,var(--surf-2),var(--sunk) 70%);
+  border:1px solid var(--edge-soft);
+}
+.dressrow{margin-top:14px}
+.dressgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px;margin-top:6px}
+.dresspick{
+  aspect-ratio:1;border-radius:12px;border:1px solid var(--edge-soft);
+  background:var(--sunk);display:grid;place-items:center;overflow:hidden;transition:.14s;
+}
+.dresspick.on{border-color:var(--brand-hi);background:var(--brand-faint);box-shadow:0 0 0 1px var(--brand-hi)}
+
+.piprow{display:grid;gap:11px;grid-template-columns:repeat(auto-fill,minmax(152px,1fr))}
+.pipcard{
+  display:grid;justify-items:center;gap:6px;padding:14px 12px 13px;border-radius:14px;
+  background:linear-gradient(var(--surface),var(--sunk));
+  border:1px solid var(--edge-soft);box-shadow:var(--sh-1);transition:.16s var(--ease);
+}
+.pipcard.buyable{border-color:var(--gold-soft)}
+.pipcard .pv{
+  width:100%;display:flex;justify-content:center;padding:4px 0 2px;border-radius:11px;
+  background:radial-gradient(circle at 50% 40%,var(--surf-2),transparent 70%);
+}
+.pipcard .nm{font-family:var(--serif);font-size:1.02rem;color:var(--text-hi)}
+.pipcard .pc{font-family:var(--serif);color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.pipcard .pc small{font-family:var(--sans);font-size:.66rem;color:var(--text-2)}
+
+.pipparts{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:9px;margin-top:14px}
+.pippart{
+  display:grid;justify-items:center;gap:3px;padding:9px 6px 8px;border-radius:12px;
+  background:var(--sunk);border:1px solid var(--edge-soft);transition:.14s;
+}
+.pippart.buyable{border-color:var(--gold-soft)}
+.pippart .n{font-size:.72rem;color:var(--text-2);text-align:center;line-height:1.2}
+.pippart .p{font-family:var(--serif);font-size:.92rem;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.shelfhead{display:flex;align-items:center;gap:10px;margin:22px 0 6px;
+  font-family:var(--serif);font-size:1.05rem;color:var(--text-hi)}
+.shelfhead .line{flex:1;height:1px;background:var(--edge-soft)}
+@media (hover:hover) and (pointer:fine){
+  .dresspick:hover{border-color:var(--brand-hi)}
+  .pipcard.buyable:hover,.pippart.buyable:hover{transform:translateY(-2px);border-color:var(--gold)}
+}
 </style>
 </head>
 <body>
@@ -1306,7 +1361,8 @@ function load(){
   S.streaks=Array.isArray(d.streaks)?d.streaks:[];
   S.active=d.active||null;
   S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',
-    wish:{on:true,shortfall:25,payback:10,cap:0},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
+    wish:{on:true,shortfall:25,payback:10,cap:0},
+    pipshop:{on:true,prices:{},off:{}},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
   /* Earlier builds kept these in subfolders. GitHub's uploader flattens
      folders, so the layout moved and stored paths need bringing along. */
@@ -1322,6 +1378,8 @@ function load(){
     if(!Array.isArray(p.adjustments))p.adjustments=[];
     if(!Array.isArray(p.streaks))p.streaks=[];
     if(p.wish===undefined)p.wish=null;
+    if(!Array.isArray(p.pipOwned))p.pipOwned=['body-sun','eyes-dot'];
+    if(!p.pipLook)p.pipLook={body:'sun',eyes:'dot'};
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1356,7 +1414,8 @@ function save(){
 function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
     avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
-    streaks:[],wish:null};
+    streaks:[],wish:null,
+    pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'}};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -1367,7 +1426,10 @@ function recs(){var p=me();return p?p.records:[];}
 
 function avatarHTML(p,size,cls){
   var s=size||40;
+  /* A picture wins if the reader chose one; otherwise it is their Pip. */
   if(p&&p.avatar)return '<img class="av av-'+s+(cls?' '+cls:'')+'" src="'+p.avatar+'" alt="">';
+  if(p)return '<span class="av av-'+s+' av-pip'+(cls?' '+cls:'')+'" aria-hidden="true">'+
+    pipHTML(p,Math.round(s*1.02),'idle',{shadow:false})+'</span>';
   return '<div class="av av-'+s+' av-ph'+(cls?' '+cls:'')+'" aria-hidden="true" style="font-size:'+(s/2.6)+'px">'+
     esc(initials(p?p.name:''))+'</div>';
 }
@@ -2294,7 +2356,7 @@ function viewCatalog(){
   h+=streakStrip('quiz');
 
   if(!S.modules.length){
-    return h+'<div class="empty"><h3>Nothing on the shelf yet</h3>'+
+    return h+'<div class="empty">'+emptyPip('sleep')+'<h3>Nothing on the shelf yet</h3>'+
       '<p class="muted">Titles arrive as content modules — one small file per book. An instructor adds them.</p>'+
       '<div class="row stack" style="justify-content:center">'+
       (S.admin?'<button class="btn btn-primary" data-act="pick-folder">'+ico('folder')+'Add from folder</button>'+
@@ -2504,6 +2566,7 @@ function viewResults(){
   var unit=none?'per cent':'of '+pts(rec.possible)+' points';
 
   var h='<div class="paper"><div class="reveal">'+
+    '<div class="pipreact">'+pipSVG(pipLook(me()),pipMood(rec),110)+'</div>'+
     '<div class="ring'+(rec.points>0||none?'':' zero')+'" id="ring">'+
       '<svg viewBox="0 0 186 186"><circle class="track" cx="93" cy="93" r="80"></circle>'+
       '<circle class="bar" cx="93" cy="93" r="80" stroke-dasharray="502.65" stroke-dashoffset="502.65"></circle></svg>'+
@@ -2590,7 +2653,7 @@ function viewRecords(){
       '</div>':'')+'</div>';
 
   if(!list.length){
-    return h+'<div class="empty"><h3>No tests taken yet</h3>'+
+    return h+'<div class="empty">'+emptyPip('wait')+'<h3>No tests taken yet</h3>'+
       '<p class="muted">Finish a test and it is logged here, with the points it earned.</p>'+
       '<div class="stack"><button class="btn btn-primary" data-go="catalog">Open the catalogue</button></div></div>';
   }
@@ -2629,9 +2692,10 @@ function viewProfile(){
     '<div class="tiny muted">'+list.length+(list.length===1?' test taken':' tests taken')+
     ', '+pts(earnedTotal())+' points earned'+(p.pin?', shelf locked with a PIN':'')+'</div>'+
     '<div class="row stack">'+
-    '<button class="btn btn-sm" data-act="change-avatar">'+ico('camera')+'Change picture</button>'+
+    '<button class="btn btn-sm btn-primary" data-act="dress">Dress Pip</button>'+
+    '<button class="btn btn-sm" data-act="change-avatar">'+ico('camera')+'Use a picture instead</button>'+
     '<button class="btn btn-sm" data-act="edit-profile">Edit name and PIN</button>'+
-    (p.avatar?'<button class="btn btn-sm btn-ghost" data-act="drop-avatar">Remove picture</button>':'')+
+    (p.avatar?'<button class="btn btn-sm btn-ghost" data-act="drop-avatar">Back to Pip</button>':'')+
     '</div></div></div></div>';
 
   var cur=S.settings.theme||'auto';
@@ -2782,8 +2846,33 @@ function viewSettings(){
   });
   h+='</tbody></table></div></div>';
 
+  h+=viewPipShop();
   h+=viewIncentives();
   h+=viewBackups();
+  return h;
+}
+
+/* ---------- Pip shop (instructor) ---------- */
+function viewPipShop(){
+  var cfg=pipShopCfg();
+  var h='<div class="panel"><h3>Pip</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Cosmetics readers buy with points. '+
+    'They cost you nothing, apply instantly, and never appear in Redemptions waiting to be handed '+
+    'over — somewhere for points to go that is not a real-world reward.</p>'+
+    '<label class="check stack"><input type="checkbox" id="ps-on"'+(cfg.on?' checked':'')+
+    '><span>Show the Pip shelf in the store</span></label>'+
+    '<div class="scroll stack"><table><thead><tr><th>Item</th><th>Kind</th>'+
+    '<th class="n">Points</th><th class="n">Offered</th></tr></thead><tbody>';
+  PIP_LOOKS.concat(PIP_PARTS.filter(function(x){return x.price>0;})).forEach(function(t){
+    h+='<tr><td>'+esc(t.name)+'</td>'+
+      '<td class="tiny muted">'+(t.grants?'complete look':esc(PIP_SLOT_NAMES[t.slot]||t.slot))+'</td>'+
+      '<td class="n"><input class="inp" style="width:84px;text-align:right" data-price="'+esc(t.id)+
+        '" type="number" min="0" step="0.5" value="'+pipPrice(t)+'"></td>'+
+      '<td class="n"><input type="checkbox" data-offer="'+esc(t.id)+'"'+
+        (pipOffered(t)?' checked':'')+'></td></tr>';
+  });
+  h+='</tbody></table></div>'+
+    '<button class="btn btn-primary stack" data-act="save-pipshop">Save Pip prices</button></div>';
   return h;
 }
 
@@ -3046,6 +3135,11 @@ function pointsEditor(p){
   openModal(body(),mount,{dismissable:false});
 }
 
+function emptyPip(pose){
+  var p=me();
+  return '<div class="emptypip">'+pipSVG(p?pipLook(p):{},pose||'wait',104)+'</div>';
+}
+
 /* =========================================================
    Router
    ========================================================= */
@@ -3160,6 +3254,8 @@ document.addEventListener('click',function(e){
   else if(act==='theme-set'){setTheme(b.dataset.t);}
   else if(act==='export-csv'){exportCSV();}
   else if(act==='buy'){buyItem(id);}
+  else if(act==='dress'){dressingRoom();}
+  else if(act==='pip-buy'){buyPip(id);}
   else if(act==='wish-set'){setWish(id);}
   else if(act==='wish-clear'){clearWish();}
   else if(act==='streak-new'){requireAdmin('Adding a streak needs the instructor key.',function(){streakEditor(null);});}
@@ -3174,6 +3270,15 @@ document.addEventListener('click',function(e){
           save();toast('"'+r.title+'" removed.');render();
         },true);
     });
+  }
+  else if(act==='save-pipshop'){
+    var prices={},off={};
+    $$('[data-price]').forEach(function(el){
+      if(el.value!=='')prices[el.dataset.price]=Math.max(0,num(el.value,0));
+    });
+    $$('[data-offer]').forEach(function(el){if(!el.checked)off[el.dataset.offer]=1;});
+    S.settings.pipshop={on:$('#ps-on').checked,prices:prices,off:off};
+    save();toast('Pip prices saved.','good');render();
   }
   else if(act==='save-wishcfg'){
     S.settings.wish={on:$('#w-on').checked,
@@ -4094,11 +4199,11 @@ function viewStore(){
   });
 
   if(!visible.length){
-    return h+'<div class="empty stack"><h3>'+(S.admin?'The shelf is empty':'Nothing on the shelf yet')+'</h3>'+
+    return h+'<div class="empty stack">'+emptyPip('wait')+'<h3>'+(S.admin?'The shelf is empty':'Nothing on the shelf yet')+'</h3>'+
       '<p class="muted">'+(S.admin?'Add something a reader would want, set what it costs, and decide when it exists.'
         :'Ask your instructor what you can spend points on.')+'</p>'+
       (S.admin?'<div class="stack"><button class="btn btn-primary" data-act="item-new">'+ico('plus')+'Add an item</button></div>':'')+
-      '</div>';
+      '</div>'+pipShelf();
   }
 
   /* One shelf. Featured items simply sort to the front of it, so an item
@@ -4122,7 +4227,7 @@ function viewStore(){
      visible.slice().sort(order).map(function(it){
        return itemCard(it,p,isFeatured(it));
      }).join('')+'</div>';
-  return h;
+  return h+pipShelf();
 }
 
 /* One card, whether it is featured or not. */
@@ -4245,7 +4350,10 @@ function buyItem(id){
 function viewRedemptions(){
   var rows=[];
   S.profiles.forEach(function(p){
-    purchasesOf(p).forEach(function(r){rows.push({p:p,r:r});});
+    purchasesOf(p).forEach(function(r){
+      if(r.cosmetic)return;            /* the app hands these over itself */
+      rows.push({p:p,r:r});
+    });
   });
   rows.sort(function(a,b){return a.r.date<b.r.date?1:-1;});
 
@@ -5743,6 +5851,375 @@ function streakEditor(existing){
     });
   }
   openModal(body(),mount,{dismissable:false});
+}
+
+/* =========================================================
+   Pip.
+
+   Not a picture — a rig. A look is a set of slot choices,
+   assembled at render time, so a crown sits correctly in
+   every pose and a new part never multiplies against the
+   poses that already exist. Every reader has their own.
+   ========================================================= */
+
+var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>"},"backs":{"wings":"<g><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/>"},"auras":{"glow":"<circle cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>"}};
+
+function pipSlots(){return ['body','pattern','eyes','hat','back','held','aura'];}
+
+function pipMouth(kind,ink){
+  if(kind==='open') return '<path d="M54 69 q10 15 20 0 q-10 5 -20 0 z" fill="'+ink+'"/>';
+  if(kind==='frown')return '<path d="M56 77 q8 -7 16 0" stroke="'+ink+'" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+  if(kind==='snore')return '<ellipse cx="64" cy="74" rx="4.4" ry="5.6" fill="'+ink+'" opacity=".85"/>';
+  if(kind==='soft') return '<path d="M57 70 q7 5 14 0" stroke="'+ink+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>';
+  return '<path d="M56 69 q8 8 16 0" stroke="'+ink+'" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+}
+function pipEyes(style,pose,mouth,ink){
+  var ex=52,ey=57,out='',i,x;
+  if(pose==='sleep'){
+    for(i=0;i<2;i++){x=ex+i*24;
+      out+='<path d="M'+(x-7)+' '+ey+' q7 7 14 0" stroke="'+ink+'" stroke-width="3.6" fill="none" stroke-linecap="round"/>';}
+    return out;
+  }
+  if(style==='star'){
+    for(i=0;i<2;i++){x=ex+i*24;
+      out+='<path d="M'+x+' '+(ey-9)+' l2.8 5.8 6.4.9 -4.6 4.4 1.1 6.3 -5.7-3 -5.7 3 1.1-6.3 -4.6-4.4 6.4-.9z" fill="'+ink+'"/>';}
+    return out;
+  }
+  if(style==='happy'){
+    for(i=0;i<2;i++){x=ex+i*24;
+      out+='<path d="M'+(x-7)+' '+(ey+3)+' q7 -10 14 0" stroke="'+ink+'" stroke-width="4.2" fill="none" stroke-linecap="round"/>';}
+    return out;
+  }
+  if(style==='visor'){
+    return '<rect x="'+(ex-16)+'" y="'+(ey-11)+'" width="56" height="22" rx="11" fill="'+ink+'"/>'+
+           '<rect x="'+(ex-11)+'" y="'+(ey-7)+'" width="18" height="7" rx="3.5" fill="#5FE3B0" opacity=".9"/>';
+  }
+  if(mouth==='frown'){
+    for(i=0;i<2;i++){x=ex+i*24;
+      out+='<ellipse cx="'+x+'" cy="'+(ey+2)+'" rx="7.4" ry="7.8" fill="'+ink+'"/>'+
+           '<circle cx="'+(x+2.8)+'" cy="'+(ey-1)+'" r="2.3" fill="#fff"/>';}
+    return out;
+  }
+  var big=(mouth==='open')?1.22:1, r=8.6*big;
+  for(i=0;i<2;i++){
+    x=ex+i*24;
+    out+='<ellipse cx="'+x+'" cy="'+ey+'" rx="'+r.toFixed(1)+'" ry="'+(r*1.06).toFixed(1)+'" fill="'+ink+'"/>'+
+         '<circle cx="'+(x+3.4).toFixed(1)+'" cy="'+(ey-3.6).toFixed(1)+'" r="'+(2.7*big).toFixed(1)+'" fill="#fff"/>'+
+         '<circle cx="'+(x-2.6).toFixed(1)+'" cy="'+(ey+3.2).toFixed(1)+'" r="'+(1.2*big).toFixed(1)+'" fill="#fff" opacity=".75"/>';
+  }
+  return out;
+}
+
+var pipUid=0;
+function pipSVG(look,pose,size,opts){
+  look=look||{};opts=opts||{};
+  var A=PIP_ART;
+  var P=A.poses[pose]||A.poses.idle;
+  var c=A.bodies[look.body]||A.bodies.sun;
+  var lo=c[0],mid=c[1],hi=c[2],ink=A.ink;
+  var n='p'+(++pipUid);                       /* ids must be unique per instance */
+  var sq=P.squash,tilt=P.tilt;
+
+  var defs=
+    '<linearGradient id="skin'+n+'" x1=".25" y1="0" x2=".7" y2="1">'+
+      '<stop offset="0" stop-color="'+lo+'"/><stop offset=".48" stop-color="'+mid+'"/>'+
+      '<stop offset="1" stop-color="'+hi+'"/></linearGradient>'+
+    '<radialGradient id="key'+n+'" cx=".33" cy=".26" r=".62">'+
+      '<stop offset="0" stop-color="#fff" stop-opacity=".55"/>'+
+      '<stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+    '<radialGradient id="occ'+n+'" cx=".55" cy=".95" r=".6">'+
+      '<stop offset="0" stop-color="'+hi+'" stop-opacity=".75"/>'+
+      '<stop offset="1" stop-color="'+hi+'" stop-opacity="0"/></radialGradient>'+
+    '<radialGradient id="aur'+n+'"><stop offset=".45" stop-color="'+mid+'" stop-opacity="0"/>'+
+      '<stop offset=".8" stop-color="'+mid+'" stop-opacity=".45"/>'+
+      '<stop offset="1" stop-color="'+mid+'" stop-opacity="0"/></radialGradient>'+
+    '<clipPath id="clip'+n+'"><path d="'+A.bodyPath+'"/></clipPath>'+
+    '<clipPath id="fth'+n+'"><rect x="-20" y="-20" width="160" height="160"/></clipPath>';
+
+  function fix(s){
+    return String(s||'')
+      .split('url(#skinclip)').join('url(#clip'+n+')')
+      .split('url(#featherclip)').join('url(#fth'+n+')')
+      .split('url(#aura)').join('url(#aur'+n+')')
+      .split('url(#skin)').join('url(#skin'+n+')')
+      .split('__HI__').join(hi).split('__MID__').join(mid).split('__LO__').join(lo);
+  }
+
+  var aura=look.aura?fix(A.auras[look.aura]||''):'';
+  var back=look.back?fix(A.backs[look.back]||''):'';
+  var pat=look.pattern?fix(A.patterns[look.pattern]||''):'';
+  var hat='',held='';
+  if(look.hat&&A.hats[look.hat]){
+    hat=fix(A.hats[look.hat]).replace('translate(0,0)',
+      'translate('+(P.head[0]-60)+','+(P.head[1]-20)+')');
+  }
+  if(look.held&&A.helds[look.held]){
+    held=fix(A.helds[look.held]).replace('translate(0,0)',
+      'translate('+P.hand[0]+','+P.hand[1]+')');
+  }
+
+  var g='url(#skin'+n+')';
+  var body=
+    '<g transform="rotate('+tilt+' 60 62) translate(0,'+(sq*14).toFixed(1)+') '+
+      'scale('+(1+sq).toFixed(3)+','+(1-sq).toFixed(3)+') '+
+      'translate('+(-60*sq).toFixed(1)+','+(62*sq).toFixed(1)+')">'+
+      '<ellipse cx="46" cy="101" rx="11.5" ry="8.5" fill="'+g+'"/>'+
+      '<ellipse cx="73" cy="101" rx="11.5" ry="8.5" fill="'+g+'"/>'+
+      '<ellipse cx="19" cy="68" rx="10.5" ry="8.5" fill="'+g+'"/>'+
+      '<path d="M42 23 C36 6 46 1 52 10 C55 15 54 20 52 25 Z" fill="'+g+'"/>'+
+      '<path d="'+A.bodyPath+'" fill="'+g+'"/>'+
+      '<g clip-path="url(#clip'+n+')">'+
+        '<ellipse cx="60" cy="104" rx="52" ry="30" fill="url(#occ'+n+')"/>'+
+        '<ellipse cx="46" cy="40" rx="40" ry="34" fill="url(#key'+n+')"/>'+
+      '</g>'+pat+
+      '<ellipse cx="38" cy="70" rx="6.5" ry="4" fill="#FF6E93" opacity=".33"/>'+
+      '<ellipse cx="88" cy="70" rx="6.5" ry="4" fill="#FF6E93" opacity=".33"/>'+
+      pipEyes(look.eyes||'dot',pose,P.mouth,ink)+pipMouth(P.mouth,ink)+
+    '</g>';
+
+  var shade=(opts.shadow===false)?'':'<ellipse cx="62" cy="110" rx="34" ry="7" fill="#000" opacity=".18"/>';
+  return '<svg class="pip" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -14 140 140" '+
+    'width="'+size+'" height="'+size+'" aria-hidden="true">'+
+    '<defs>'+defs+'</defs>'+aura+shade+back+body+held+hat+'</svg>';
+}
+
+/* =========================================================
+   What a reader owns and wears
+   ========================================================= */
+var PIP_PARTS=[
+  {id:'body-sun',slot:'body',v:'sun',name:'Sunny',price:0},
+  {id:'eyes-dot',slot:'eyes',v:'dot',name:'Bright eyes',price:0},
+
+  {id:'body-mint',slot:'body',v:'mint',name:'Mint',price:4},
+  {id:'body-berry',slot:'body',v:'berry',name:'Berry',price:4},
+  {id:'body-grape',slot:'body',v:'grape',name:'Grape',price:4},
+  {id:'body-ember',slot:'body',v:'ember',name:'Ember',price:5},
+  {id:'body-frost',slot:'body',v:'frost',name:'Frost',price:5},
+  {id:'body-moss',slot:'body',v:'moss',name:'Moss',price:5},
+  {id:'body-coral',slot:'body',v:'coral',name:'Coral',price:5},
+  {id:'body-midnight',slot:'body',v:'midnight',name:'Midnight',price:8},
+  {id:'body-gold',slot:'body',v:'gold',name:'Gold',price:12},
+
+  {id:'eyes-happy',slot:'eyes',v:'happy',name:'Happy eyes',price:3},
+  {id:'eyes-star',slot:'eyes',v:'star',name:'Star eyes',price:7},
+  {id:'eyes-visor',slot:'eyes',v:'visor',name:'Visor',price:9},
+
+  {id:'pattern-spots',slot:'pattern',v:'spots',name:'Spots',price:5},
+  {id:'pattern-stripes',slot:'pattern',v:'stripes',name:'Stripes',price:5},
+  {id:'pattern-starry',slot:'pattern',v:'starry',name:'Starry',price:8},
+
+  {id:'hat-cap',slot:'hat',v:'cap',name:'Cap',price:5},
+  {id:'hat-flower',slot:'hat',v:'flower',name:'Flower',price:6},
+  {id:'hat-party',slot:'hat',v:'party',name:'Party hat',price:6},
+  {id:'hat-crown',slot:'hat',v:'crown',name:'Crown',price:12},
+  {id:'hat-wizard',slot:'hat',v:'wizard',name:'Wizard hat',price:12},
+
+  {id:'held-book',slot:'held',v:'book',name:'Book',price:4},
+  {id:'held-balloon',slot:'held',v:'balloon',name:'Balloon',price:5},
+  {id:'held-wand',slot:'held',v:'wand',name:'Wand',price:9},
+
+  {id:'back-wings',slot:'back',v:'wings',name:'Wings',price:14},
+  {id:'back-cape',slot:'back',v:'cape',name:'Cape',price:14},
+  {id:'back-jet',slot:'back',v:'jet',name:'Jetpack',price:16},
+
+  {id:'aura-sparks',slot:'aura',v:'sparks',name:'Sparks',price:6},
+  {id:'aura-glow',slot:'aura',v:'glow',name:'Glow',price:10}
+];
+var PIP_LOOKS=[
+  {id:'look-bookworm',name:'Bookworm',price:16,
+   grants:['body-moss','hat-cap','held-book','pattern-spots']},
+  {id:'look-royal',name:'Royal',price:26,
+   grants:['body-berry','hat-crown','back-cape']},
+  {id:'look-winged',name:'Winged',price:26,
+   grants:['body-frost','back-wings','aura-sparks','eyes-happy']},
+  {id:'look-astro',name:'Astro',price:30,
+   grants:['body-midnight','back-jet','eyes-visor','aura-glow']},
+  {id:'look-starcaster',name:'Starcaster',price:38,
+   grants:['body-grape','hat-wizard','held-wand','aura-glow','eyes-star','pattern-starry']},
+  {id:'look-legend',name:'Legend',price:52,
+   grants:['body-gold','hat-crown','back-wings','aura-glow','eyes-star','pattern-starry']}
+];
+function pipPart(id){
+  for(var i=0;i<PIP_PARTS.length;i++)if(PIP_PARTS[i].id===id)return PIP_PARTS[i];
+  return null;
+}
+function pipLookById(id){
+  for(var i=0;i<PIP_LOOKS.length;i++)if(PIP_LOOKS[i].id===id)return PIP_LOOKS[i];
+  return null;
+}
+function pipShopCfg(){
+  var s=S.settings.pipshop||{};
+  return{on:s.on!==false,prices:s.prices||{},off:s.off||{}};
+}
+function pipPrice(thing){
+  var cfg=pipShopCfg();
+  var p=cfg.prices[thing.id];
+  return (p===undefined||p===null||p==='')?num(thing.price,0):Math.max(0,num(p,0));
+}
+function pipOffered(thing){return !pipShopCfg().off[thing.id];}
+
+function ownedPip(p){
+  p=p||me();
+  var o=(p&&p.pipOwned)?p.pipOwned:[];
+  return o.concat(['body-sun','eyes-dot']).filter(function(v,i,a){return a.indexOf(v)===i;});
+}
+function ownsPip(id,p){return ownedPip(p).indexOf(id)>=0;}
+function pipLook(p){
+  p=p||me();
+  var l=(p&&p.pipLook)?p.pipLook:{};
+  return{body:l.body||'sun',pattern:l.pattern||null,eyes:l.eyes||'dot',
+         hat:l.hat||null,back:l.back||null,held:l.held||null,aura:l.aura||null};
+}
+function pipHTML(p,size,pose,opts){
+  return pipSVG(pipLook(p),pose||'idle',size||64,opts);
+}
+/* Pip answers to how the test went. */
+function pipMood(rec){
+  if(!rec)return 'idle';
+  if(!rec.passed)return 'sad';
+  return rec.pct>=90?'cheer':'idle';
+}
+
+function equipPip(id){
+  var p=me(),part=pipPart(id);
+  if(!p||!part)return;
+  if(!ownsPip(id,p)){toast('Not unlocked yet.','bad');return;}
+  if(!p.pipLook)p.pipLook={};
+  p.pipLook[part.slot]=(p.pipLook[part.slot]===part.v&&part.price>0)?null:part.v;
+  if(part.slot==='body'&&!p.pipLook.body)p.pipLook.body='sun';
+  if(part.slot==='eyes'&&!p.pipLook.eyes)p.pipLook.eyes='dot';
+  save();render();
+}
+function buyPip(id){
+  var p=me();if(!p)return;
+  var thing=pipPart(id)||pipLookById(id);
+  if(!thing)return;
+  var price=pipPrice(thing);
+  if(ownsPip(id,p)||(thing.grants&&thing.grants.every(function(g){return ownsPip(g,p);}))){
+    toast('Already unlocked.','bad');return;
+  }
+  if(balance(p)<price){
+    toast(pts(Math.round((price-balance(p))*10)/10)+' more points needed.','bad');return;
+  }
+  confirmModal('Unlock '+thing.name+'?',
+    'It costs '+pts(price)+' points, and it is yours for good. Your balance is '+
+    pts(balance(p))+'.','Unlock',function(){
+      if(balance(p)<price){toast('Not enough points.','bad');return;}
+      if(!Array.isArray(p.pipOwned))p.pipOwned=[];
+      var gained=thing.grants?thing.grants.slice():[id];
+      gained.forEach(function(g){if(p.pipOwned.indexOf(g)<0)p.pipOwned.push(g);});
+      /* A cosmetic is handed over by the app, not by an instructor, so it
+         never joins the redemptions waiting to be given. */
+      p.purchases=purchasesOf(p).concat([{
+        id:uid(),itemId:thing.id,title:thing.name,cost:price,full:price,
+        discount:0,payback:0,cosmetic:true,date:nowISO(),given:true
+      }]);
+      if(!p.pipLook)p.pipLook={};
+      gained.forEach(function(g){
+        var part=pipPart(g);
+        if(part)p.pipLook[part.slot]=part.v;
+      });
+      save();
+      snapshot('after unlocking '+thing.name);
+      toast(thing.name+' unlocked, and Pip is wearing it.','good',6000);
+      render();
+    });
+}
+
+/* ---------- the dressing room ---------- */
+var PIP_SLOT_NAMES={body:'Colour',pattern:'Pattern',eyes:'Eyes',hat:'Hat',
+  back:'Back',held:'Holding',aura:'Aura'};
+
+function dressingRoom(){
+  var p=me();if(!p)return;
+  function body(){
+    var look=pipLook(p);
+    var h='<h3>Pip</h3><p class="lede">Everything you have unlocked. Tap to put it on, '+
+      'tap again to take it off.</p>'+
+      '<div class="dressstage">'+pipSVG(look,'cheer',150)+'</div>';
+    pipSlots().forEach(function(slot){
+      var mine=PIP_PARTS.filter(function(pt){return pt.slot===slot&&ownsPip(pt.id,p);});
+      if(!mine.length)return;
+      h+='<div class="dressrow"><div class="tiny muted">'+esc(PIP_SLOT_NAMES[slot])+'</div>'+
+        '<div class="dressgrid">';
+      mine.forEach(function(pt){
+        var on=look[slot]===pt.v;
+        var preview={body:look.body};
+        preview[pt.slot]=pt.v;
+        if(pt.slot!=='body')preview.body=look.body;
+        h+='<button type="button" class="dresspick'+(on?' on':'')+'" data-equip="'+esc(pt.id)+
+           '" title="'+esc(pt.name)+'">'+pipSVG(preview,'idle',54,{shadow:false})+'</button>';
+      });
+      h+='</div></div>';
+    });
+    var locked=PIP_PARTS.filter(function(pt){return !ownsPip(pt.id,p)&&pipOffered(pt);}).length;
+    if(locked)h+='<p class="tiny muted stack">'+locked+' more waiting in the store.</p>';
+    return h+'<div class="foot"><button class="btn btn-primary" data-close>Done</button></div>';
+  }
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var b=e.target.closest('[data-equip]');
+      if(!b)return;
+      equipPip(b.dataset.equip);
+      redrawModal(body(),mount);
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+
+/* ---------- the Pip shelf in the store ---------- */
+function pipShelf(){
+  var p=me();
+  var cfg=pipShopCfg();
+  if(!cfg.on||!p)return '';
+  var looks=PIP_LOOKS.filter(pipOffered).filter(function(l){
+    return !l.grants.every(function(g){return ownsPip(g,p);});
+  });
+  var parts=PIP_PARTS.filter(function(pt){
+    return pt.price>0&&pipOffered(pt)&&!ownsPip(pt.id,p);
+  });
+  if(!looks.length&&!parts.length){
+    return '<div class="shelfhead stack-lg">Pip<span class="line"></span></div>'+
+      '<p class="tiny muted">Everything is unlocked. Pip has it all.</p>';
+  }
+  var h='<div class="shelfhead stack-lg">Pip<span class="line"></span>'+
+    '<button class="btn btn-sm btn-ghost" data-act="dress">Dress Pip</button></div>'+
+    '<p class="tiny muted" style="margin-bottom:12px">Yours for good once unlocked, and '+
+    'nobody has to hand anything over.</p>';
+
+  if(looks.length){
+    h+='<div class="piprow">';
+    looks.forEach(function(l){
+      var preview={};
+      l.grants.forEach(function(g){var pt=pipPart(g);if(pt)preview[pt.slot]=pt.v;});
+      var price=pipPrice(l);
+      var afford=balance(p)>=price;
+      h+='<div class="pipcard'+(afford?' buyable':'')+'">'+
+        '<div class="pv">'+pipSVG(preview,'cheer',96)+'</div>'+
+        '<div class="nm">'+esc(l.name)+'</div>'+
+        '<div class="pc">'+pts(price)+' <small>points</small></div>'+
+        '<button class="btn btn-sm '+(afford?'btn-primary':'btn-ghost')+
+          '" data-act="pip-buy" data-id="'+esc(l.id)+'">'+
+          (afford?'Unlock':pts(Math.round((price-balance(p))*10)/10)+' more')+'</button>'+
+        '</div>';
+    });
+    h+='</div>';
+  }
+  if(parts.length){
+    h+='<div class="pipparts">';
+    parts.forEach(function(pt){
+      var price=pipPrice(pt);
+      var afford=balance(p)>=price;
+      var preview={body:pipLook(p).body};
+      preview[pt.slot]=pt.v;
+      h+='<button class="pippart'+(afford?' buyable':'')+'" data-act="pip-buy" data-id="'+esc(pt.id)+'">'+
+        pipSVG(preview,'idle',52,{shadow:false})+
+        '<span class="n">'+esc(pt.name)+'</span>'+
+        '<span class="p">'+pts(price)+'</span></button>';
+    });
+    h+='</div>';
+  }
+  return h;
 }
 
 /* =========================================================
