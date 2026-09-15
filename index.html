@@ -238,6 +238,27 @@ a{color:var(--gold-hi)}
   border:1px solid var(--edge);border-radius:999px;transition:.16s;
 }
 .chip:hover{border-color:var(--text-3);background:rgba(255,255,255,.04)}
+.chip.on{
+  border-color:var(--brand-hi);
+  background:var(--brand-faint);
+  box-shadow:0 0 0 1px var(--brand-faint);
+}
+.chip.on .nm{color:var(--text-hi)}
+.mecards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:16px}
+.mecard{
+  display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+  padding:15px 16px;border-radius:13px;
+  background:linear-gradient(var(--surface),var(--sunk));
+  border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
+  transition:border-color .16s,transform .16s var(--ease);
+}
+.mecard:hover{border-color:var(--brand-hi);transform:translateY(-1px)}
+.mecard .ic{width:42px;height:42px;border-radius:12px;background:var(--brand-faint)}
+.mecard .ic svg{width:21px;height:21px;stroke:var(--brand-hi);fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.mecard .t{font-size:.97rem;color:var(--text-hi)}
+.mecard .d{font-size:.78rem;color:var(--text-2);margin-top:2px}
+.mecard .go{margin-left:auto;color:var(--text-3);font-size:1.1rem}
 .chip .nm{font-size:.86rem;max-width:11ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ============ avatar ============ */
@@ -849,6 +870,112 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
   font-family:var(--serif);font-size:1.05rem;color:var(--text-hi);
 }
 .shelfhead .line{flex:1;height:1px;background:var(--edge-soft)}
+
+/* ============ corner badges ============ */
+.badges{
+  position:absolute;top:-12px;right:-10px;z-index:3;
+  display:flex;flex-direction:column;align-items:flex-end;gap:7px;
+  pointer-events:none;
+}
+.item{padding-top:20px}
+
+/* the sale rosette */
+.bsale{
+  position:relative;width:60px;height:60px;border-radius:50%;
+  display:grid;place-items:center;text-align:center;line-height:1;
+  background:radial-gradient(circle at 36% 30%,#8FE3AC,var(--pass) 62%,#2C7A4E);
+  color:#06230F;
+  box-shadow:0 5px 16px -4px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.5) inset;
+  animation:bob 2.8s var(--ease) infinite;
+  transform-origin:50% 50%;
+}
+.bsale .n{font-family:var(--serif);font-size:1.32rem;font-weight:700;letter-spacing:-.02em}
+.bsale .u{font-size:.52rem;letter-spacing:.14em;margin-top:1px;opacity:.85}
+.bsale::before{
+  content:"";position:absolute;inset:-5px;border-radius:50%;
+  border:2px dashed rgba(255,255,255,.55);
+  animation:spin 11s linear infinite;
+}
+.bsale::after{
+  content:"";position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.75) 48%,transparent 58%);
+  background-size:260% 100%;
+  animation:sweep 3.6s ease-in-out infinite;
+}
+.bsale.big{width:70px;height:70px}
+.bsale.big .n{font-size:1.55rem}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sweep{0%{background-position:160% 0}55%,100%{background-position:-160% 0}}
+
+/* the countdown tag */
+.btime{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 13px;border-radius:999px;
+  background:linear-gradient(var(--gold-hi),var(--gold));
+  color:var(--on-gold);font-size:.74rem;font-weight:700;letter-spacing:.01em;
+  box-shadow:0 4px 14px -3px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.5) inset;
+  transform-origin:88% 130%;
+  animation:swing 3s var(--ease) infinite;
+  white-space:nowrap;
+}
+.btime .dot{
+  width:7px;height:7px;border-radius:50%;background:var(--on-gold);
+  animation:blip 1.3s ease-in-out infinite;
+}
+@keyframes swing{
+  0%,68%,100%{transform:rotate(0deg)}
+  74%{transform:rotate(-9deg)}
+  80%{transform:rotate(7deg)}
+  86%{transform:rotate(-4deg)}
+  92%{transform:rotate(2deg)}
+}
+.btime.soon{animation-duration:1.9s}
+.btime.last{
+  background:linear-gradient(#FFB49F,var(--fail));color:#fff;
+  animation-duration:1.15s;
+  box-shadow:0 4px 16px -2px rgba(240,112,92,.55),0 1px 0 rgba(255,255,255,.4) inset;
+}
+.btime.last .dot{background:#fff}
+
+/* ============ featured, configurable ============ */
+.item.hero{
+  --fx:var(--gold);--fx-hi:var(--gold-hi);--fx-ink:var(--on-gold);
+  border-color:var(--fx);
+  background:linear-gradient(var(--raise),var(--surface));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--fx) 30%,transparent),var(--sh-2);
+  padding-top:26px;
+}
+.item.hero[data-fx="blue"]{--fx:var(--brand-hi);--fx-hi:#9CC8FF;--fx-ink:#06224F}
+.item.hero[data-fx="mint"]{--fx:#3FBE92;--fx-hi:#7FEFC6;--fx-ink:#05261B}
+.item.hero[data-fx="rose"]{--fx:#E4658A;--fx-hi:#FFA0BA;--fx-ink:#2C0A14}
+.item.hero[data-fx="plum"]{--fx:#9270E2;--fx-hi:#C3AAFF;--fx-ink:#180B31}
+.item.hero.glow{
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--fx) 34%,transparent),
+             0 0 34px -8px var(--fx),var(--sh-2);
+}
+.item.hero .ribbon{
+  position:absolute;top:0;left:0;right:0;height:26px;
+  border-radius:13px 13px 0 0;
+  background:linear-gradient(90deg,var(--fx),var(--fx-hi),var(--fx));
+  background-size:220% 100%;
+  color:var(--fx-ink);font-size:.62rem;font-weight:700;letter-spacing:.16em;
+  display:flex;align-items:center;justify-content:center;
+  animation:drift 7s linear infinite;
+}
+@keyframes drift{to{background-position:-220% 0}}
+.item.hero .ic{width:68px;height:68px;border-radius:17px}
+.item.hero .ic svg{width:42px;height:42px}
+.item.hero .ic .emo{font-size:36px}
+.item.hero h4{font-size:1.2rem}
+.item.wide{grid-column:1/-1}
+.item.wide .row:first-of-type{align-items:center}
+@media(max-width:560px){.item.wide{grid-column:auto}}
+.fxpick{display:flex;gap:7px;flex-wrap:wrap}
+.fxpick button{
+  width:38px;height:38px;border-radius:11px;border:1px solid var(--edge);
+}
+.fxpick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brand-hi);border-color:transparent}
 </style>
 </head>
 <body>
@@ -863,8 +990,6 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
       <button data-go="catalog">Catalogue</button>
       <button data-go="activities">Activities</button>
       <button data-go="store">Store</button>
-      <button data-go="records">Records</button>
-      <button data-go="profile">Profile</button>
       <button class="admin-only hide" data-go="titles">Titles</button>
       <button class="admin-only hide" data-go="settings">Settings</button>
     </nav>
@@ -2023,7 +2148,8 @@ function animateResults(){
 function viewRecords(){
   var p=me();
   var list=recs().slice().sort(function(a,b){return a.date<b.date?1:-1;});
-  var h='<div class="pagehead"><div><h2>Records</h2>'+
+  var h='<button class="btn btn-sm btn-ghost" data-go="profile">Back to your profile</button>'+
+    '<div class="pagehead stack"><div><h2>Records</h2>'+
     '<div class="sub">'+esc(p?p.name:'')+'</div></div>'+
     (list.length?'<div class="row"><button class="btn btn-sm" data-act="export-csv">'+ico('down')+'Spreadsheet</button>'+
       (S.admin?'<button class="btn btn-sm btn-danger" data-act="clear-records">'+ico('trash')+'Clear</button>':'')+
@@ -2093,7 +2219,22 @@ function viewProfile(){
       (canInstallHint()?'<button class="btn btn-sm" data-act="ios-install">'+ico('down')+'Add to home screen</button>':''))+
     '</div>';
 
-  h+='<div class="panel"><h3>Switch reader</h3>'+
+  var tests=list.length;
+  h+='<div class="mecards">'+
+    '<button class="mecard" data-go="records">'+
+      '<span class="ic" style="display:grid;place-items:center">'+ico('file')+'</span>'+
+      '<span><span class="t">Records</span>'+
+      '<span class="d">'+tests+(tests===1?' test taken':' tests taken')+
+      ', '+pts(earnedTotal(list))+' from reading</span></span>'+
+      '<span class="go">&rsaquo;</span></button>'+
+    '<button class="mecard" data-go="store">'+
+      '<span class="ic" style="display:grid;place-items:center">'+ico('down')+'</span>'+
+      '<span><span class="t">Points</span>'+
+      '<span class="d">'+pts(balance(p))+' to spend, '+purchasesOf(p).length+' redeemed</span></span>'+
+      '<span class="go">&rsaquo;</span></button>'+
+    '</div>';
+
+  h+='<div class="panel stack"><h3>Switch reader</h3>'+
     '<p class="tiny muted" style="margin-top:4px">Each reader keeps their own points and history on this device.</p>'+
     '<div class="people" style="margin-top:18px;justify-content:flex-start">';
   S.profiles.forEach(function(o){
@@ -2324,7 +2465,9 @@ function render(){
   $('#chrome').classList.toggle('hide',onGate);
   $('#footbar').classList.toggle('hide',onGate);
   var active={title:'catalog',quiz:'catalog',results:'catalog',
-    redemptions:'store',approvals:'activities'}[S.view]||S.view;
+    redemptions:'store',approvals:'activities',
+    profile:'',records:''}[S.view];
+  if(active===undefined)active=S.view;
   $$('#nav button').forEach(function(b){
     if(b.dataset.go===active)b.setAttribute('aria-current','page');
     else b.removeAttribute('aria-current');
@@ -2346,6 +2489,7 @@ function render(){
   var p=me();
   $('#chip').innerHTML=p?(avatarHTML(p,28)+'<span class="nm">'+esc(p.name)+'</span>'):'';
   $('#chip').classList.toggle('hide',!p);
+  $('#chip').classList.toggle('on',S.view==='profile'||S.view==='records');
 
   $('#foot-left').textContent=S.modules.length+(S.modules.length===1?' title':' titles')+
     ', '+pts(S.modules.reduce(function(s,m){return s+m.ar.points;},0))+' points available';
@@ -3242,36 +3386,51 @@ function viewStore(){
 }
 
 /* One card, whether it is featured or not. */
+var FX=['gold','blue','mint','rose','plum'];
+function featureOf(it){
+  var fx=it.feature||{};
+  return{style:(FX.indexOf(fx.style)>=0?fx.style:'gold'),
+         label:String(fx.label||'FEATURED').slice(0,22),
+         wide:!!fx.wide,glow:fx.glow!==false};
+}
+
 function itemCard(it,p,hero){
   var el=eligibility(it,p);
   var pr=priceOf(it);
   var av=availability(it);
+  var fx=featureOf(it);
 
-  /* The countdown badge only makes sense while the item is actually there
-     and actually going away. */
-  var badge='';
-  if(av.open&&av.label&&/day|Last/.test(av.label)){
-    var left=/Last/.test(av.label)?0:parseInt(av.label,10);
-    var urgency=(left<=1?'last':(left<=5?'soon':''));
-    badge='<span class="timer '+urgency+'"><span class="dot"></span>'+
-      esc(/Last/.test(av.label)?'Last day!':av.label)+'</span>';
+  /* Corner badges: the sale rosette on top, the countdown under it. */
+  var badges='';
+  if(pr.active){
+    badges+='<span class="bsale'+(pr.pct>=30?' big':'')+'">'+
+      '<span><span class="n">'+pr.pct+'%</span><br><span class="u">OFF</span></span></span>';
   }
+  if(av.open&&av.label&&/day|Last/.test(av.label)){
+    var isLast=/Last/.test(av.label);
+    var left=isLast?0:parseInt(av.label,10);
+    var urgency=(isLast||left<=1?'last':(left<=5?'soon':''));
+    badges+='<span class="btime '+urgency+'"><span class="dot"></span>'+
+      esc(isLast?'LAST DAY':av.label.toUpperCase())+'</span>';
+  }
+  if(badges)badges='<span class="badges" aria-hidden="true">'+badges+'</span>';
 
-  return '<div class="item'+(el.can?' buyable':' shut')+(hero?' hero':'')+'">'+
-    badge+
+  return '<div class="item'+(el.can?' buyable':' shut')+
+      (hero?' hero'+(fx.wide?' wide':'')+(fx.glow?' glow':''):'')+'"'+
+      (hero?' data-fx="'+fx.style+'"':'')+'>'+
+    (hero?'<span class="ribbon">'+esc(fx.label)+'</span>':'')+
+    badges+
     '<div class="row" style="gap:12px;align-items:flex-start">'+itemIcon(it)+
     '<div style="flex:1;min-width:0"><h4>'+esc(it.title)+'</h4>'+
     '<div class="price">'+(pr.active?'<s>'+pts(pr.base)+'</s>':'')+
       pts(pr.now)+' <small>points</small></div></div></div>'+
     (it.blurb?'<p>'+esc(it.blurb)+'</p>':'')+
     '<div class="foot">'+
-      (pr.active?'<span class="sale">'+pr.pct+'% off</span>':'')+
       (el.can
         ? '<button class="btn btn-sm btn-primary" data-act="buy" data-id="'+esc(it.id)+'">Redeem</button>'
         : '<span class="pill '+el.tone+'">'+esc(el.label)+'</span>')+
       (el.owned?'<span class="pill cold">redeemed '+el.owned+'&times;</span>':'')+
       (it.hidden?'<span class="pill cold">hidden</span>':'')+
-      (S.admin&&it.featured?'<span class="pill warm">featured</span>':'')+
     '</div>'+
     (S.admin?'<div class="adminrow">'+
       '<button class="btn btn-sm btn-ghost" data-act="item-edit" data-id="'+esc(it.id)+'">Edit</button>'+
@@ -3363,10 +3522,12 @@ function itemEditor(existing){
     repurchase:{mode:'unlimited',limit:1,days:7},
     avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
     locked:false,hidden:false,hideWhenClosed:false,featured:false,
+    feature:{style:'gold',label:'FEATURED',wide:false,glow:true},
     sale:{on:false,min:10,max:30,every:30,lasts:3,cooldown:14,chance:100,autoFeature:true,anchor:''},
     created:nowISO()
   };
   if(!d.icon)d.icon={glyph:'star',fg:'#F4B53F',bg:'#1C2340'};
+  if(!d.feature)d.feature={style:'gold',label:'FEATURED',wide:false,glow:true};
   if(!d.sale)d.sale={on:false,min:10,max:30,every:30,lasts:3,cooldown:14,chance:100,autoFeature:true,anchor:''};
 
   function seg(field,opts,cur){
@@ -3426,6 +3587,20 @@ function itemEditor(existing){
       '><span>Hidden from readers entirely</span></label>'+
       '<label class="check"><input type="checkbox" id="i-featured"'+(d.featured?' checked':'')+
       '><span>Featured — shown at the top of the store</span></label>'+
+      (d.featured?'<div class="subfields">'+
+        '<div class="tiny muted" style="margin-bottom:7px">Banner colour</div>'+
+        '<div class="fxpick">'+FX.map(function(s){
+          var sw={gold:'#F4B53F',blue:'#2E8CFF',mint:'#3FBE92',rose:'#E4658A',plum:'#9270E2'}[s];
+          return '<button type="button" data-fx="'+s+'" aria-pressed="'+
+            (featureOf(d).style===s)+'" title="'+s+'" style="background:'+sw+'"></button>';
+        }).join('')+'</div>'+
+        '<label class="field stack"><span>Banner text</span>'+
+        '<input class="inp" id="f-label" maxlength="22" value="'+esc(featureOf(d).label)+'"></label>'+
+        '<label class="check"><input type="checkbox" id="f-wide"'+(d.feature.wide?' checked':'')+
+        '><span>Give it the full width of the shelf</span></label>'+
+        '<label class="check"><input type="checkbox" id="f-glow"'+(d.feature.glow?' checked':'')+
+        '><span>Add a glow around it</span></label>'+
+      '</div>':'')+
 
       '<div class="divider"></div>'+
       '<h4 style="font-size:.95rem;color:var(--text-hi)">Sales</h4>'+
@@ -3486,15 +3661,20 @@ function itemEditor(existing){
     if(g('#s-cool')!==null)d.sale.cooldown=Math.max(0,num(g('#s-cool'),14));
     if(g('#s-chance')!==null)d.sale.chance=Math.max(1,Math.min(100,num(g('#s-chance'),100)));
     if(g('#s-anchor')!==null)d.sale.anchor=g('#s-anchor');
+    if(g('#f-label')!==null)d.feature.label=g('#f-label').trim()||'FEATURED';
     var cb=function(id){var el=scrim.querySelector(id);return el?el.checked:false;};
     d.locked=cb('#i-locked');d.hidden=cb('#i-hidden');d.hideWhenClosed=cb('#i-hideclosed');
     d.featured=cb('#i-featured');
+    if(scrim.querySelector('#f-wide'))d.feature.wide=cb('#f-wide');
+    if(scrim.querySelector('#f-glow'))d.feature.glow=cb('#f-glow');
     if(scrim.querySelector('#i-sale'))d.sale.on=cb('#i-sale');
     if(scrim.querySelector('#s-feature'))d.sale.autoFeature=cb('#s-feature');
   }
   function redraw(){redrawModal(body(),mount);}
   function mount(scrim){
     scrim.addEventListener('click',function(e){
+      var fxb=e.target.closest('[data-fx]');
+      if(fxb){grab(scrim);d.feature.style=fxb.dataset.fx;redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
         grab(scrim);
@@ -3505,6 +3685,9 @@ function itemEditor(existing){
       grab(scrim);
       if(iconEditorClick(e,d.icon)){redraw();return;}
     });
+    var featBox=scrim.querySelector('#i-featured');
+    if(featBox)featBox.addEventListener('change',function(){grab(scrim);d.featured=featBox.checked;redraw();});
+
     var saleBox=scrim.querySelector('#i-sale');
     if(saleBox)saleBox.addEventListener('change',function(){grab(scrim);d.sale.on=saleBox.checked;redraw();});
 

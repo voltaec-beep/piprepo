@@ -191,9 +191,15 @@ Two more switches: **Locked** shows an item but refuses redemption, which is use
 
 ### Featured, countdowns and sales
 
-**Countdown badge.** An item with a closing date wears a small tilting badge with a blinking dot — "5 days left". Under six days it ticks faster; on the final day it turns coral and reads "Last day!". It only appears when there is genuinely something to count down to, so a permanent item stays quiet. Reduced-motion settings stop the animation.
+**Corner badges.** Anything urgent hangs off the top-right corner of the card, stacked, so it reads before the price does.
 
-**Featured.** Any item can be pinned to a Featured band at the top of the store, with a larger icon and a gold edge. Toggle it from the item's Feature button or from the editor.
+A sale wears a green rosette with the number large and "OFF" beneath, ringed by a slowly turning dashed circle, bobbing gently with a shine sweeping across it. Discounts of 30% or more get a larger rosette.
+
+A closing item wears a swinging tag — "3 DAYS LEFT" — with a blinking dot. Under six days it swings faster; on the final day it turns coral and reads "LAST DAY". It only appears when there is genuinely something to count down to, so a permanent item stays quiet.
+
+Both respect reduced-motion settings.
+
+**Featured.** Any item can be pinned to a Featured band at the top of the store, and its look is configurable: a banner colour (gold, blue, mint, rose or plum), your own banner text — "STAFF PICK", "NEW", whatever fits — an optional glow, and a switch to give it the full width of the shelf. Toggle featuring from the item's Feature button or the editor; the look controls appear as soon as Featured is ticked.
 
 **Sales.** An item can go on sale for a random amount off, on a repeating schedule:
 
@@ -255,6 +261,12 @@ The same icon is inlined into the top bar as the wordmark's mark, and again on t
 ## On iOS, install it
 
 The text fields misbehaving inside the installed app on iOS came from two things, both fixed: the status bar was set to `black-translucent`, which makes the web view extend under it and throws touch coordinates off in standalone mode; and iOS does not shrink the layout viewport when the keyboard opens, so a fixed overlay kept covering the whole screen while taps arrived in the smaller visual viewport. Overlays are now pinned to `window.visualViewport`, every control in a modal is at least 16px so Safari does not zoom on focus, and the page behind a modal is locked.
+
+## Your profile
+
+The top bar carries three sections — Catalogue, Activities, Store — and that is all. Everything about *you* lives behind the avatar chip in the top right corner, which lights up while you are there.
+
+The profile page is the hub: your picture and name, quick cards through to **Records** (tests taken, points from reading) and **Points** (balance and what you have redeemed), appearance settings, and the reader switcher. Records has a link straight back.
 
 ## Erasing a reader's data
 
