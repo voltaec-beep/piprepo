@@ -1,37 +1,20 @@
 {
-  "schema": "pip-avatars/1",
-  "avatars": [
-    {
-      "file": "owl.svg",
-      "name": "Owl"
-    },
-    {
-      "file": "fox.svg",
-      "name": "Fox"
-    },
-    {
-      "file": "cat.svg",
-      "name": "Cat"
-    },
-    {
-      "file": "whale.svg",
-      "name": "Whale"
-    },
-    {
-      "file": "bee.svg",
-      "name": "Bee"
-    },
-    {
-      "file": "mushroom.svg",
-      "name": "Mushroom"
-    },
-    {
-      "file": "moon.svg",
-      "name": "Moon"
-    },
-    {
-      "file": "rocket.svg",
-      "name": "Rocket"
-    }
+  "name": "Pip — reading catalogue",
+  "short_name": "Pip",
+  "description": "A reading catalogue and comprehension tester. Take a test on a book you have read and earn points.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#151B2E",
+  "theme_color": "#151B2E",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "books"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
