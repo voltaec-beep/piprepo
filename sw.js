@@ -3,7 +3,7 @@
    network-first so an instructor who edits the folder sees the change,
    with the cached copy as the offline fallback. */
 
-var VERSION = 'pip-2026-09-16-8';
+var VERSION = 'pip-2026-09-17-1';
 var CACHE = VERSION;
 
 var PRECACHE = [
@@ -18,6 +18,7 @@ var PRECACHE = [
   './modules.json',
   './amulet-of-samarkand.json',
   './the-tortoise-and-the-hare.json',
+  './alice-in-wonderland.json',
   './avatars.json',
   './owl.svg',
   './fox.svg',

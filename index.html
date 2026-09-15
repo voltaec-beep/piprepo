@@ -575,7 +575,8 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .pick img{width:100%;aspect-ratio:1;border-radius:9px;object-fit:cover}
 
 /* ============ toast ============ */
-html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
+html.modal-open{overflow:hidden}
+html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .sheet input,.sheet textarea{-webkit-user-select:text;user-select:text}
 #toasts{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:110;display:grid;gap:8px;width:min(500px,92vw)}
 .toast{
@@ -759,7 +760,14 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
 .pill.warm{border-color:var(--gold-soft);color:var(--gold-hi);background:var(--gold-faint)}
 .pill.cold{border-color:var(--edge-soft);color:var(--text-3)}
 .pill.good{border-color:var(--pass);color:var(--pass);background:var(--pass-faint)}
-.item .adminrow{display:flex;gap:6px;border-top:1px solid var(--edge-soft);padding-top:10px;margin-top:2px}
+.item .adminrow{
+  display:flex;flex-wrap:wrap;gap:6px;
+  border-top:1px solid var(--edge-soft);padding-top:10px;margin-top:2px;
+  min-width:0;
+}
+.item .adminrow .btn{flex:0 1 auto;min-width:0}
+.item .adminrow .btn:last-child{margin-left:auto}
+@media(max-width:400px){.item .adminrow .btn:last-child{margin-left:0}}
 
 .glyphgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:7px}
 .glyphgrid button{
@@ -998,6 +1006,41 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
 .badges{top:-14px;right:-12px}
 .item.hero .badges{top:-16px}
 .item .itemtop{gap:15px}
+
+/* ============ chapters ============ */
+.progline{display:flex;align-items:center;gap:12px;margin-top:20px}
+.progline .bar{
+  flex:1;height:7px;border-radius:4px;background:var(--paper-rule);overflow:hidden;
+}
+.progline .bar span{
+  display:block;height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-hi));
+  transition:width .5s var(--ease);
+}
+.papers{display:grid;gap:7px}
+.paper-row{
+  display:flex;align-items:center;gap:13px;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(255,255,255,.42);
+  border:1px solid var(--paper-rule);
+}
+.paper-row[data-st="passed"]{background:var(--pass-faint);border-color:rgba(44,122,78,.35)}
+.paper-row[data-st="failed"]{border-color:rgba(172,58,43,.3)}
+.paper-row .mark-passed,.paper-row .mark-failed,.paper-row .mark-new{
+  width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-size:.8rem;border:1px solid var(--paper-rule);color:var(--paper-text-2);
+}
+.paper-row .mark-passed{background:var(--pass-ink);border-color:var(--pass-ink);color:#fff}
+.paper-row .mark-failed{color:var(--fail-ink);border-color:rgba(172,58,43,.4)}
+.pr-main{flex:1;min-width:0}
+.pr-title{display:block;font-family:var(--serif);font-size:1.04rem;line-height:1.3}
+.pr-meta{display:block;font-size:.78rem;color:var(--paper-text-2);margin-top:2px}
+.pr-key{flex:none;color:var(--paper-text-2)}
+.pr-key svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7}
+@media(max-width:480px){
+  .paper-row{flex-wrap:wrap}
+  .paper-row .btn{margin-left:37px}
+}
 </style>
 </head>
 <body>
@@ -1009,7 +1052,7 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
       <span class="wordmark">PipHub</span>
     </div>
     <nav class="nav" id="nav" aria-label="Sections">
-      <button data-go="catalog">Catalogue</button>
+      <button data-go="catalog">Reading Catalogue</button>
       <button data-go="activities">Activities</button>
       <button data-go="store">Store</button>
       <button class="admin-only hide" data-go="titles">Titles</button>
@@ -1126,6 +1169,7 @@ function load(){
   S.profiles.forEach(function(p){
     if(!Array.isArray(p.purchases))p.purchases=[];
     if(!Array.isArray(p.activities))p.activities=[];
+    if(!Array.isArray(p.adjustments))p.adjustments=[];
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1159,7 +1203,7 @@ function save(){
 /* ---------- profiles ---------- */
 function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
-    avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[]};
+    avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[]};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -1237,6 +1281,39 @@ function requireAdmin(reason,fn){
   askPW(reason,function(){S.admin=true;armIdle();fn();});
 }
 
+
+/* iOS focus scrolls the document to reveal the field, and on dismissing the
+   keyboard it does not always put that scroll back. A fixed overlay then
+   paints in one place while touches arrive in another. Freezing the page
+   at a known offset for as long as a layer is open removes the whole
+   class of problem: there is no document scroll left to go wrong. */
+var pageLocks=0, lockedAt=0;
+function pageLock(){
+  if(pageLocks++)return;
+  lockedAt=window.pageYOffset||document.documentElement.scrollTop||0;
+  var b=document.body;
+  b.style.position='fixed';
+  b.style.top=(-lockedAt)+'px';
+  b.style.left='0';
+  b.style.right='0';
+  b.style.width='100%';
+  document.documentElement.classList.add('modal-open');
+}
+function pageUnlock(){
+  if(pageLocks===0)return;
+  if(--pageLocks)return;
+  var b=document.body;
+  b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';
+  document.documentElement.classList.remove('modal-open');
+  window.scrollTo(0,lockedAt);
+}
+/* Belt and braces: when the keyboard closes, re-assert the freeze. */
+function reassertLock(){
+  if(!pageLocks)return;
+  document.body.style.top=(-lockedAt)+'px';
+  if((window.pageYOffset||0)!==0)window.scrollTo(0,0);
+}
+
 /* ---------- modals ---------- */
 function openModal(html,onMount,opts){
   opts=opts||{};
@@ -1253,7 +1330,7 @@ function openModal(html,onMount,opts){
     if(scrim.dismissable&&downOnBackdrop&&e.target===scrim)closeModal();
     downOnBackdrop=false;
   });
-  document.documentElement.classList.add('modal-open');
+  pageLock();
   if(onMount)onMount(scrim);
   /* A redraw keeps the reader where they were: re-focusing or jumping to
      the top moves the content out from under the next tap. */
@@ -1274,7 +1351,7 @@ function redrawModal(html,onMount){
 function closeModal(){
   var m=S.modals.pop();
   if(m&&m.parentNode)m.parentNode.removeChild(m);
-  if(!S.modals.length)document.documentElement.classList.remove('modal-open');
+  pageUnlock();
 }
 function closeAllModals(){while(S.modals.length)closeModal();}
 
@@ -1591,26 +1668,57 @@ function cropper(srcURI,onDone){
 /* =========================================================
    Content modules
    ========================================================= */
+/* One shared question validator, used for the book test and every chapter. */
+function readQuestions(list,errs,where){
+  var out=[];
+  for(var i=0;i<list.length;i++){
+    var q=list[i]||{};
+    var text=String(q.q||q.question||'').trim();
+    var opts=Array.isArray(q.options)?q.options.map(function(o){return String(o);}):[];
+    var a=Number(q.answer);
+    if(!text){errs.push(where+' question '+(i+1)+': no question text.');continue;}
+    if(opts.length<2){errs.push(where+' question '+(i+1)+': needs at least two options.');continue;}
+    if(a!==Math.floor(a)||a<0||a>=opts.length){
+      errs.push(where+' question '+(i+1)+': "answer" must be a whole number from 0 to '+(opts.length-1)+'.');continue;}
+    out.push({q:text,options:opts,answer:a,why:String(q.why||q.explanation||''),tag:String(q.tag||'')});
+  }
+  return out;
+}
+
 function validate(raw){
   var errs=[];
   if(!raw||typeof raw!=='object'||Array.isArray(raw))return{ok:false,errs:['Not a module object.']};
   var title=String(raw.title||'').trim();
   if(!title)errs.push('No "title".');
   var qs=Array.isArray(raw.questions)?raw.questions:[];
-  if(!qs.length)errs.push('No "questions" array, or it is empty.');
-  var questions=[];
-  for(var i=0;i<qs.length;i++){
-    var q=qs[i]||{};
-    var text=String(q.q||q.question||'').trim();
-    var opts=Array.isArray(q.options)?q.options.map(function(o){return String(o);}):[];
-    var a=Number(q.answer);
-    if(!text){errs.push('Question '+(i+1)+': no question text.');continue;}
-    if(opts.length<2){errs.push('Question '+(i+1)+': needs at least two options.');continue;}
-    if(a!==Math.floor(a)||a<0||a>=opts.length){errs.push('Question '+(i+1)+': "answer" must be a whole number from 0 to '+(opts.length-1)+'.');continue;}
-    questions.push({q:text,options:opts,answer:a,why:String(q.why||q.explanation||''),tag:String(q.tag||'')});
-  }
-  if(errs.length)return{ok:false,errs:errs};
+  var rawChapters=Array.isArray(raw.chapters)?raw.chapters:[];
+  if(!qs.length&&!rawChapters.length)
+    errs.push('No "questions" and no "chapters" — a title needs at least one of them.');
+  var questions=readQuestions(qs,errs,'Book');
   var ar=raw.ar||{},qz=raw.quiz||{},vd=raw.verdicts||{};
+  var defPassing=Math.min(100,Math.max(0,num(qz.passing,70)));
+  var defAward=['proportional','full','none'].indexOf(qz.award)>=0?qz.award:'proportional';
+  var chapters=[],seen={};
+  rawChapters.forEach(function(ch,ci){
+    ch=ch||{};
+    var ctitle=String(ch.title||('Chapter '+(ci+1))).trim();
+    var cq=readQuestions(Array.isArray(ch.questions)?ch.questions:[],errs,'"'+ctitle+'"');
+    if(!cq.length){errs.push('"'+ctitle+'" has no usable questions.');return;}
+    var cid=slug(ch.id||ctitle)||('ch'+(ci+1));
+    while(seen[cid])cid=cid+'-b';
+    seen[cid]=1;
+    chapters.push({
+      id:cid,title:ctitle,
+      number:(ch.number==null?ci+1:num(ch.number,ci+1)),
+      summary:String(ch.summary||'').trim(),
+      points:Math.max(0,num(ch.points,0)),
+      passing:Math.min(100,Math.max(0,num(ch.passing,defPassing))),
+      ask:Math.max(0,Math.floor(num(ch.ask,0))),
+      award:['proportional','full','none'].indexOf(ch.award)>=0?ch.award:defAward,
+      questions:cq
+    });
+    if(chapters[chapters.length-1].ask>cq.length)chapters[chapters.length-1].ask=0;
+  });
   var m={
     schema:SCHEMA,id:slug(raw.id||title),title:title,
     author:String(raw.author||'').trim(),
@@ -1630,10 +1738,11 @@ function validate(raw){
       shuffleOptions:qz.shuffleOptions!==false,
       award:['proportional','full','none'].indexOf(qz.award)>=0?qz.award:'proportional',
       reviewMisses:qz.reviewMisses!==false,
-      lockRetakes:qz.lockRetakes!==false
+      lockRetakes:qz.lockRetakes!==false,
+      chaptersInOrder:qz.chaptersInOrder===true
     },
     verdicts:{high:String(vd.high||''),pass:String(vd.pass||''),fail:String(vd.fail||'')},
-    questions:questions,added:raw.added||nowISO()
+    questions:questions,chapters:chapters,added:raw.added||nowISO()
   };
   if(m.quiz.ask>m.questions.length)m.quiz.ask=0;
   return{ok:true,module:m};
@@ -1765,6 +1874,7 @@ function restoreBackup(d){
       S.profiles.forEach(function(p){
         if(!Array.isArray(p.purchases))p.purchases=[];
         if(!Array.isArray(p.activities))p.activities=[];
+        if(!Array.isArray(p.adjustments))p.adjustments=[];
       });
       if(d.settings){
         S.settings.folder=d.settings.folder||S.settings.folder;
@@ -1800,15 +1910,37 @@ function exportCSV(){
 /* =========================================================
    Quiz runtime
    ========================================================= */
-function startRun(m){
-  var items=m.questions.map(function(q,i){
+function chapterById(m,id){
+  var list=(m&&m.chapters)||[];
+  for(var i=0;i<list.length;i++)if(list[i].id===id)return list[i];
+  return null;
+}
+/* Everything a run needs, whether it is the book test or one chapter. */
+function paperOf(m,chId){
+  var ch=chId?chapterById(m,chId):null;
+  if(ch){
+    return{id:ch.id,title:ch.title,questions:ch.questions,points:ch.points,
+      passing:ch.passing,ask:ch.ask,award:ch.award,label:ch.title};
+  }
+  return{id:null,title:m.title,questions:m.questions,points:m.ar.points,
+    passing:m.quiz.passing,ask:m.quiz.ask,award:m.quiz.award,label:'The whole book'};
+}
+function titlePoints(m){
+  return Math.round(((m.ar.points||0)+((m.chapters||[]).reduce(function(s,ch){return s+ch.points;},0)))*10)/10;
+}
+function hasBookTest(m){return (m.questions||[]).length>0;}
+
+function startRun(m,chId){
+  var paper=paperOf(m,chId);
+  var items=paper.questions.map(function(q,i){
     return{src:i,q:q.q,why:q.why,tag:q.tag,chosen:null,
       options:q.options.map(function(t,j){return{t:t,correct:j===q.answer};})};
   });
   if(m.quiz.shuffleQuestions)shuffle(items);
-  if(m.quiz.ask>0)items=items.slice(0,m.quiz.ask);
+  if(paper.ask>0)items=items.slice(0,paper.ask);
   if(m.quiz.shuffleOptions)items.forEach(function(it){shuffle(it.options);});
-  S.run={moduleId:m.id,items:items,idx:0,started:Date.now(),busy:false};
+  S.run={moduleId:m.id,chapterId:paper.id,paper:paper,
+    items:items,idx:0,started:Date.now(),busy:false};
   go('quiz');
 }
 function answer(i,node){
@@ -1831,17 +1963,19 @@ function finish(){
     var c=it.options[it.chosen];
     if(c&&c.correct)correct++;else missed.push(it);
   });
+  var paper=run.paper||paperOf(m,run.chapterId);
   var total=run.items.length;
   var pct=total?Math.round(correct/total*100):0;
-  var passed=pct>=m.quiz.passing;
+  var passed=pct>=paper.passing;
   var earned=0;
   if(passed){
-    if(m.quiz.award==='proportional')earned=Math.round(m.ar.points*pct/100*10)/10;
-    else if(m.quiz.award==='full')earned=m.ar.points;
+    if(paper.award==='proportional')earned=Math.round(paper.points*pct/100*10)/10;
+    else if(paper.award==='full')earned=paper.points;
   }
   var rec={id:uid(),moduleId:m.id,title:m.title,author:m.author,date:nowISO(),
-    pct:pct,correct:correct,total:total,points:earned,possible:m.ar.points,
-    passed:passed,award:m.quiz.award,ms:Date.now()-run.started};
+    chapterId:paper.id||null,chapterTitle:paper.id?paper.title:'',
+    pct:pct,correct:correct,total:total,points:earned,possible:paper.points,
+    passed:passed,award:paper.award,ms:Date.now()-run.started};
   if(p)p.records.push(rec);
   S.last={rec:rec,missed:missed};
   S.run=null;save();
@@ -1852,19 +1986,49 @@ function verdictFor(m,rec){
   if(rec.pct>=90)return m.verdicts.high||'A strong result. This one you know well.';
   return m.verdicts.pass||'Passed.';
 }
-function attemptsFor(id){
-  return recs().filter(function(r){return r.moduleId===id;})
-    .sort(function(a,b){return a.date<b.date?1:-1;});
+function attemptsFor(id,chId){
+  return recs().filter(function(r){
+    if(r.moduleId!==id)return false;
+    if(chId===undefined)return true;
+    return (r.chapterId||null)===(chId||null);
+  }).sort(function(a,b){return a.date<b.date?1:-1;});
+}
+function papersDone(m){
+  var total=(m.chapters||[]).length+(hasBookTest(m)?1:0);
+  var done=0;
+  (m.chapters||[]).forEach(function(ch){
+    if(attemptsFor(m.id,ch.id).some(function(r){return r.passed;}))done++;
+  });
+  if(hasBookTest(m)&&attemptsFor(m.id,null).some(function(r){return r.passed;}))done++;
+  return{done:done,total:total};
 }
 function statusFor(id){
   var a=attemptsFor(id);
   if(!a.length)return 'new';
+  var m=byId(id);
+  if(m){
+    var p=papersDone(m);
+    if(p.total&&p.done===p.total)return 'passed';
+    if(p.done)return 'part';
+  }
   return a.some(function(r){return r.passed;})?'passed':'failed';
 }
+/* Chapters unlock in order when the module asks for it. */
+function chapterLocked(m,ch){
+  if(!m.quiz.chaptersInOrder)return false;
+  var list=m.chapters||[];
+  for(var i=0;i<list.length;i++){
+    if(list[i].id===ch.id)return false;
+    if(!attemptsFor(m.id,list[i].id).some(function(r){return r.passed;}))return true;
+  }
+  return false;
+}
+/* Keyed per paper: a chapter and the book test each pay once. */
 function bestByTitle(list){
   var best={};
   (list||recs()).forEach(function(r){
-    if(!best[r.moduleId]||r.points>best[r.moduleId].points)best[r.moduleId]=r;
+    var k=r.moduleId+'|'+(r.chapterId||'');
+    if(!best[k]||r.points>best[k].points)best[k]=r;
   });
   return best;
 }
@@ -1873,12 +2037,17 @@ function earnedTotal(list){
   Object.keys(b).forEach(function(k){s+=b[k].points;});
   return s;
 }
-function requestStart(id){
+function requestStart(id,chId){
   var m=byId(id);if(!m)return;
   if(!me()){go('gate');return;}
-  if(attemptsFor(id).length>0&&m.quiz.lockRetakes){
-    requireAdmin('A retake of "'+m.title+'" needs the instructor key.',function(){startRun(m);});
-  }else startRun(m);
+  var paper=paperOf(m,chId||null);
+  if(chId){
+    var ch=chapterById(m,chId);
+    if(ch&&chapterLocked(m,ch)){toast('Pass the earlier chapters first.','bad');return;}
+  }
+  if(attemptsFor(id,chId||null).length>0&&m.quiz.lockRetakes){
+    requireAdmin('A retake of "'+paper.title+'" needs the instructor key.',function(){startRun(m,chId||null);});
+  }else startRun(m,chId||null);
 }
 
 var BUILTIN_AVATARS=[{"name": "Owl", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%232E4A57%22/%3E%3Ccircle cx=%22120%22 cy=%22128%22 r=%2266%22 fill=%22%23EFE3CB%22/%3E%3Cpath d=%22M62 92 L72 42 L104 74 Z%22 fill=%22%23EFE3CB%22/%3E%3Cpath d=%22M178 92 L168 42 L136 74 Z%22 fill=%22%23EFE3CB%22/%3E%3Ccircle cx=%2296%22 cy=%22118%22 r=%2223%22 fill=%22%23fff%22/%3E%3Ccircle cx=%22144%22 cy=%22118%22 r=%2223%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2299%22 cy=%22120%22 r=%2211%22 fill=%22%2322333B%22/%3E%3Ccircle cx=%22141%22 cy=%22120%22 r=%2211%22 fill=%22%2322333B%22/%3E%3Cpath d=%22M120 134 l13 16 -13 14 -13-14 Z%22 fill=%22%23D9963C%22/%3E%3Cpath d=%22M84 176 q36 22 72 0%22 stroke=%22%23D5C6A6%22 stroke-width=%227%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E"}, {"name": "Fox", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%23E39A3C%22/%3E%3Cpath d=%22M120 50 L186 96 q6 68 -66 96 Q42 164 54 96 Z%22 fill=%22%23C4551F%22/%3E%3Cpath d=%22M54 96 L44 40 L88 64 Z%22 fill=%22%23C4551F%22/%3E%3Cpath d=%22M186 96 L196 40 L152 64 Z%22 fill=%22%23C4551F%22/%3E%3Cpath d=%22M120 122 q40 8 46 -26 q6 68 -46 96 Z%22 fill=%22%23E7EAEE%22/%3E%3Cpath d=%22M120 122 q-40 8 -46 -26 q-6 68 46 96 Z%22 fill=%22%23F4F6F8%22/%3E%3Ccircle cx=%2296%22 cy=%22112%22 r=%229%22 fill=%22%232A211B%22/%3E%3Ccircle cx=%22144%22 cy=%22112%22 r=%229%22 fill=%22%232A211B%22/%3E%3Cpath d=%22M120 152 l11 10 -11 10 -11-10 Z%22 fill=%22%232A211B%22/%3E%3C/svg%3E"}, {"name": "Cat", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%237E9A7A%22/%3E%3Cpath d=%22M62 84 L58 34 L100 62 Z%22 fill=%22%2343474C%22/%3E%3Cpath d=%22M178 84 L182 34 L140 62 Z%22 fill=%22%2343474C%22/%3E%3Ccircle cx=%22120%22 cy=%22128%22 r=%2266%22 fill=%22%2353585E%22/%3E%3Cellipse cx=%2296%22 cy=%22118%22 rx=%2212%22 ry=%2216%22 fill=%22%23F2D98B%22/%3E%3Cellipse cx=%22144%22 cy=%22118%22 rx=%2212%22 ry=%2216%22 fill=%22%23F2D98B%22/%3E%3Cellipse cx=%2296%22 cy=%22118%22 rx=%224%22 ry=%2214%22 fill=%22%2323262A%22/%3E%3Cellipse cx=%22144%22 cy=%22118%22 rx=%224%22 ry=%2214%22 fill=%22%2323262A%22/%3E%3Cpath d=%22M120 146 l9 8 -9 8 -9-8 Z%22 fill=%22%23E4A79E%22/%3E%3Cpath d=%22M108 168 q12 10 24 0%22 stroke=%22%2323262A%22 stroke-width=%225%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M56 140 h34 M56 154 h34 M184 140 h-34 M184 154 h-34%22 stroke=%22%23D8DEE4%22 stroke-width=%224%22 stroke-linecap=%22round%22/%3E%3C/svg%3E"}, {"name": "Whale", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%234E82A8%22/%3E%3Cpath d=%22M42 146 q10-56 70-56 q66 0 74 54 q4 30 -50 34 q-64 4 -94-32 Z%22 fill=%22%2323415E%22/%3E%3Cpath d=%22M186 144 l34-26 l-6 54 Z%22 fill=%22%2323415E%22/%3E%3Cpath d=%22M52 158 q54 26 118 4%22 stroke=%22%237FA9C7%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2286%22 cy=%22122%22 r=%229%22 fill=%22%23F2F6F9%22/%3E%3Ccircle cx=%2288%22 cy=%22123%22 r=%224.5%22 fill=%22%2312212F%22/%3E%3Cpath d=%22M112 84 q0-26 20-34%22 stroke=%22%23CFE3F0%22 stroke-width=%228%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M112 84 q-4-28 -26-34%22 stroke=%22%23CFE3F0%22 stroke-width=%228%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E"}, {"name": "Bee", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%23F0C548%22/%3E%3Cellipse cx=%22120%22 cy=%22136%22 rx=%2252%22 ry=%2246%22 fill=%22%233A3226%22/%3E%3Cpath d=%22M74 118 h92 v18 h-92 Z%22 fill=%22%23F0C548%22/%3E%3Cpath d=%22M82 154 h76 v18 h-76 Z%22 fill=%22%23F0C548%22/%3E%3Cellipse cx=%2278%22 cy=%2286%22 rx=%2230%22 ry=%2220%22 fill=%22%23FFFCF2%22 opacity=%22.85%22 transform=%22rotate%28-22 78 86%29%22/%3E%3Cellipse cx=%22164%22 cy=%2286%22 rx=%2230%22 ry=%2220%22 fill=%22%23FFFCF2%22 opacity=%22.85%22 transform=%22rotate%2822 164 86%29%22/%3E%3Ccircle cx=%22104%22 cy=%22124%22 r=%227%22 fill=%22%23FFF%22/%3E%3Ccircle cx=%22138%22 cy=%22124%22 r=%227%22 fill=%22%23FFF%22/%3E%3Cpath d=%22M96 66 q6-22 24-22%22 stroke=%22%233A3226%22 stroke-width=%226%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M146 66 q-6-22 -24-22%22 stroke=%22%233A3226%22 stroke-width=%226%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E"}, {"name": "Mushroom", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%236E5580%22/%3E%3Cpath d=%22M120 62 q68 0 76 60 q2 14 -76 14 q-78 0 -76-14 q8-60 76-60 Z%22 fill=%22%23C3453C%22/%3E%3Ccircle cx=%2286%22 cy=%22104%22 r=%2212%22 fill=%22%23F3E7D2%22/%3E%3Ccircle cx=%22152%22 cy=%2298%22 r=%2215%22 fill=%22%23F3E7D2%22/%3E%3Ccircle cx=%22120%22 cy=%22124%22 r=%228%22 fill=%22%23F3E7D2%22/%3E%3Cpath d=%22M94 136 q26 12 52 0 l-6 56 q-20 10 -40 0 Z%22 fill=%22%23EADFC6%22/%3E%3Ccircle cx=%22106%22 cy=%22158%22 r=%226%22 fill=%22%232E2A33%22/%3E%3Ccircle cx=%22136%22 cy=%22158%22 r=%226%22 fill=%22%232E2A33%22/%3E%3Cpath d=%22M112 174 q9 8 18 0%22 stroke=%22%232E2A33%22 stroke-width=%225%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E"}, {"name": "Moon", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%231E2A47%22/%3E%3Cpath d=%22M150 42 a80 80 0 1 0 0 156 a64 64 0 0 1 0-156 Z%22 fill=%22%23EBD9A6%22/%3E%3Ccircle cx=%22118%22 cy=%2296%22 r=%2210%22 fill=%22%23DCC78C%22/%3E%3Ccircle cx=%22102%22 cy=%22142%22 r=%227%22 fill=%22%23DCC78C%22/%3E%3Cpath d=%22M188 62 l5 13 13 5 -13 5 -5 13 -5-13 -13-5 13-5 Z%22 fill=%22%23F4E9C5%22/%3E%3Cpath d=%22M196 150 l4 9 9 4 -9 4 -4 9 -4-9 -9-4 9-4 Z%22 fill=%22%23F4E9C5%22/%3E%3C/svg%3E"}, {"name": "Rocket", "uri": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 240%22 width=%22240%22 height=%22240%22%3E%3Crect width=%22240%22 height=%22240%22 fill=%22%2338344F%22/%3E%3Cpath d=%22M120 34 q40 40 40 96 l-80 0 q0-56 40-96 Z%22 fill=%22%23E9E4D8%22/%3E%3Cpath d=%22M80 130 l-26 32 26 0 Z%22 fill=%22%23C4553F%22/%3E%3Cpath d=%22M160 130 l26 32 -26 0 Z%22 fill=%22%23C4553F%22/%3E%3Ccircle cx=%22120%22 cy=%2294%22 r=%2219%22 fill=%22%235D9CC4%22/%3E%3Ccircle cx=%22120%22 cy=%2294%22 r=%2219%22 fill=%22none%22 stroke=%22%239BA3AE%22 stroke-width=%225%22/%3E%3Cpath d=%22M100 162 h40 l-8 18 h-24 Z%22 fill=%22%239BA3AE%22/%3E%3Cpath d=%22M120 182 q14 16 0 34 q-14-18 0-34 Z%22 fill=%22%23E8A33D%22/%3E%3C/svg%3E"}];
@@ -1947,9 +2116,9 @@ function viewCatalog(){
   });
 
   var p=me();
-  var h='<div class="pagehead"><div><h2>The catalogue</h2>'+
+  var h='<div class="pagehead"><div><h2>Reading catalogue</h2>'+
     '<div class="sub">'+S.modules.length+(S.modules.length===1?' title on the shelf':' titles on the shelf')+
-    ', worth '+pts(S.modules.reduce(function(s,m){return s+m.ar.points;},0))+' points</div></div>'+
+    ', worth '+pts(S.modules.reduce(function(s,m){return s+titlePoints(m);},0))+' points</div></div>'+
     '<div class="row"><div class="stat" style="min-width:120px"><div class="k">'+esc(p?p.name:'')+'&rsquo;s points</div>'+
     '<div class="v" style="color:var(--gold-hi)">'+pts(balance(p))+'</div></div></div></div>';
 
@@ -1983,7 +2152,11 @@ function viewCatalog(){
     var st=statusFor(m.id),best=attemptsFor(m.id)[0];
     var tags='';
     if(m.ar.level!=null)tags+='<span class="tag">Level '+m.ar.level+'</span>';
-    tags+='<span class="tag">'+(m.quiz.ask||m.questions.length)+' questions</span>';
+    var pg=papersDone(m);
+    if((m.chapters||[]).length)
+      tags+='<span class="tag'+(pg.done&&pg.done===pg.total?' pass':'')+'">'+
+        pg.done+'/'+pg.total+' chapters</span>';
+    else tags+='<span class="tag">'+(m.quiz.ask||m.questions.length)+' questions</span>';
     if(best)tags+='<span class="tag '+(best.passed?'pass':'fail')+'">'+
       (best.passed?'Passed at '+best.pct+'%':'Best '+best.pct+'%')+'</span>';
     h+='<button class="bookcard" data-act="open" data-id="'+esc(m.id)+'" data-st="'+st+'">'+
@@ -1992,7 +2165,7 @@ function viewCatalog(){
       '<span class="by">'+(m.author?esc(m.author):'Author not recorded')+'</span>'+
       '<span class="rule"></span>'+
       '<span class="meta">'+tags+'</span></span>'+
-      '<span class="medal"><span class="disc"><span>'+pts(m.ar.points)+'</span></span>'+
+      '<span class="medal"><span class="disc"><span>'+pts(titlePoints(m))+'</span></span>'+
       '<span class="cap">points</span></span>'+
       '</span>'+
       (st==='passed'?'<span class="seal"><i></i></span>':'')+
@@ -2007,20 +2180,45 @@ function adminBar(){
 }
 
 /* ---------- one title ---------- */
+function paperRow(m,paper,locked){
+  var tries=attemptsFor(m.id,paper.id);
+  var best=tries.filter(function(r){return r.passed;})
+    .sort(function(a,b){return b.pct-a.pct;})[0];
+  var state=best?'passed':(tries.length?'failed':'new');
+  var needKey=tries.length>0&&m.quiz.lockRetakes&&!S.admin;
+  return '<div class="paper-row" data-st="'+state+'">'+
+    '<span class="mark-'+state+'" aria-hidden="true">'+
+      (state==='passed'?'&#10003;':(state==='failed'?'&#8635;':''))+'</span>'+
+    '<span class="pr-main"><span class="pr-title">'+esc(paper.label)+'</span>'+
+    '<span class="pr-meta">'+(paper.ask||paper.questions.length)+' questions'+
+      (paper.points?' &nbsp;·&nbsp; worth '+pts(paper.points):'')+
+      (best?' &nbsp;·&nbsp; passed at '+best.pct+'%':
+        (tries.length?' &nbsp;·&nbsp; best '+tries.sort(function(a,b){return b.pct-a.pct;})[0].pct+'%':''))+
+    '</span></span>'+
+    (locked
+      ? '<span class="pill cold">Locked</span>'
+      : '<button class="btn btn-sm'+(state==='passed'?'':' btn-primary')+
+        '" data-act="begin" data-id="'+esc(m.id)+'"'+
+        (paper.id?' data-ch="'+esc(paper.id)+'"':'')+'>'+
+        (tries.length?'Retake':'Start')+'</button>')+
+    (needKey&&!locked?'<span class="pr-key" title="A retake needs the instructor key">'+ico('key')+'</span>':'')+
+    '</div>';
+}
+
 function viewTitle(){
   var m=byId(S.arg);
   if(!m)return '<div class="empty"><h3>That title is no longer on the shelf</h3>'+
     '<div class="stack"><button class="btn" data-go="catalog">Back to the catalogue</button></div></div>';
-  var tries=attemptsFor(m.id);
+  var chapters=m.chapters||[];
+  var prog=papersDone(m);
   var facts=[];
   if(m.ar.level!=null)facts.push(['Reading level',m.ar.level]);
-  facts.push(['Points',pts(m.ar.points)]);
-  facts.push(['Questions',m.quiz.ask||m.questions.length]);
+  facts.push(['Points',pts(titlePoints(m))]);
+  if(chapters.length)facts.push(['Chapters',chapters.length]);
   facts.push(['Passing mark',m.quiz.passing+'%']);
   if(m.ar.interest)facts.push(['Interest',m.ar.interest]);
   if(m.ar.wordCount)facts.push(['Words',Number(m.ar.wordCount).toLocaleString()]);
 
-  var locked=tries.length>0&&m.quiz.lockRetakes&&!S.admin;
   var h='<button class="btn btn-sm btn-ghost" data-go="catalog">Back to the catalogue</button>'+
     '<div class="paper stack">'+
     '<h2 style="font-size:clamp(1.7rem,4.4vw,2.5rem)">'+esc(m.title)+'</h2>'+
@@ -2029,22 +2227,45 @@ function viewTitle(){
     '<div class="row" style="gap:28px;margin-top:20px">'+facts.map(function(f){
       return '<div><div class="tiny" style="color:var(--paper-text-2)">'+esc(f[0])+'</div>'+
         '<div style="font-family:var(--serif);font-size:1.3rem" class="tnum">'+esc(f[1])+'</div></div>';
-    }).join('')+'</div><hr>'+
-    '<div class="row"><button class="btn btn-primary" data-act="begin" data-id="'+esc(m.id)+'">'+
-      (tries.length?'Start a retake':'Start the test')+'</button>'+
-    '<span class="tiny" style="color:var(--paper-text-2)">'+
-      (locked?'A retake needs the instructor key.'
-        :m.quiz.award==='none'?'No points are attached to this title.'
-        :m.quiz.award==='full'?'Any passing score earns the full '+pts(m.ar.points)+' points.'
-        :'Points are awarded in proportion to the score.')+
-    '</span></div>';
+    }).join('')+'</div>';
 
+  if(chapters.length){
+    var pctDone=prog.total?Math.round(prog.done/prog.total*100):0;
+    h+='<div class="progline"><div class="bar"><span style="width:'+pctDone+'%"></span></div>'+
+       '<div class="tiny" style="color:var(--paper-text-2)">'+prog.done+' of '+prog.total+' passed</div></div>';
+  }
+  h+='<hr>';
+
+  if(chapters.length){
+    h+='<h3 style="font-size:1.06rem;margin-bottom:10px">Chapters</h3><div class="papers">';
+    chapters.forEach(function(ch){
+      h+=paperRow(m,paperOf(m,ch.id),chapterLocked(m,ch));
+    });
+    h+='</div>';
+    if(hasBookTest(m)){
+      h+='<h3 style="font-size:1.06rem;margin:20px 0 10px">The whole book</h3><div class="papers">'+
+         paperRow(m,paperOf(m,null),false)+'</div>';
+    }
+    if(m.quiz.chaptersInOrder)
+      h+='<p class="tiny" style="color:var(--paper-text-2);margin-top:12px">Chapters open one at a time — pass one to reach the next.</p>';
+  }else{
+    h+='<div class="row"><button class="btn btn-primary" data-act="begin" data-id="'+esc(m.id)+'">'+
+      (attemptsFor(m.id,null).length?'Start a retake':'Start the test')+'</button>'+
+      '<span class="tiny" style="color:var(--paper-text-2)">'+
+      (attemptsFor(m.id,null).length&&m.quiz.lockRetakes&&!S.admin
+        ? 'A retake needs the instructor key.'
+        : m.quiz.award==='none'?'No points are attached to this title.'
+        : m.quiz.award==='full'?'Any passing score earns the full '+pts(m.ar.points)+' points.'
+        : 'Points are awarded in proportion to the score.')+'</span></div>';
+  }
+
+  var tries=attemptsFor(m.id);
   if(tries.length){
     h+='<hr><h3 style="font-size:1.06rem">Your attempts</h3><div class="review" style="margin-top:6px">';
-    tries.forEach(function(r){
-      h+='<div class="item"><div class="a">'+
+    tries.slice(0,12).forEach(function(r){
+      h+='<div class="item"><div class="a" style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">'+
         '<span style="font-family:var(--serif);font-size:1.1rem">'+r.pct+'%</span>'+
-        '<span>'+r.correct+' of '+r.total+' correct</span>'+
+        '<span>'+esc(r.chapterTitle||'The whole book')+'</span>'+
         '<span class="'+(r.passed?'good':'')+'" style="'+(r.passed?'':'color:var(--paper-text-2)')+'">'+
           (r.passed?pts(r.points)+' points':'no points')+'</span>'+
         '<span style="color:var(--paper-text-2)">'+dateShort(r.date)+'</span></div></div>';
@@ -2066,7 +2287,7 @@ function quizInner(){
       '<span class="key">'+'abcdefgh'.charAt(i)+'</span><span>'+esc(o.t)+'</span></button>';
   }).join('');
   return '<div class="quizbar">'+
-      '<span class="who">'+esc(m.title)+'</span>'+
+      '<span class="who">'+esc(m.title)+(run.chapterId?' &nbsp;·&nbsp; '+esc(run.paper.label):'')+'</span>'+
       '<span class="count">'+(run.idx+1)+' / '+run.items.length+'</span>'+
       '<button class="iconbtn quizexit" data-act="abandon" aria-label="Leave this test">'+
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
@@ -2087,7 +2308,7 @@ function mountQuizLayer(on){
   if(!on){
     if(quizLayerEl&&quizLayerEl.parentNode)quizLayerEl.parentNode.removeChild(quizLayerEl);
     quizLayerEl=null;
-    document.body.style.overflow='';
+    pageUnlock();
     return;
   }
   if(!quizLayerEl){
@@ -2095,7 +2316,7 @@ function mountQuizLayer(on){
     quizLayerEl.className='quizlayer';
     quizLayerEl.innerHTML='<div class="quizbox"></div>';
     document.body.appendChild(quizLayerEl);
-    document.body.style.overflow='hidden';
+    pageLock();
   }
   quizLayerEl.querySelector('.quizbox').innerHTML=quizInner();
 }
@@ -2115,6 +2336,7 @@ function viewResults(){
       '<div class="mid"><div class="n tnum" id="bignum">'+big+'</div><div class="u">'+unit+'</div></div>'+
     '</div>'+
     '<div><div class="verdict">'+esc(verdictFor(m,rec))+'</div>'+
+    (rec.chapterTitle?'<div class="tiny" style="color:var(--paper-text-2);margin-bottom:4px">'+esc(rec.chapterTitle)+'</div>':'')+
     '<div class="scoreline">'+rec.pct+'% &nbsp;·&nbsp; '+rec.correct+' of '+rec.total+' correct'+
     (none?'':' &nbsp;·&nbsp; '+(rec.passed?pts(rec.points)+' points added':'no points'))+'</div></div>'+
     '</div>';
@@ -2305,7 +2527,10 @@ function viewTitles(){
     S.modules.slice().sort(function(a,b){return a.title.localeCompare(b.title);}).forEach(function(m){
       h+='<tr><td>'+esc(m.title)+'<div class="tiny muted">'+esc(m.author||'')+'</div></td>'+
         '<td class="n">'+(m.ar.level==null?'—':m.ar.level)+'</td>'+
-        '<td class="n">'+m.questions.length+'</td><td class="n">'+pts(m.ar.points)+'</td>'+
+        '<td class="n">'+((m.chapters||[]).length
+            ? m.questions.length+' + '+m.chapters.reduce(function(s,c){return s+c.questions.length;},0)
+            : m.questions.length)+'</td>'+
+        '<td class="n">'+pts(titlePoints(m))+'</td>'+
         '<td style="text-align:right;white-space:nowrap">'+
         '<button class="btn btn-sm btn-ghost" data-act="export-mod" data-id="'+esc(m.id)+'">Save</button> '+
         '<button class="btn btn-sm btn-danger" data-act="del-mod" data-id="'+esc(m.id)+'">Remove</button></td></tr>';
@@ -2361,6 +2586,7 @@ function viewSettings(){
       '<td class="n">'+pts(spentTotal(p))+'</td>'+
       '<td class="n">'+pts(balance(p))+'</td>'+
       '<td style="text-align:right;white-space:nowrap">'+
+        '<button class="btn btn-sm" data-act="adjust-points" data-id="'+p.id+'">Points</button> '+
         '<button class="btn btn-sm btn-ghost" data-act="wipe-reader" data-id="'+p.id+'">Erase data</button> '+
         (S.profiles.length>1?
         '<button class="btn btn-sm btn-danger" data-act="del-profile" data-id="'+p.id+'">Delete</button>':'')+'</td></tr>';
@@ -2460,6 +2686,71 @@ function showStatusText(txt){
     '<div class="foot"><button class="btn btn-primary" data-close>Close</button></div>');
 }
 
+
+/* Instructor can hand out or take back points directly — a reward that
+   does not fit an activity, or a correction. */
+function pointsEditor(p){
+  function body(){
+    var log=adjustmentsOf(p).slice().sort(function(a,b){return a.date<b.date?1:-1;}).slice(0,6);
+    return '<h3>Adjust '+esc(p.name)+'&rsquo;s points</h3>'+
+      '<p class="lede">Balance is '+pts(balance(p))+'. A positive number gives points, a negative one takes them back.</p>'+
+      '<div class="row" style="gap:6px;margin-top:16px">'+
+        [-10,-5,-1,1,5,10].map(function(n){
+          return '<button class="btn btn-sm" type="button" data-bump="'+n+'">'+(n>0?'+':'')+n+'</button>';
+        }).join('')+
+      '</div>'+
+      '<label class="field stack"><span>Points</span>'+
+      '<input class="inp" id="a-pts" data-focus type="number" step="0.5" value="0"></label>'+
+      '<label class="field"><span>Reason — the reader sees this</span>'+
+      '<input class="inp" id="a-why" maxlength="60" placeholder="Helped tidy the classroom"></label>'+
+      '<div class="err" id="a-err"></div>'+
+      (log.length?'<div class="divider"></div><div class="tiny muted" style="margin-bottom:6px">Recent adjustments</div>'+
+        log.map(function(a){
+          return '<div class="receipt" style="padding:8px 0">'+
+            '<span style="font-family:var(--serif);font-size:1.05rem;color:'+
+              (a.points>=0?'var(--gold-hi)':'var(--fail)')+';min-width:52px">'+
+              (a.points>0?'+':'')+pts(a.points)+'</span>'+
+            '<div style="flex:1;min-width:0"><div class="tiny">'+esc(a.note||'No reason given')+'</div>'+
+            '<div class="tiny muted">'+dateShort(a.date)+'</div></div>'+
+            '<button class="btn btn-sm btn-ghost" type="button" data-undo="'+esc(a.id)+'">Undo</button>'+
+            '</div>';
+        }).join(''):'')+
+      '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+      '<button class="btn btn-primary" id="a-save">Apply</button></div>';
+  }
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var b=e.target.closest('[data-bump]');
+      if(b){
+        var box=scrim.querySelector('#a-pts');
+        box.value=(Math.round((num(box.value,0)+num(b.dataset.bump,0))*10)/10);
+        return;
+      }
+      var u=e.target.closest('[data-undo]');
+      if(u){
+        p.adjustments=adjustmentsOf(p).filter(function(a){return a.id!==u.dataset.undo;});
+        save();redrawModal(body(),mount);render();
+        return;
+      }
+    });
+    scrim.querySelector('#a-save').addEventListener('click',function(){
+      var n=num(scrim.querySelector('#a-pts').value,0);
+      var why=scrim.querySelector('#a-why').value.trim();
+      if(!n){scrim.querySelector('#a-err').textContent='Enter a number of points, up or down.';return;}
+      if(balance(p)+n<0){
+        scrim.querySelector('#a-err').textContent='That would put '+p.name+' below zero. They have '+pts(balance(p))+'.';
+        return;
+      }
+      p.adjustments=adjustmentsOf(p).concat([{id:uid(),points:Math.round(n*10)/10,
+        note:why,date:nowISO()}]);
+      save();closeModal();
+      toast((n>0?'Gave ':'Took back ')+pts(Math.abs(n))+' points. '+p.name+' now has '+pts(balance(p))+'.','good');
+      render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+
 /* =========================================================
    Router
    ========================================================= */
@@ -2514,7 +2805,7 @@ function render(){
   $('#chip').classList.toggle('on',S.view==='profile'||S.view==='records');
 
   $('#foot-left').textContent=S.modules.length+(S.modules.length===1?' title':' titles')+
-    ', '+pts(S.modules.reduce(function(s,m){return s+m.ar.points;},0))+' points available';
+    ', '+pts(S.modules.reduce(function(s,m){return s+titlePoints(m);},0))+' points available';
   $('#foot-right').textContent=p?(p.name+' has earned '+pts(earnedTotal())):'';
 
   if(S.view==='quiz'&&S.run)wakeOn();else wakeOff();
@@ -2546,7 +2837,7 @@ document.addEventListener('click',function(e){
   else if(act==='drop-avatar'){me().avatar='';save();render();}
   else if(act==='signout'){S.active=null;S.admin=false;save();go('gate');}
   else if(act==='open'){go('title',id);}
-  else if(act==='begin'){requestStart(id);}
+  else if(act==='begin'){requestStart(id,b.dataset.ch||null);}
   else if(act==='answer'){answer(Number(b.dataset.i),b);}
   else if(act==='abandon'){
     confirmModal('Leave this test?','Nothing is recorded and the questions are reshuffled next time.',
@@ -2642,6 +2933,11 @@ document.addEventListener('click',function(e){
         },true);
     });
   }
+  else if(act==='adjust-points'){
+    requireAdmin('Adjusting points needs the instructor key.',function(){
+      var p=profile(id);if(p)pointsEditor(p);
+    });
+  }
   else if(act==='wipe-reader'){
     requireAdmin('Erasing a reader\u2019s data needs the instructor key.',function(){
       var p=profile(id);if(!p)return;
@@ -2649,7 +2945,7 @@ document.addEventListener('click',function(e){
         'Every test result, all earned points, their activity log, their redemption history '+
         'and their picture are removed. '+
         'The reader and their name stay.','Erase data',function(){
-          p.records=[];p.purchases=[];p.activities=[];p.avatar='';
+          p.records=[];p.purchases=[];p.activities=[];p.adjustments=[];p.avatar='';
           if(S.last&&S.active===id)S.last=null;
           save();toast(p.name+'\u2019s data erased.');render();
         },true);
@@ -3081,8 +3377,14 @@ function bindViewport(){
     root.style.setProperty('--vv-w',vv.width+'px');
     root.style.setProperty('--vv-h',vv.height+'px');
   }
-  vv.addEventListener('resize',sync);
+  vv.addEventListener('resize',function(){sync();reassertLock();});
   vv.addEventListener('scroll',sync);
+  /* The blur that closes the keyboard is the moment iOS leaves the page
+     scrolled, so settle it once the animation has finished. */
+  document.addEventListener('focusout',function(){
+    setTimeout(function(){sync();reassertLock();},120);
+    setTimeout(function(){sync();reassertLock();},400);
+  },true);
   window.addEventListener('orientationchange',function(){setTimeout(sync,250);});
   sync();
 }
@@ -3172,10 +3474,14 @@ function purchasesOf(p){p=p||me();return (p&&p.purchases)?p.purchases:[];}
 function spentTotal(p){
   return purchasesOf(p).reduce(function(s,r){return s+(Number(r.cost)||0);},0);
 }
+function adjustmentsOf(p){p=p||me();return (p&&p.adjustments)?p.adjustments:[];}
+function adjustedTotal(p){
+  return Math.round(adjustmentsOf(p).reduce(function(s,a){return s+(Number(a.points)||0);},0)*10)/10;
+}
 function balance(p){
   p=p||me();
   if(!p)return 0;
-  return Math.round((earnedTotal(p.records)+activityPoints(p)-spentTotal(p))*10)/10;
+  return Math.round((earnedTotal(p.records)+activityPoints(p)+adjustedTotal(p)-spentTotal(p))*10)/10;
 }
 
 /* ---------- dates ---------- */
@@ -3367,7 +3673,7 @@ function eligibility(item,p){
   var ask=priceOf(item).now;
   if(balance(p)<ask){
     var short=Math.round((ask-balance(p))*10)/10;
-    return{can:false,label:pts(short)+' more points',tone:'cold',avail:av,owned:mine.length};
+    return{can:false,label:pts(short)+' more points needed',tone:'cold',avail:av,owned:mine.length};
   }
   return{can:true,label:av.label,tone:av.tone,avail:av,owned:mine.length};
 }
@@ -3390,6 +3696,7 @@ function viewStore(){
     '<div style="margin-left:auto;text-align:right" class="tiny muted">'+
     pts(earnedTotal(p?p.records:[]))+' from tests<br>'+
     pts(activityPoints(p))+' from activities<br>'+
+    (adjustedTotal(p)?(adjustedTotal(p)>0?'+':'')+pts(adjustedTotal(p))+' from your instructor<br>':'')+
     pts(spentTotal(p))+' spent</div></div>';
 
   if(S.admin){
@@ -3486,7 +3793,7 @@ function itemCard(it,p,hero){
         (it.featured?'Unfeature':'Feature')+'</button>'+
       '<button class="btn btn-sm btn-ghost" data-act="item-lock" data-id="'+esc(it.id)+'">'+
         (it.locked?'Unlock':'Lock')+'</button>'+
-      '<button class="btn btn-sm btn-danger" data-act="item-del" data-id="'+esc(it.id)+'" style="margin-left:auto">Remove</button>'+
+      '<button class="btn btn-sm btn-danger" data-act="item-del" data-id="'+esc(it.id)+'">Remove</button>'+
     '</div>':'')+
     '</div>';
 }

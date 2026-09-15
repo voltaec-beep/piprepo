@@ -1,0 +1,191 @@
+{
+  "schema": "pip-module/1",
+  "id": "alice-in-wonderland",
+  "title": "Alice's Adventures in Wonderland",
+  "author": "Lewis Carroll",
+  "summary": "A chapter-by-chapter title. Pass each chapter as you read it, then sit the whole-book test at the end.",
+
+  "ar": {
+    "level": null,
+    "points": 3.0,
+    "wordCount": 26500,
+    "interest": "MG"
+  },
+
+  "quiz": {
+    "passing": 70,
+    "ask": 0,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "award": "proportional",
+    "reviewMisses": true,
+    "lockRetakes": true,
+    "chaptersInOrder": true
+  },
+
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "1. Down the Rabbit-Hole",
+      "points": 1.5,
+      "questions": [
+        {
+          "q": "What is Alice's complaint about the book her sister is reading?",
+          "options": ["It has no pictures or conversations", "It is far too long", "It is written in French", "She has read it before"],
+          "answer": 0,
+          "why": "Her boredom with a picture-less book is what makes a talking rabbit worth following.",
+          "tag": "plot"
+        },
+        {
+          "q": "What makes the White Rabbit worth chasing, rather than just odd?",
+          "options": ["It is wearing a crown", "It takes a watch out of its waistcoat-pocket", "It speaks Latin", "It is enormous"],
+          "answer": 1,
+          "why": "Alice only starts after it once it produces a pocket watch — a rabbit in a waistcoat with somewhere to be.",
+          "tag": "plot"
+        },
+        {
+          "q": "What does Alice notice on the shelves as she falls?",
+          "options": ["Nothing, it is pitch dark", "Cupboards, bookshelves, maps and a jar labelled orange marmalade", "Portraits of her family", "Clocks of every size"],
+          "answer": 1,
+          "why": "The fall is furnished like a house, which is the first sign the rules have changed.",
+          "tag": "setting"
+        },
+        {
+          "q": "Why can Alice not use the little golden key at first?",
+          "options": ["The lock is rusted shut", "She is far too large for the door it opens", "She drops it down a crack", "It belongs to the Rabbit"],
+          "answer": 1,
+          "why": "The key fits the tiny door to the garden, which sets up the whole drink-me and eat-me problem.",
+          "tag": "plot"
+        },
+        {
+          "q": "What happens when Alice drinks from the bottle marked DRINK ME?",
+          "options": ["She falls asleep", "She shuts up like a telescope and shrinks", "She grows taller", "Nothing at all"],
+          "answer": 1,
+          "why": "Shrinking gets her to the right size for the door, but leaves the key on a table she can no longer reach.",
+          "tag": "plot"
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "2. The Pool of Tears",
+      "points": 1.5,
+      "questions": [
+        {
+          "q": "How does Alice greet her sudden growth at the start of the chapter?",
+          "options": ["\"Curiouser and curiouser!\"", "\"Off with her head!\"", "\"How doth the little crocodile\"", "\"We're all mad here\""],
+          "answer": 0,
+          "why": "Her own grammar falls apart along with her size, which she notices and half apologises for.",
+          "tag": "character"
+        },
+        {
+          "q": "What odd plan does Alice make once her feet are a long way off?",
+          "options": ["To write them a letter of complaint", "To send them presents at Christmas", "To leave them behind", "To have them measured"],
+          "answer": 1,
+          "why": "She imagines posting boots to her own feet, addressed to the hearth-rug — silly in a way she takes entirely seriously.",
+          "tag": "character"
+        },
+        {
+          "q": "What does the White Rabbit drop when Alice startles him?",
+          "options": ["His pocket watch", "A pair of white kid gloves and a fan", "A tray of tarts", "A trumpet"],
+          "answer": 1,
+          "why": "The fan is the important one: fanning herself is what shrinks her again.",
+          "tag": "plot"
+        },
+        {
+          "q": "What is the pool Alice ends up swimming in?",
+          "options": ["The sea", "A pool of her own tears", "A bowl of soup", "A river of ink"],
+          "answer": 1,
+          "why": "She wept while she was nine feet tall, so the pool is the exact size of her earlier misery.",
+          "tag": "plot"
+        },
+        {
+          "q": "How does Alice offend the Mouse?",
+          "options": ["By swimming too close", "By talking about her cat Dinah", "By laughing at its tail", "By refusing to speak French"],
+          "answer": 1,
+          "why": "She cannot stop mentioning what a good mouser Dinah is — a habit that gets her into trouble again later.",
+          "tag": "character"
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "3. A Caucus-Race and a Long Tale",
+      "points": 1.5,
+      "questions": [
+        {
+          "q": "Who proposes the Caucus-race, and why?",
+          "options": ["The Mouse, to warm everyone up", "The Dodo, as the best way to get dry", "The Eaglet, for a joke", "Alice, to pass the time"],
+          "answer": 1,
+          "why": "The Dodo's answer to being soaked is a race, explained in the most official language possible.",
+          "tag": "plot"
+        },
+        {
+          "q": "What are the rules of the Caucus-race?",
+          "options": ["Three laps of the bank", "There is no proper start or finish, and everyone runs as they please", "Last one to the rock wins", "Everyone must run backwards"],
+          "answer": 1,
+          "why": "Nobody calls time; they simply stop, and the joke is that a race with no rules still needs a prize-giving.",
+          "tag": "plot"
+        },
+        {
+          "q": "How does the race end?",
+          "options": ["The Dodo wins", "Everybody has won, and all must have prizes", "It is abandoned in the rain", "The Mouse is disqualified"],
+          "answer": 1,
+          "why": "The Dodo's verdict is the line the whole scene is built to reach.",
+          "tag": "theme"
+        },
+        {
+          "q": "Where do the prizes come from?",
+          "options": ["The Dodo's hat", "Alice's pocket, which holds a box of comfits", "A tree by the bank", "The Rabbit's house"],
+          "answer": 1,
+          "why": "Alice supplies the prizes and is then handed her own thimble back as hers, presented very solemnly.",
+          "tag": "plot"
+        },
+        {
+          "q": "Why do the birds leave at the end of the chapter?",
+          "options": ["It starts to rain", "Alice talks about Dinah again", "The Mouse calls them away", "They are late for the Queen"],
+          "answer": 1,
+          "why": "She repeats exactly the mistake she made with the Mouse, and clears the bank of company.",
+          "tag": "character"
+        }
+      ]
+    }
+  ],
+
+  "verdicts": {
+    "high": "Curiouser and curiouser — and very well read.",
+    "pass": "Well done. On to the next chapter.",
+    "fail": "Below the passing mark. Read it again and come back."
+  },
+
+  "questions": [
+    {
+      "q": "What sets the whole adventure off?",
+      "options": ["Alice falls asleep over a lesson book", "Alice follows a White Rabbit with a pocket watch down a hole", "Alice is pushed by her sister", "Alice chases a cat"],
+      "answer": 1,
+      "why": "The rabbit, the waistcoat and the watch together are the invitation she cannot refuse.",
+      "tag": "plot"
+    },
+    {
+      "q": "What repeated mistake keeps costing Alice company in the early chapters?",
+      "options": ["Mentioning her cat Dinah to animals", "Forgetting her own name", "Refusing to run races", "Crying too loudly"],
+      "answer": 0,
+      "why": "First the Mouse, then the birds — she means no harm and empties the room twice.",
+      "tag": "theme"
+    },
+    {
+      "q": "What is Alice's own prize in the Caucus-race?",
+      "options": ["A box of comfits", "Her own thimble, handed back to her", "A pocket watch", "Nothing at all"],
+      "answer": 1,
+      "why": "She provides every prize and receives her own property with full ceremony.",
+      "tag": "plot"
+    },
+    {
+      "q": "How does Wonderland treat rules and ceremony in these chapters?",
+      "options": ["It obeys them strictly", "It keeps the ceremony and drops the sense", "It ignores them completely", "It punishes anyone who breaks them"],
+      "answer": 1,
+      "why": "A race with no start, a prize-giving with no prizes, a verdict with no contest — the forms survive, the logic does not.",
+      "tag": "theme"
+    }
+  ]
+}

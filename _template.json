@@ -6,14 +6,12 @@
   "series": "",
   "volume": null,
   "summary": "One or two sentences describing what this test covers. Shown on the title card before the reader begins.",
-
   "ar": {
     "level": 5.0,
     "points": 8.0,
     "wordCount": null,
     "interest": "MG"
   },
-
   "quiz": {
     "passing": 70,
     "ask": 0,
@@ -21,32 +19,40 @@
     "shuffleOptions": true,
     "award": "proportional",
     "reviewMisses": true,
-    "lockRetakes": true
+    "lockRetakes": true,
+    "chaptersInOrder": false
   },
-
   "verdicts": {
     "high": "",
     "pass": "",
     "fail": ""
   },
-
   "questions": [
     {
       "q": "Question text. Keep it answerable only by someone who read the book.",
-      "options": ["Correct answer", "Plausible distractor", "Plausible distractor", "Plausible distractor"],
+      "options": [
+        "Correct answer",
+        "Plausible distractor",
+        "Plausible distractor",
+        "Plausible distractor"
+      ],
       "answer": 0,
       "why": "Optional. Shown in the review screen after a missed question.",
       "tag": "plot"
     },
     {
       "q": "A second question.",
-      "options": ["Wrong", "Right", "Wrong", "Wrong"],
+      "options": [
+        "Wrong",
+        "Right",
+        "Wrong",
+        "Wrong"
+      ],
       "answer": 1,
       "why": "",
       "tag": "character"
     }
   ],
-
   "_notes": {
     "id": "Lowercase, no spaces. Must be unique in the catalogue. Leave it out and it will be generated from the title.",
     "ar.points": "Maximum points the title is worth. This is the number the award is calculated from.",
@@ -56,6 +62,32 @@
     "quiz.lockRetakes": "true = a second attempt needs the instructor password.",
     "questions[].answer": "Zero-based index into the options array. The first option is 0.",
     "verdicts": "Optional flavour lines shown on the results card. 'high' is used at 90% or above. Leave blank to use the system wording.",
-    "questions[].tag": "Free text. Used to group the results breakdown, e.g. plot, character, setting, vocabulary, theme."
-  }
+    "questions[].tag": "Free text. Used to group the results breakdown, e.g. plot, character, setting, vocabulary, theme.",
+    "chapters": "Optional. Each chapter is its own test with its own points and its own pass mark. A title can have chapters, a whole-book test, or both \u2014 'questions' is the whole-book test. Points shown in the catalogue are the chapters plus the book test added up.",
+    "quiz.chaptersInOrder": "true = a chapter stays locked until the one before it is passed.",
+    "chapters[].points": "What passing this chapter is worth. Chapters pay separately, and each pays once from its best attempt."
+  },
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "1. Chapter title",
+      "points": 1.0,
+      "passing": 70,
+      "ask": 0,
+      "questions": [
+        {
+          "q": "A question about this chapter only.",
+          "options": [
+            "Right",
+            "Wrong",
+            "Wrong",
+            "Wrong"
+          ],
+          "answer": 0,
+          "why": "",
+          "tag": "plot"
+        }
+      ]
+    }
+  ]
 }

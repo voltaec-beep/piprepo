@@ -4,6 +4,7 @@
   "updated": "2026-09-14",
   "modules": [
     "amulet-of-samarkand.json",
-    "the-tortoise-and-the-hare.json"
+    "the-tortoise-and-the-hare.json",
+    "alice-in-wonderland.json"
   ]
 }

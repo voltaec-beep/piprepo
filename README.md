@@ -82,7 +82,29 @@ What changed and why:
 
 Every text-on-surface pair was checked: all body and label combinations clear WCAG AA in both palettes.
 
-## 5. The module format
+## 5. Chapters
+
+A title can be tested as a whole book, chapter by chapter, or both. Add a `chapters` array and each entry becomes its own test with its own questions, its own points and its own pass mark:
+
+```json
+"chapters": [
+  { "id": "ch1", "title": "1. Down the Rabbit-Hole", "points": 1.5,
+    "questions": [ { "q": "...", "options": ["...","..."], "answer": 0 } ] }
+],
+"questions": [ ... ]        // still the whole-book test, if you want one
+```
+
+The top-level `questions` array stays exactly what it was, so every existing module keeps working untouched. A title with both offers the chapters and a final test over the lot.
+
+**Points.** Each chapter pays separately and pays once, from its best attempt — so a reader can retake chapter 2 without putting chapter 1's points at risk. The number on the catalogue medallion is every chapter plus the book test added together.
+
+**Order.** Set `"chaptersInOrder": true` in `quiz` and each chapter stays locked until the one before it is passed, which keeps a reader honest about reading in sequence. The whole-book test is never gated — a reader who has finished the book can sit it.
+
+**Progress** shows on the title page as a bar and on the catalogue card as "2/4 chapters". The quiz names the chapter in its header, results name it, and every record keeps the chapter it belonged to.
+
+`alice-in-wonderland.json` ships as a working example: three chapters at 1.5 points each, gated in order, plus a 3-point whole-book test.
+
+## 6. The module format
 
 Only `title` and `questions` are required.
 
@@ -277,7 +299,9 @@ The profile page is the hub: your picture and name, quick cards through to **Rec
 
 ## Erasing a reader's data
 
-Settings → Readers now shows tests taken, points spent and current balance per reader, with two actions. **Erase data** removes every test result, all earned points, the activity log, the redemption history and the profile picture, keeping the reader and their name. **Delete** removes the reader entirely. Both need the instructor key.
+Settings → Readers now shows tests taken, points spent and current balance per reader, with two actions. **Points** opens an adjustment panel: quick −10 to +10 buttons or an exact figure, plus a reason the reader sees. It refuses to push anyone below zero, keeps a log of recent adjustments, and each one can be undone. Instructor-granted points show separately in the store's balance breakdown.
+
+**Erase data** removes every test result, all earned points, the activity log, the redemption history and the profile picture, keeping the reader and their name. **Delete** removes the reader entirely. Both need the instructor key.
 
 ---
 
