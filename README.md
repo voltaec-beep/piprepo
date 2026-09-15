@@ -245,6 +245,8 @@ On sale, the card shows the old price struck through, the new price beside it, a
 
 ### Redeeming
 
+An item a reader cannot afford yet is **not** dimmed. It keeps its full colour and simply says how many more points are needed, because something to save towards should look worth saving towards. Dimming is kept for items that are genuinely shut: out of season, locked, or already taken to their limit. The shelf sorts accordingly — redeemable first, then within reach, then closed.
+
 A reader taps Redeem, confirms against their balance, and the points come off. Eligibility is rechecked at the moment of purchase, so two quick taps cannot overspend.
 
 **Redemptions** (instructor) lists everything every reader has spent, newest first, with a count of what is still waiting to be handed over. **Mark given** tracks that. **Refund** returns the points and removes the redemption, for the inevitable mis-tap.
@@ -257,6 +259,8 @@ Reading is no longer the only way to earn. An activity is anything you want to e
 
 *How often it counts:* once only, every day, every week or every month. For a repeating activity you set how many times it can be done in that period, and weekly or monthly ones can also carry a **most-times-in-a-single-day** cap — so "three times a week, but only once a day" is a single setting rather than a rule you have to police. Daily counts reset at midnight, weekly on Monday morning, monthly on the first.
 
+*When it is available:* always, between two dates, or returning on a cycle — the same three rules the store uses. That makes a reading-week challenge, a holiday task or a termly bonus possible: the activity appears on its own, wears a swinging countdown badge while it runs, and goes quiet when it is over. There is a switch to hide it entirely between runs rather than advertise its return.
+
 *Who it is for:* every reader, or named ones. An activity assigned to someone else simply does not appear on your list.
 
 **Approval.** Tick *hold the points until an instructor approves it* and marking something done logs it without crediting anything. It appears under **Approvals** with a count of what is waiting, and the points land when you approve. Undo takes them back off. This is the difference between "I say I practised" and "you saw me practise".
@@ -268,6 +272,8 @@ Activity points and test points are the same currency. The store's balance line 
 ## Item and activity icons
 
 Store items and activities share one icon system with three sources: any emoji from your device's keyboard (there is a field you can tap the emoji key into, plus fifty common ones to pick from), seventeen built-in symbols with a background and symbol colour you choose, or a picture cropped with the same tool the avatars use.
+
+**Size.** A slider sets how large the mark sits inside its tile, from 50% to 180%, and the preview follows as you drag. The scale is relative, not absolute, so one setting looks right everywhere the icon appears — the 68px featured tile, the 48px activity row, the 36px line in a receipt. A busy emoji can be dialled down, a simple glyph pushed up to fill its square.
 
 ## Colour roles
 
