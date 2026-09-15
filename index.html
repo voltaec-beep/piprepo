@@ -1339,6 +1339,31 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 }
 .abil svg{width:15px;height:15px;fill:currentColor;stroke:none}
 
+/* seasonal */
+.seasonflag{
+  font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold-hi);text-align:center;margin:-2px 0 2px;
+}
+.seasonflag.closing{color:var(--fail)}
+.pip-live .pw-leaf{transform-box:fill-box;transform-origin:50% 50%;animation:pipLeaf 5.6s linear infinite}
+.pip-live .pw-leaf.f1{animation-delay:-1.4s;animation-duration:6.4s}
+.pip-live .pw-leaf.f2{animation-delay:-2.8s}
+.pip-live .pw-leaf.f3{animation-delay:-4.2s;animation-duration:6.9s}
+@keyframes pipLeaf{
+  0%{transform:translate(0,-14px) rotate(0deg);opacity:0}
+  12%{opacity:1}
+  50%{transform:translate(7px,10px) rotate(160deg)}
+  85%{opacity:1}
+  100%{transform:translate(-3px,34px) rotate(330deg);opacity:0}
+}
+.pip-live .pw-sway{transform-box:fill-box;transform-origin:50% 100%;animation:pipBob 3s ease-in-out infinite}
+.pip-live .pw-swing{transform-box:fill-box;transform-origin:50% 0%;animation:pipSwing 2.8s ease-in-out infinite}
+@keyframes pipSwing{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.pip-live .pw-lampglow{animation:pipLamp 1.3s ease-in-out infinite}
+.pip-live .pw-lampface{animation:pipLamp .9s steps(2,end) infinite}
+@keyframes pipLamp{0%,100%{opacity:.3}50%{opacity:.75}}
+.pip-live .pw-bird{animation:pipBob 4.2s ease-in-out infinite;transform-box:fill-box}
+
 /* premium animations */
 .pip-live .pw-orbit{
   transform-box:fill-box;transform-origin:50% 50%;
@@ -1656,6 +1681,42 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .mrays{width:420px;height:420px}
   .mpip .pip{width:146px;height:146px}
 }
+
+/* ============ Pip reacting ============ */
+.pipstand,.emptypip,.dressstage{position:relative;cursor:pointer}
+.pip-hop{animation:pipHop .72s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pipHop{
+  0%{transform:translateY(0) scale(1,1)}
+  18%{transform:translateY(2px) scale(1.07,.92)}
+  46%{transform:translateY(-20px) scale(.95,1.06) rotate(-4deg)}
+  70%{transform:translateY(0) scale(1.05,.95) rotate(3deg)}
+  100%{transform:translateY(0) scale(1,1) rotate(0)}
+}
+.pip-glance{animation:pipGlance 1.5s ease-in-out}
+@keyframes pipGlance{
+  0%,100%{transform:rotate(0)}
+  22%{transform:rotate(-5deg)}
+  48%{transform:rotate(4deg)}
+  72%{transform:rotate(-2deg)}
+}
+.pipsay{
+  position:absolute;left:50%;bottom:calc(100% - 6px);transform:translateX(-50%);
+  max-width:min(260px,72vw);width:max-content;
+  padding:9px 14px;border-radius:14px;
+  background:var(--paper);color:var(--paper-text);
+  font-size:.84rem;line-height:1.4;text-align:center;
+  box-shadow:0 10px 24px -10px rgba(0,0,0,.6);
+  animation:sayIn .28s cubic-bezier(.2,1.4,.4,1) both;
+  z-index:4;pointer-events:none;
+}
+.pipsay::after{
+  content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-top-color:var(--paper);
+}
+.pipsay.go{animation:sayOut .4s var(--ease) both}
+@keyframes sayIn{from{opacity:0;transform:translateX(-50%) translateY(8px) scale(.9)}}
+@keyframes sayOut{to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
+@media(max-width:480px){.pipsay{font-size:.8rem;padding:8px 12px}}
 </style>
 </head>
 <body>
@@ -3327,7 +3388,8 @@ function viewPipShop(){
     '<th class="n">Offered</th></tr></thead><tbody>';
   PIP_LOOKS.concat(PIP_PARTS.filter(function(x){return x.price>0;})).forEach(function(t){
     var ab=t.grants?lookAbility(t):null;
-    h+='<tr><td>'+esc(t.name)+(t.tier==='top'?' <span class="pill warm">top</span>':'')+'</td>'+
+    h+='<tr><td>'+esc(t.name)+(t.tier==='top'?' <span class="pill warm">top</span>':'')+
+      (t.season&&PIP_SEASONS[t.season]?' <span class="pill">'+esc(PIP_SEASONS[t.season].name)+'</span>':'')+'</td>'+
       '<td class="tiny muted">'+(t.grants?'complete look':esc(PIP_SLOT_NAMES[t.slot]||t.slot))+'</td>'+
       '<td class="n"><input class="inp" style="width:78px;text-align:right" data-price="'+esc(t.id)+
         '" type="number" min="0" step="0.5" value="'+pipPrice(t)+'"></td>'+
@@ -3338,7 +3400,7 @@ function viewPipShop(){
       '<td class="n">'+(ab?'<input class="inp" style="width:64px;text-align:right" data-abilv="'+
         esc(t.id)+'" type="number" min="0" max="100" value="'+ab.value+'">':'')+'</td>'+
       '<td class="n"><input type="checkbox" data-offer="'+esc(t.id)+'"'+
-        (pipOffered(t)?' checked':'')+'></td></tr>';
+        (!pipShopCfg().off[t.id]?' checked':'')+'></td></tr>'+'';
   });
   h+='</tbody></table></div>'+
     '<button class="btn btn-primary stack" data-act="save-pipshop">Save Pip prices</button></div>';
@@ -3604,9 +3666,10 @@ function pointsEditor(p){
   openModal(body(),mount,{dismissable:false});
 }
 
-function emptyPip(pose){
+function emptyPip(pose,where){
   var p=me();
-  return '<div class="emptypip">'+pipSVG(p?pipLook(p):{},pose||'wait',104)+'</div>';
+  return '<div class="emptypip" data-act="pip-poke" data-where="'+esc(where||'')+'">'+
+    pipSVG(p?pipLook(p):{},pose||'wait',104)+'</div>';
 }
 
 /* =========================================================
@@ -3619,6 +3682,7 @@ var VIEWS={gate:viewGate,catalog:viewCatalog,title:viewTitle,results:viewResults
   events:viewEvents,reviews:viewReviews,room:viewRoom};
 
 function go(v,arg){
+  if(v!==S.view)resetGreetings();
   S.view=v;S.arg=(arg===undefined?null:arg);
   if(!navBack)pushView();
   render();
@@ -3672,6 +3736,7 @@ function render(){
   $('#foot-right').textContent=p?(p.name+' has earned '+pts(earnedTotal())):'';
 
   if(S.view==='quiz'&&S.run)wakeOn();else wakeOff();
+  if(S.view==='room')pipGreet('room',$('.room .pipstand'));
   if(S.view==='settings'){fillStatus();fillSnapSize();}
   if(S.view==='results')animateResults();
   var q=$('#q');
@@ -3741,6 +3806,7 @@ document.addEventListener('click',function(e){
   else if(act==='theme-set'){setTheme(b.dataset.t);}
   else if(act==='export-csv'){exportCSV();}
   else if(act==='buy'){buyItem(id);}
+  else if(act==='pip-poke'){pokePip(b,b.dataset.where||'');}
   else if(act==='room-wall'){
     var rp=me();
     if(rp){rp.room=rp.room||{};rp.room.wall=b.dataset.w;save();render();}
@@ -6442,9 +6508,9 @@ function streakEditor(existing){
    poses that already exist. Every reader has their own.
    ========================================================= */
 
-var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"],"inferno":["#FFD08A","#FF6A2C","#8E1408"],"aurora":["#B8FFEC","#7FC7FF","#8B5CF6"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle class=\"pw-gem\" cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>","horns":"<g transform=\"translate(0,0)\"><path d=\"M48 26 C35 22 24 8 28 -10 C31 -3 37 4 45 10 Z\" fill=\"#EFE4D2\"/><path d=\"M48 26 C37 22 28 9 30 -6 C35 2 41 8 46 12 Z\" fill=\"#C3B096\"/><path d=\"M42 18 C35 13 30 4 30 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/><path d=\"M80 26 C93 22 104 8 100 -10 C97 -3 91 4 83 10 Z\" fill=\"#EFE4D2\"/><path d=\"M80 26 C91 22 100 9 98 -6 C93 2 87 8 82 12 Z\" fill=\"#C3B096\"/><path d=\"M86 18 C93 13 98 4 98 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/></g>","starcrown":"<g transform=\"translate(0,0)\"><ellipse cx=\"64\" cy=\"8\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#FFD84D\" stroke-width=\"3\" opacity=\".9\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0s\" d=\"M38 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0.6s\" d=\"M64 -8 l3.2 6.5 7.2 .1 -5.6 5.2 2.2 7.2 -7.0 -4.1 -7.0 4.1 2.2 -7.2 -5.6 -5.2 7.2 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-1.2s\" d=\"M90 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path class=\"pw-wandstar\" d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g class=\"pw-balloon\"><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>","flame":"<g transform=\"translate(0,0)\"><g class=\"pw-fire\"><path d=\"M-2 0 C-14 -10 -10 -26 0 -34 C-2 -22 8 -22 6 -10 C10 -14 12 -8 10 -2 C8 6 -2 8 -2 0 Z\" fill=\"#FF8A2B\"/><path d=\"M-1 -2 C-8 -9 -6 -19 0 -25 C-1 -16 5 -16 4 -8 C3 -2 -1 2 -1 -2 Z\" fill=\"#FFE07A\"/></g></g>","trophy":"<g transform=\"translate(0,0)\"><g><rect x=\"-9\" y=\"16\" width=\"18\" height=\"5\" rx=\"2\" fill=\"#B37A10\"/><rect x=\"-4\" y=\"8\" width=\"8\" height=\"9\" fill=\"#D49A28\"/><path d=\"M-11 -12 h22 v9 a11 11 0 0 1 -22 0 z\" fill=\"#F4B53F\"/><path d=\"M-11 -9 h-6 v4 a7 7 0 0 0 7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/><path d=\"M11 -9 h6 v4 a7 7 0 0 1 -7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/></g></g>"},"backs":{"wings":"<g class=\"pw-wing pw-l\"><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g><g class=\"pw-wing pw-r\"><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<g class=\"pw-cape\"><path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/></g>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><g class=\"pw-flame\"><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/></g>","dragon":"<g class=\"pw-wing pw-l\"><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#C4342A\"/><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M30 56 L-25.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-33.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-25.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g><g class=\"pw-wing pw-r\"><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#C4342A\"/><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M90 56 L145.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L153.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L145.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g>","orbit":"<g class=\"pw-orbit\"><ellipse cx=\"60\" cy=\"60\" rx=\"62\" ry=\"22\" fill=\"none\" stroke=\"#9FD8FF\" stroke-width=\"2.6\" opacity=\".8\" transform=\"rotate(-18 60 60)\"/><path d=\"M122 42 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M-2 66 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M62 33 l1.8 3.6 4.0 .1 -3.1 2.9 1.2 4.0 -3.9 -2.3 -3.9 2.3 1.2 -4.0 -3.1 -2.9 4.0 -.1 z\" fill=\"#FFE9A8\"/></g>"},"auras":{"glow":"<circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect class=\"pw-spark s0\" x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect class=\"pw-spark s1\" x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect class=\"pw-spark s2\" x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>","starfield":"<g class=\"pw-field\"><circle class=\"pw-star s0\" cx=\"118.0\" cy=\"58.0\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"78.3\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"104.9\" cy=\"98.5\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.5\" cy=\"113.5\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"47.0\" cy=\"98.7\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.4\" cy=\"94.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"-4.9\" cy=\"80.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"-19.0\" cy=\"57.9\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"7.8\" cy=\"39.8\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.6\" cy=\"21.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"44.1\" cy=\"7.4\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.7\" cy=\"2.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"96.3\" cy=\"25.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"37.8\" r=\"3.2\" fill=\"#FFF3C4\"/></g>","embers":"<g><circle class=\"pw-ember e0\" cx=\"30\" cy=\"92\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"46\" cy=\"100\" r=\"2.4\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"76\" cy=\"98\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e0\" cx=\"92\" cy=\"88\" r=\"2.6\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"22\" cy=\"76\" r=\"2.2\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"98\" cy=\"72\" r=\"2.4\" fill=\"#FF8A2B\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g class=\"pw-twinkle\" clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>","scales":"<g clip-path=\"url(#skinclip)\"><path d=\"M18 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/></g>","galaxy":"<g clip-path=\"url(#skinclip)\" class=\"pw-galaxy\"><ellipse cx=\"54\" cy=\"58\" rx=\"46\" ry=\"16\" fill=\"__HI__\" opacity=\".40\" transform=\"rotate(-24 54 58)\"/><ellipse cx=\"66\" cy=\"66\" rx=\"38\" ry=\"11\" fill=\"#fff\" opacity=\".22\" transform=\"rotate(-24 66 66)\"/><circle cx=\"40\" cy=\"48\" r=\"2.4\" fill=\"#fff\"/><circle cx=\"76\" cy=\"70\" r=\"2\" fill=\"#fff\"/><circle cx=\"58\" cy=\"40\" r=\"1.8\" fill=\"#fff\"/><circle cx=\"84\" cy=\"52\" r=\"2.2\" fill=\"#fff\"/></g>"}};
+var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"],"inferno":["#FFD08A","#FF6A2C","#8E1408"],"aurora":["#B8FFEC","#7FC7FF","#8B5CF6"],"acorn":["#F4D7AC","#D29A5A","#7F4B22"],"straw":["#FFF1BD","#F1CB5A","#B0801A"],"maple":["#FFE0B0","#EF6A2E","#8C1B2E"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle class=\"pw-gem\" cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>","horns":"<g transform=\"translate(0,0)\"><path d=\"M48 26 C35 22 24 8 28 -10 C31 -3 37 4 45 10 Z\" fill=\"#EFE4D2\"/><path d=\"M48 26 C37 22 28 9 30 -6 C35 2 41 8 46 12 Z\" fill=\"#C3B096\"/><path d=\"M42 18 C35 13 30 4 30 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/><path d=\"M80 26 C93 22 104 8 100 -10 C97 -3 91 4 83 10 Z\" fill=\"#EFE4D2\"/><path d=\"M80 26 C91 22 100 9 98 -6 C93 2 87 8 82 12 Z\" fill=\"#C3B096\"/><path d=\"M86 18 C93 13 98 4 98 -3\" stroke=\"#A8927A\" stroke-width=\"1.6\" fill=\"none\" opacity=\".8\"/></g>","starcrown":"<g transform=\"translate(0,0)\"><ellipse cx=\"64\" cy=\"8\" rx=\"30\" ry=\"9\" fill=\"none\" stroke=\"#FFD84D\" stroke-width=\"3\" opacity=\".9\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0s\" d=\"M38 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-0.6s\" d=\"M64 -8 l3.2 6.5 7.2 .1 -5.6 5.2 2.2 7.2 -7.0 -4.1 -7.0 4.1 2.2 -7.2 -5.6 -5.2 7.2 -.1 z\" fill=\"#FFE9A8\"/><path class=\"pw-crownstar\" style=\"animation-delay:-1.2s\" d=\"M90 1 l2.5 5.0 5.6 .1 -4.3 4.1 1.7 5.6 -5.5 -3.2 -5.5 3.2 1.7 -5.6 -4.3 -4.1 5.6 -.1 z\" fill=\"#FFE9A8\"/></g>","acorncap":"<g transform=\"translate(0,0)\"><path d=\"M30 28 C30 4 98 4 98 28 C90 33 38 33 30 28 Z\" fill=\"#8A5A2E\"/><path d=\"M64 6 C84 7 97 15 98 28 C92 31 76 32 64 32 Z\" fill=\"#5E3A1A\" opacity=\".45\"/><g clip-path=\"url(#capclip)\" stroke=\"#5E3A1A\" stroke-width=\"1.3\" opacity=\".6\" fill=\"none\"><path d=\"M24 4 l18 30\"/><path d=\"M33 4 l18 30\"/><path d=\"M42 4 l18 30\"/><path d=\"M51 4 l18 30\"/><path d=\"M60 4 l18 30\"/><path d=\"M69 4 l18 30\"/><path d=\"M78 4 l18 30\"/><path d=\"M87 4 l18 30\"/><path d=\"M96 4 l18 30\"/><path d=\"M40 4 l-18 30\"/><path d=\"M49 4 l-18 30\"/><path d=\"M58 4 l-18 30\"/><path d=\"M67 4 l-18 30\"/><path d=\"M76 4 l-18 30\"/><path d=\"M85 4 l-18 30\"/><path d=\"M94 4 l-18 30\"/><path d=\"M103 4 l-18 30\"/><path d=\"M112 4 l-18 30\"/></g><path d=\"M30 28 C38 33 90 33 98 28\" stroke=\"#C48A4E\" stroke-width=\"2.4\" fill=\"none\"/><path d=\"M64 8 C63 2 66 -4 71 -6\" stroke=\"#5E3A1A\" stroke-width=\"3.4\" fill=\"none\" stroke-linecap=\"round\"/></g>","strawhat":"<g transform=\"translate(0,0)\"><ellipse cx=\"64\" cy=\"24\" rx=\"44\" ry=\"9\" fill=\"#E3B04B\"/><ellipse cx=\"64\" cy=\"26\" rx=\"44\" ry=\"7\" fill=\"#B98524\" opacity=\".45\"/><path d=\"M42 24 C42 2 86 2 86 24 Z\" fill=\"#F0C862\"/><path d=\"M64 4 C78 5 86 12 86 24 L64 24 Z\" fill=\"#C9962F\" opacity=\".5\"/><rect x=\"42\" y=\"16\" width=\"44\" height=\"6\" fill=\"#C0392B\"/><path d=\"M24 26 l-6 4 M28 29 l-5 6 M104 26 l6 4 M100 29 l5 6 M40 31 l-2 6 M88 31 l2 6\" stroke=\"#D9A43C\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><path d=\"M50 8 l2 10 M58 5 l1 10 M72 5 l-1 10 M79 8 l-2 10\" stroke=\"#D8A63F\" stroke-width=\"1\" opacity=\".7\"/></g>","leafcrown":"<g transform=\"translate(0,0)\"><path d=\"M34 24 Q64 12 94 24\" stroke=\"#7A4A1E\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><g transform=\"translate(41.0 13.0) rotate(-50) scale(0.90)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#E8452C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#7A1B10\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(51.3 9.3) rotate(-25) scale(0.90)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#7A1B10\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(64.0 8.0) rotate(0) scale(1.15)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#7A1B10\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(76.7 9.3) rotate(25) scale(0.90)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#C9302C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#7A1B10\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(87.0 13.0) rotate(50) scale(0.90)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#7A1B10\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-gem\"><ellipse cx=\"64\" cy=\"22\" rx=\"4.2\" ry=\"5\" fill=\"#FFB347\"/><path d=\"M59.6 20 C60 15 68 15 68.4 20 Z\" fill=\"#7A4A1E\"/><circle cx=\"62.6\" cy=\"22.4\" r=\"1.2\" fill=\"#FFF3C4\"/></g></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path class=\"pw-wandstar\" d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g class=\"pw-balloon\"><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>","flame":"<g transform=\"translate(0,0)\"><g class=\"pw-fire\"><path d=\"M-2 0 C-14 -10 -10 -26 0 -34 C-2 -22 8 -22 6 -10 C10 -14 12 -8 10 -2 C8 6 -2 8 -2 0 Z\" fill=\"#FF8A2B\"/><path d=\"M-1 -2 C-8 -9 -6 -19 0 -25 C-1 -16 5 -16 4 -8 C3 -2 -1 2 -1 -2 Z\" fill=\"#FFE07A\"/></g></g>","trophy":"<g transform=\"translate(0,0)\"><g><rect x=\"-9\" y=\"16\" width=\"18\" height=\"5\" rx=\"2\" fill=\"#B37A10\"/><rect x=\"-4\" y=\"8\" width=\"8\" height=\"9\" fill=\"#D49A28\"/><path d=\"M-11 -12 h22 v9 a11 11 0 0 1 -22 0 z\" fill=\"#F4B53F\"/><path d=\"M-11 -9 h-6 v4 a7 7 0 0 0 7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/><path d=\"M11 -9 h6 v4 a7 7 0 0 1 -7 6\" fill=\"none\" stroke=\"#F4B53F\" stroke-width=\"2.6\"/></g></g>","sunflower":"<g transform=\"translate(0,0)\"><g class=\"pw-sway\"><path d=\"M0 12 C-1 0 -3 -12 -2 -26\" stroke=\"#4F8A22\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M-1 -4 C-10 -8 -13 -2 -12 1 C-7 1 -3 -1 -1 -4 Z\" fill=\"#6DA835\"/><g transform=\"translate(-2,-34)\"><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(0)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(30)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(60)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(90)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(120)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(150)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(180)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(210)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(240)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(270)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(300)\"/><ellipse cx=\"0\" cy=\"-9\" rx=\"3.2\" ry=\"6\" fill=\"#FFC928\" transform=\"rotate(330)\"/><circle r=\"6.5\" fill=\"#6B3A12\"/><circle r=\"4\" fill=\"#8A5224\"/><circle cx=\"-1.6\" cy=\"-1.4\" r=\".9\" fill=\"#3F200A\"/><circle cx=\"1.8\" cy=\".6\" r=\".9\" fill=\"#3F200A\"/><circle cx=\"-.4\" cy=\"2.2\" r=\".9\" fill=\"#3F200A\"/></g></g></g>","lantern":"<g transform=\"translate(0,0)\"><g class=\"pw-swing\"><path d=\"M0 -2 V-14\" stroke=\"#4A3A2A\" stroke-width=\"1.8\"/><circle cx=\"0\" cy=\"-15\" r=\"2.4\" fill=\"none\" stroke=\"#4A3A2A\" stroke-width=\"1.6\"/><circle class=\"pw-lampglow\" cx=\"0\" cy=\"12\" r=\"15\" fill=\"#FFB347\" opacity=\".35\"/><rect x=\"-7\" y=\"-2\" width=\"14\" height=\"4\" rx=\"1.5\" fill=\"#5A4632\"/><path d=\"M-8 2 C-11 10 -11 16 -8 22 H8 C11 16 11 10 8 2 Z\" fill=\"#F07A2E\"/><path d=\"M-8 2 C-11 10 -11 16 -8 22 H-3 C-5 16 -5 8 -3 2 Z\" fill=\"#B2451B\" opacity=\".6\"/><path d=\"M-3 7 l2 3 2 -3 M-4 15 q4 3 8 0\" stroke=\"#FFE07A\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\" class=\"pw-lampface\"/><rect x=\"-6\" y=\"22\" width=\"12\" height=\"3\" rx=\"1.2\" fill=\"#5A4632\"/></g></g>"},"backs":{"wings":"<g class=\"pw-wing pw-l\"><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g><g class=\"pw-wing pw-r\"><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<g class=\"pw-cape\"><path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/></g>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><g class=\"pw-flame\"><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/></g>","dragon":"<g class=\"pw-wing pw-l\"><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#C4342A\"/><path d=\"M30 50 C8 16 -14 -4 -28 -6 C-16 12 -22 14 -36 22 C-20 32 -22 36 -28 48 C-4 58 16 62 30 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M30 56 L-25.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-33.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M30 56 L-25.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g><g class=\"pw-wing pw-r\"><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#C4342A\"/><path d=\"M90 50 C112 16 134 -4 148 -6 C136 12 142 14 156 22 C140 32 142 36 148 48 C124 58 104 62 90 62 Z\" fill=\"#8E1408\" opacity=\".3\"/><path d=\"M90 56 L145.68 -2\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L153.36 26\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/><path d=\"M90 56 L145.68 52\" stroke=\"#7A1B10\" stroke-width=\"2.6\" opacity=\".7\" stroke-linecap=\"round\"/></g>","orbit":"<g class=\"pw-orbit\"><ellipse cx=\"60\" cy=\"60\" rx=\"62\" ry=\"22\" fill=\"none\" stroke=\"#9FD8FF\" stroke-width=\"2.6\" opacity=\".8\" transform=\"rotate(-18 60 60)\"/><path d=\"M122 42 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M-2 66 l2.2 4.3 4.8 .1 -3.7 3.5 1.4 4.8 -4.7 -2.8 -4.7 2.8 1.4 -4.8 -3.7 -3.5 4.8 -.1 z\" fill=\"#FFE9A8\"/><path d=\"M62 33 l1.8 3.6 4.0 .1 -3.1 2.9 1.2 4.0 -3.9 -2.3 -3.9 2.3 1.2 -4.0 -3.1 -2.9 4.0 -.1 z\" fill=\"#FFE9A8\"/></g>","leafwings":"<g class=\"pw-wing pw-l\"><g transform=\"translate(8.0 28.0) rotate(-45) scale(1.45)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#C9302C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(5.0 52.0) rotate(-85) scale(1.45)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#E8452C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(11.0 76.0) rotate(-125) scale(1.35)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(20.0 40.0) rotate(-60) scale(1.05)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(18.0 64.0) rotate(-105) scale(1.00)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g></g><g class=\"pw-wing pw-r\"><g transform=\"translate(112.0 28.0) rotate(45) scale(1.45)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#C9302C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(115.0 52.0) rotate(85) scale(1.45)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#E8452C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(109.0 76.0) rotate(125) scale(1.35)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(100.0 40.0) rotate(60) scale(1.05)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g transform=\"translate(102.0 64.0) rotate(105) scale(1.00)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g></g>"},"auras":{"glow":"<circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect class=\"pw-spark s0\" x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect class=\"pw-spark s1\" x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect class=\"pw-spark s2\" x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>","starfield":"<g class=\"pw-field\"><circle class=\"pw-star s0\" cx=\"118.0\" cy=\"58.0\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"78.3\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"104.9\" cy=\"98.5\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.5\" cy=\"113.5\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"47.0\" cy=\"98.7\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.4\" cy=\"94.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"-4.9\" cy=\"80.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"-19.0\" cy=\"57.9\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"7.8\" cy=\"39.8\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"19.6\" cy=\"21.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s2\" cx=\"44.1\" cy=\"7.4\" r=\"3.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s3\" cx=\"77.7\" cy=\"2.6\" r=\"4.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s0\" cx=\"96.3\" cy=\"25.4\" r=\"2.2\" fill=\"#FFF3C4\"/><circle class=\"pw-star s1\" cx=\"118.6\" cy=\"37.8\" r=\"3.2\" fill=\"#FFF3C4\"/></g>","embers":"<g><circle class=\"pw-ember e0\" cx=\"30\" cy=\"92\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"46\" cy=\"100\" r=\"2.4\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"76\" cy=\"98\" r=\"3\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e0\" cx=\"92\" cy=\"88\" r=\"2.6\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e1\" cx=\"22\" cy=\"76\" r=\"2.2\" fill=\"#FF8A2B\"/><circle class=\"pw-ember e2\" cx=\"98\" cy=\"72\" r=\"2.4\" fill=\"#FF8A2B\"/></g>","harvestmoon":"<g><circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"60\" fill=\"url(#moonglow)\"/><circle cx=\"92\" cy=\"18\" r=\"24\" fill=\"#FFD27A\"/><circle cx=\"92\" cy=\"18\" r=\"24\" fill=\"#E88A2E\" opacity=\".25\" clip-path=\"url(#moonshade)\"/><circle cx=\"84\" cy=\"12\" r=\"4.5\" fill=\"#E9A64A\" opacity=\".55\"/><circle cx=\"100\" cy=\"24\" r=\"3.2\" fill=\"#E9A64A\" opacity=\".5\"/><circle cx=\"96\" cy=\"8\" r=\"2.2\" fill=\"#E9A64A\" opacity=\".5\"/><g class=\"pw-bird\" fill=\"none\" stroke=\"#3A1E14\" stroke-width=\"1.6\" stroke-linecap=\"round\" opacity=\".8\"><path d=\"M72 -4 q3 -3 6 0 q3 -3 6 0\"/><path d=\"M104 -8 q2 -2 4 0 q2 -2 4 0\"/></g></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g class=\"pw-twinkle\" clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>","scales":"<g clip-path=\"url(#skinclip)\"><path d=\"M18 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 34 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 48 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 62 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M26 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M43 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M60 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M77 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M94 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M111 76 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M18 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M35 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M52 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M69 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M86 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/><path d=\"M103 90 a9 9 0 0 1 18 0 z\" fill=\"__HI__\" opacity=\".45\"/></g>","galaxy":"<g clip-path=\"url(#skinclip)\" class=\"pw-galaxy\"><ellipse cx=\"54\" cy=\"58\" rx=\"46\" ry=\"16\" fill=\"__HI__\" opacity=\".40\" transform=\"rotate(-24 54 58)\"/><ellipse cx=\"66\" cy=\"66\" rx=\"38\" ry=\"11\" fill=\"#fff\" opacity=\".22\" transform=\"rotate(-24 66 66)\"/><circle cx=\"40\" cy=\"48\" r=\"2.4\" fill=\"#fff\"/><circle cx=\"76\" cy=\"70\" r=\"2\" fill=\"#fff\"/><circle cx=\"58\" cy=\"40\" r=\"1.8\" fill=\"#fff\"/><circle cx=\"84\" cy=\"52\" r=\"2.2\" fill=\"#fff\"/></g>","patchwork":"<g clip-path=\"url(#skinclip)\"><rect x=\"70\" y=\"72\" width=\"20\" height=\"17\" rx=\"2\" fill=\"#6A8FCF\" transform=\"rotate(-8 80 80)\"/><rect x=\"70\" y=\"72\" width=\"20\" height=\"17\" rx=\"2\" fill=\"none\" stroke=\"#FFF3D6\" stroke-width=\"1.3\" stroke-dasharray=\"2.4 2\" transform=\"rotate(-8 80 80)\"/><rect x=\"26\" y=\"34\" width=\"16\" height=\"14\" rx=\"2\" fill=\"#C0533B\" transform=\"rotate(10 34 41)\"/><rect x=\"26\" y=\"34\" width=\"16\" height=\"14\" rx=\"2\" fill=\"none\" stroke=\"#FFF3D6\" stroke-width=\"1.3\" stroke-dasharray=\"2.4 2\" transform=\"rotate(10 34 41)\"/><path d=\"M40 88 l6 -4 M42 92 l6 -4 M44 96 l6 -4\" stroke=\"#7A5A1E\" stroke-width=\"1.4\" stroke-linecap=\"round\" opacity=\".7\"/></g>","leafvein":"<g clip-path=\"url(#skinclip)\" fill=\"none\" stroke=\"__LO__\" stroke-linecap=\"round\" opacity=\".38\"><path d=\"M60 104 C58 80 60 50 62 18\" stroke-width=\"2.2\"/><path d=\"M59 84 C48 78 36 76 22 78 M59 84 C70 78 84 76 100 78\" stroke-width=\"1.6\"/><path d=\"M60 62 C48 56 34 50 22 48 M60 62 C72 56 86 50 100 46\" stroke-width=\"1.6\"/><path d=\"M61 40 C52 34 44 28 36 24 M61 40 C70 34 78 28 86 24\" stroke-width=\"1.4\"/></g>"},"fxs":{"leaffall":"<g><g class=\"pw-leaf f0\" transform=\"translate(-6.0 4.0) rotate(-45) scale(1.00)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#E8452C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-leaf f1\" transform=\"translate(112.0 -2.0) rotate(2) scale(0.90)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-leaf f2\" transform=\"translate(4.0 50.0) rotate(-41) scale(0.75)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-leaf f3\" transform=\"translate(118.0 56.0) rotate(6) scale(0.85)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#C9302C\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-leaf f1\" transform=\"translate(98.0 86.0) rotate(2) scale(0.70)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F28B2B\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g><g class=\"pw-leaf f3\" transform=\"translate(16.0 90.0) rotate(6) scale(0.70)\"><path d=\"M0.0 -10.0 L1.6 -5.8 L4.6 -7.4 L3.9 -2.8 L8.8 -4.6 L7.4 -0.6 L9.4 0.8 L4.2 2.6 L4.8 5.2 L1.2 3.8 L0.9 4.4 L-0.9 4.4 L-1.2 3.8 L-4.8 5.2 L-4.2 2.6 L-9.4 0.8 L-7.4 -0.6 L-8.8 -4.6 L-3.9 -2.8 L-4.6 -7.4 L-1.6 -5.8 Z\" fill=\"#F6C143\"/><path d=\"M0 9 V-7 M0 1 L5 -3 M0 1 L-5 -3\" stroke=\"#6E1420\" stroke-width=\"0.9\" fill=\"none\" opacity=\".55\" stroke-linecap=\"round\"/></g></g>"}};
 
-function pipSlots(){return ['body','pattern','eyes','hat','back','held','aura'];}
+function pipSlots(){return ['body','pattern','eyes','hat','back','held','aura','fx'];}
 
 function pipMouth(kind,ink){
   if(kind==='open') return '<path d="M54 69 q10 15 20 0 q-10 5 -20 0 z" fill="'+ink+'"/>';
@@ -6473,6 +6539,13 @@ function pipEyes(style,pose,mouth,ink){
   if(style==='visor'){
     return '<rect x="'+(ex-16)+'" y="'+(ey-11)+'" width="56" height="22" rx="11" fill="'+ink+'"/>'+
            '<rect x="'+(ex-11)+'" y="'+(ey-7)+'" width="18" height="7" rx="3.5" fill="#5FE3B0" opacity=".9"/>';
+  }
+  if(style==='button'){
+    for(i=0;i<2;i++){x=ex+i*24;
+      out+='<circle cx="'+x+'" cy="'+ey+'" r="8.2" fill="'+ink+'"/>'+
+           '<circle cx="'+x+'" cy="'+ey+'" r="6" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>'+
+           '<path d="M'+(x-2.4)+' '+(ey-2.4)+' l4.8 4.8 M'+(x+2.4)+' '+(ey-2.4)+' l-4.8 4.8" stroke="#F1CB5A" stroke-width="1.6" stroke-linecap="round"/>';}
+    return out;
   }
   if(mouth==='frown'){
     for(i=0;i<2;i++){x=ex+i*24;
@@ -6514,12 +6587,19 @@ function pipSVG(look,pose,size,opts){
       '<stop offset=".8" stop-color="'+mid+'" stop-opacity=".45"/>'+
       '<stop offset="1" stop-color="'+mid+'" stop-opacity="0"/></radialGradient>'+
     '<clipPath id="clip'+n+'"><path d="'+A.bodyPath+'"/></clipPath>'+
-    '<clipPath id="fth'+n+'"><rect x="-20" y="-20" width="160" height="160"/></clipPath>';
+    '<clipPath id="fth'+n+'"><rect x="-20" y="-20" width="160" height="160"/></clipPath>'+
+    '<clipPath id="cap'+n+'"><path d="M30 28 C30 4 98 4 98 28 C90 33 38 33 30 28 Z"/></clipPath>'+
+    '<clipPath id="msh'+n+'"><circle cx="104" cy="28" r="22"/></clipPath>'+
+    '<radialGradient id="moon'+n+'"><stop offset=".5" stop-color="#FFB347" stop-opacity=".45"/>'+
+      '<stop offset="1" stop-color="#FF8A2B" stop-opacity="0"/></radialGradient>';
 
   function fix(s){
     return String(s||'')
       .split('url(#skinclip)').join('url(#clip'+n+')')
       .split('url(#featherclip)').join('url(#fth'+n+')')
+      .split('url(#capclip)').join('url(#cap'+n+')')
+      .split('url(#moonglow)').join('url(#moon'+n+')')
+      .split('url(#moonshade)').join('url(#msh'+n+')')
       .split('url(#aura)').join('url(#aur'+n+')')
       .split('url(#skin)').join('url(#skin'+n+')')
       .split('__HI__').join(hi).split('__MID__').join(mid).split('__LO__').join(lo);
@@ -6528,6 +6608,8 @@ function pipSVG(look,pose,size,opts){
   var aura=look.aura?fix(A.auras[look.aura]||''):'';
   var back=look.back?fix(A.backs[look.back]||''):'';
   var pat=look.pattern?fix(A.patterns[look.pattern]||''):'';
+  /* Weather sits in front of everything: the one layer that can cross Pip. */
+  var fx=(look.fx&&A.fxs)?fix(A.fxs[look.fx]||''):'';
   var hat='',held='';
   if(look.hat&&A.hats[look.hat]){
     hat=fix(A.hats[look.hat]).replace('translate(0,0)',
@@ -6565,7 +6647,7 @@ function pipSVG(look,pose,size,opts){
   var live=(opts.still===true)?false:(size>=64);
   return '<svg class="pip'+(live?' pip-live':'')+'" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -14 140 140" '+
     'width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    '<defs>'+defs+'</defs>'+aura+shade+back+body+held+hat+'</svg>';
+    '<defs>'+defs+'</defs>'+aura+shade+back+body+held+hat+fx+'</svg>';
 }
 
 /* =========================================================
@@ -6621,7 +6703,23 @@ var PIP_PARTS=[
   {id:'held-flame',slot:'held',v:'flame',name:'Flame',price:12},
   {id:'held-trophy',slot:'held',v:'trophy',name:'Trophy',price:14},
   {id:'aura-embers',slot:'aura',v:'embers',name:'Embers',price:14},
-  {id:'aura-starfield',slot:'aura',v:'starfield',name:'Starfield',price:16}
+  {id:'aura-starfield',slot:'aura',v:'starfield',name:'Starfield',price:16},
+
+  /* ---- Autumn 2026 (added 15 Sep) ---- */
+  {id:'body-acorn',slot:'body',v:'acorn',name:'Acorn',price:5,season:'autumn'},
+  {id:'hat-acorncap',slot:'hat',v:'acorncap',name:'Acorn cap',price:6,season:'autumn'},
+  {id:'body-straw',slot:'body',v:'straw',name:'Straw',price:6,season:'autumn'},
+  {id:'pattern-patchwork',slot:'pattern',v:'patchwork',name:'Patchwork',price:7,season:'autumn'},
+  {id:'hat-strawhat',slot:'hat',v:'strawhat',name:'Straw hat',price:9,season:'autumn'},
+  {id:'held-sunflower',slot:'held',v:'sunflower',name:'Sunflower',price:8,season:'autumn'},
+  {id:'eyes-button',slot:'eyes',v:'button',name:'Button eyes',price:6,season:'autumn'},
+  {id:'body-maple',slot:'body',v:'maple',name:'Maple',price:18,season:'autumn'},
+  {id:'pattern-leafvein',slot:'pattern',v:'leafvein',name:'Leaf veins',price:12,season:'autumn'},
+  {id:'hat-leafcrown',slot:'hat',v:'leafcrown',name:'Leaf crown',price:18,season:'autumn'},
+  {id:'back-leafwings',slot:'back',v:'leafwings',name:'Maple wings',price:24,season:'autumn'},
+  {id:'held-lantern',slot:'held',v:'lantern',name:'Harvest lantern',price:14,season:'autumn'},
+  {id:'aura-harvestmoon',slot:'aura',v:'harvestmoon',name:'Harvest moon',price:16,season:'autumn'},
+  {id:'fx-leaffall',slot:'fx',v:'leaffall',name:'Falling leaves',price:20,season:'autumn'}
 ];
 var PIP_LOOKS=[
   {id:'look-bookworm',name:'Bookworm',price:16,
@@ -6643,8 +6741,44 @@ var PIP_LOOKS=[
   {id:'look-starborn',name:'Starborn',price:110,tier:'top',
    ability:{kind:'boost',value:15},
    grants:['body-aurora','hat-starcrown','back-orbit','pattern-galaxy',
-           'aura-starfield','eyes-star']}
+           'aura-starfield','eyes-star']},
+
+  /* ---- Autumn 2026 ---- */
+  {id:'look-acorn',name:'Little Acorn',price:9,tier:'basic',season:'autumn',
+   grants:['body-acorn','hat-acorncap']},
+  {id:'look-scarecrow',name:'Scarecrow',price:30,season:'autumn',
+   grants:['body-straw','hat-strawhat','pattern-patchwork','held-sunflower','eyes-button']},
+  {id:'look-maplemonarch',name:'Maple Monarch',price:120,tier:'top',season:'autumn',
+   ability:{kind:'discount',value:10},
+   grants:['body-maple','pattern-leafvein','hat-leafcrown','back-leafwings','held-lantern',
+           'aura-harvestmoon','fx-leaffall','eyes-star']}
 ];
+
+/* Seasons. A seasonal part or look is only on the shelf inside its window
+   (month, day — the year wraps, so winter can run Dec to Feb). Anything
+   already unlocked stays the reader's for good, in or out of season. */
+var PIP_SEASONS={
+  autumn:{name:'Autumn',from:[9,1],to:[11,30]}
+};
+function pipSeasonWindow(key,now){
+  var s=PIP_SEASONS[key];
+  if(!s)return null;
+  now=now||new Date();
+  var y=now.getFullYear();
+  var mk=function(yr,md,end){return end?new Date(yr,md[0]-1,md[1],23,59,59):new Date(yr,md[0]-1,md[1]);};
+  var wraps=(s.to[0]*100+s.to[1])<(s.from[0]*100+s.from[1]);
+  var tries=wraps?[[y-1,y],[y,y+1]]:[[y,y],[y+1,y+1]];
+  for(var i=0;i<tries.length;i++){
+    var a=mk(tries[i][0],s.from),b=mk(tries[i][1],s.to,true);
+    if(now<=b)return{name:s.name,from:a,to:b,open:now>=a};
+  }
+  return null;
+}
+function pipInSeason(thing,now){
+  if(!thing||!thing.season)return true;
+  var w=pipSeasonWindow(thing.season,now);
+  return !!(w&&w.open);
+}
 function pipPart(id){
   for(var i=0;i<PIP_PARTS.length;i++)if(PIP_PARTS[i].id===id)return PIP_PARTS[i];
   return null;
@@ -6662,7 +6796,7 @@ function pipPrice(thing){
   var p=cfg.prices[thing.id];
   return (p===undefined||p===null||p==='')?num(thing.price,0):Math.max(0,num(p,0));
 }
-function pipOffered(thing){return !pipShopCfg().off[thing.id];}
+function pipOffered(thing){return !pipShopCfg().off[thing.id]&&pipInSeason(thing);}
 
 function ownedPip(p){
   p=p||me();
@@ -6674,7 +6808,8 @@ function pipLook(p){
   p=p||me();
   var l=(p&&p.pipLook)?p.pipLook:{};
   return{body:l.body||'sun',pattern:l.pattern||null,eyes:l.eyes||'dot',
-         hat:l.hat||null,back:l.back||null,held:l.held||null,aura:l.aura||null};
+         hat:l.hat||null,back:l.back||null,held:l.held||null,aura:l.aura||null,
+         fx:l.fx||null};
 }
 function pipHTML(p,size,pose,opts){
   return pipSVG(pipLook(p),pose||'idle',size||64,opts);
@@ -6737,7 +6872,7 @@ function buyPip(id){
 
 /* ---------- the dressing room ---------- */
 var PIP_SLOT_NAMES={body:'Colour',pattern:'Pattern',eyes:'Eyes',hat:'Hat',
-  back:'Back',held:'Holding',aura:'Aura'};
+  back:'Back',held:'Holding',aura:'Aura',fx:'Weather'};
 
 function dressingRoom(){
   var p=me();if(!p)return;
@@ -6745,7 +6880,8 @@ function dressingRoom(){
     var look=pipLook(p);
     var h='<h3>Pip</h3><p class="lede">Everything you have unlocked. Tap to put it on, '+
       'tap again to take it off.</p>'+
-      '<div class="dressstage">'+pipSVG(look,'cheer',150)+'</div>'+
+      '<div class="dressstage" data-act="pip-poke" data-where="dress">'+
+        pipSVG(look,'cheer',150)+'</div>'+
       (abilityLine(p)?'<div class="abilbar">'+abilityLine(p)+'</div>':
         '<p class="tiny muted" style="text-align:center">Wearing every piece of a top-tier look '+
         'switches its power on.</p>');
@@ -6810,6 +6946,13 @@ function pipShelf(){
       h+='<div class="pipcard'+(afford?' buyable':'')+(l.tier==='top'?' top':'')+'">'+
         (l.tier==='top'?'<span class="tierflag">TOP TIER</span>':'')+
         '<div class="pv">'+pipSVG(preview,'cheer',96)+'</div>'+
+        (l.season?(function(){
+          var w=pipSeasonWindow(l.season);
+          if(!w)return '';
+          var left=Math.max(0,Math.ceil((w.to-new Date())/864e5));
+          return '<div class="seasonflag'+(left<=7?' closing':'')+'">'+esc(w.name)+' · '+
+            (left<=1?'last day':left+' days left')+'</div>';
+        })():'')+
         '<div class="nm">'+esc(l.name)+'</div>'+
         (ab.kind!=='none'&&ab.value?'<div class="abilnote">'+
           esc(PIP_ABILITIES[ab.kind].blurb(ab.value))+'</div>':'')+
@@ -7676,7 +7819,8 @@ function viewRoom(){
       '<div class="board"></div>'+
     '</div>'+
     (trophyRow?'<div class="plinth"><div class="trophies">'+trophyRow+'</div><div class="top"></div></div>':'')+
-    '<div class="pipstand">'+pipSVG(pipLook(p),'idle',150)+'</div>'+
+    '<div class="pipstand" data-act="pip-poke" data-where="room">'+
+      pipSVG(pipLook(p),'idle',150)+'</div>'+
     '<div class="rug"></div>'+
     '</div>';
 
@@ -7967,6 +8111,132 @@ function completedTitle(m,p,rec){
 }
 
 /* =========================================================
+   Reactions.
+
+   Pip answers being tapped, fidgets between times, and says
+   something now and then. Every line is drawn from what is
+   actually going on — never random chatter — so he stays
+   worth listening to.
+   ========================================================= */
+
+/* ---------- what he has to say ---------- */
+var sayTick=0;
+function pipSays(where,rotate){
+  var p=me();
+  if(!p)return null;
+  var lines=[];
+
+  /* the wish, if there is one and it is close */
+  var wp=wishProgress(p);
+  if(wp){
+    if(wp.ready)lines.push('You can afford '+wp.item.title+'. Go on.');
+    else if(wp.short<=5)lines.push('Only '+pts(wp.short)+' more and '+wp.item.title+' is yours.');
+    else if(wp.pct>=50)lines.push('Halfway to '+wp.item.title+'.');
+  }
+
+  /* a run that is alive or about to pay */
+  liveStreakRules().forEach(function(rule){
+    var stt=streakState(rule,p);
+    if(!stt.run)return;
+    if(stt.thisPeriod<stt.need)
+      lines.push(stt.run+' '+stt.word+(stt.run===1?'':'s')+' running. '+
+        stt.ask+' '+stt.nowWord+' to keep it.');
+    else if(stt.toGo===1)
+      lines.push('One more '+stt.word+' and that run pays out.');
+  });
+
+  /* work sent in and not yet looked at */
+  var waiting=totalPending(p);
+  if(waiting)lines.push(waiting===1?'One thing is waiting to be looked at.'
+    :waiting+' things are waiting to be looked at.');
+
+  /* a book part-read */
+  S.modules.forEach(function(m){
+    if(!(m.chapters||[]).length)return;
+    var pg=papersDone(m);
+    if(pg.done&&pg.done<pg.total)
+      lines.push(m.title+' — '+(pg.total-pg.done)+' to go.');
+  });
+
+  /* the shelf, when he is standing in front of it */
+  if(where==='room'){
+    var books=finishedTitles(p).length;
+    if(books>=2)lines.push(books+' books on that shelf. All yours.');
+    else if(books===1)lines.push('One on the shelf. Room for more.');
+    else lines.push('The shelf is empty. Let us fix that.');
+    var run=bestRunEver(p);
+    if(run>=3)lines.push('Best run so far: '+run+' days.');
+  }
+
+  /* nothing pressing — a few warm ones, still true */
+  if(!lines.length){
+    var bal=balance(p);
+    if(bal>=10)lines.push(pts(bal)+' points burning a hole in your pocket.');
+    lines.push('Read me something.');
+    lines.push('I am not doing anything. Are you?');
+  }
+  /* Tapping walks through what he has to say; an unprompted greeting
+     holds still so it does not change under you. */
+  if(rotate)return lines[(sayTick++)%lines.length];
+  var seed=(where||'')+':'+todayKey()+':'+Math.floor(Date.now()/9000);
+  return lines[Math.floor(hashUnit(seed)*lines.length)%lines.length];
+}
+
+/* ---------- being tapped ---------- */
+function sayNear(host,text){
+  if(!host||!text)return;
+  var old=host.querySelector('.pipsay');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var b=document.createElement('div');
+  b.className='pipsay';
+  b.textContent=text;
+  host.appendChild(b);
+  setTimeout(function(){
+    b.classList.add('go');
+    setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},420);
+  },3400);
+}
+function pokePip(host,where){
+  if(!host)return;
+  var svg=host.querySelector('svg.pip');
+  if(svg&&!reducedMotion()){
+    svg.classList.remove('pip-hop');
+    void svg.getBoundingClientRect();        /* restart the animation */
+    svg.classList.add('pip-hop');
+    setTimeout(function(){svg.classList.remove('pip-hop');},760);
+  }
+  sayNear(host,pipSays(where,true));
+}
+
+/* ---------- fidgeting between times ---------- */
+var idleTimer=null;
+function startPipIdle(){
+  if(idleTimer)return;
+  idleTimer=setInterval(function(){
+    if(reducedMotion())return;
+    if(document.hidden)return;
+    if(document.getElementById('moment'))return;
+    var list=$$('.pip-live');
+    if(!list.length)return;
+    var el=list[Math.floor(Math.random()*list.length)];
+    if(!el||el.classList.contains('pip-hop'))return;
+    el.classList.add('pip-glance');
+    setTimeout(function(){el.classList.remove('pip-glance');},1500);
+  },11000);
+}
+/* A line on arrival, but only where he is standing about with nothing
+   else to do, and only once per visit. */
+var greeted={};
+function pipGreet(where,host){
+  if(!host||greeted[where])return;
+  greeted[where]=true;
+  setTimeout(function(){
+    if(document.body.contains(host))sayNear(host,pipSays(where));
+  },900);
+}
+function resetGreetings(){greeted={};}
+
+/* =========================================================
    Boot
    ========================================================= */
 var TEMPLATE={
@@ -7997,6 +8267,7 @@ function boot(){
     save();
     if(!storageOK)toast('This browser is blocking local storage, so readers and results will not be kept.','bad',9000);
     initPlatform();
+    startPipIdle();
     loadSnaps().then(function(){if(S.view==='settings')render();});
     /* Always ask who is reading. On a shared device the last reader must
        not be inherited by whoever opens it next. */
