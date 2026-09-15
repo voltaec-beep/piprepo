@@ -318,6 +318,16 @@ Every reader has their own Pip, and Pip is their face everywhere in the app — 
 
 Seven slots with 30 parts already give tens of thousands of combinations, and each new part multiplies rather than adds.
 
+### Pip's room
+
+Every other number in PipHub is a balance, and a balance goes down when it is used. The room is the opposite — a place that only fills up. It is reached from the profile page.
+
+It is a scene, not a page. Pip stands in it, wearing whatever he is wearing. Behind him is a **bookshelf with a spine for every title finished** — colour and height drawn from the title itself, so the shelf is the same shelf every time. On the wall hang **frames of the best-rated artwork** sent in to events, and a **plaque with the longest run of days** ever managed. On a plinth stand **trophies for anything rated at the top of its rubric**. The reader picks the wall colour from six.
+
+Nothing here is stored specially. The shelf, the frames, the plinth and the plaque are all read back out of records that already exist, so the room was true the moment it was built, including for readers who have been going for months.
+
+Four figures sit under the scene and **never go down**: points earned in all, books finished, best run of days, and best rating. Spending does not touch them. A title later removed from the catalogue stays on the shelf — it is still a book they finished.
+
 ### Cosmetics
 
 Bought with points from the **Pip** shelf in the store. Single parts are cheap; six complete looks — Bookworm, Royal, Winged, Astro, Starcaster, Legend — are bundles worth saving for, which makes them natural wishlist targets.

@@ -1429,6 +1429,115 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 .rubrow{display:flex;gap:7px;align-items:center}
 .rubrow input[data-rl]{flex:1}
 .rubrow input[data-rp]{width:84px;text-align:right;flex:none}
+
+/* ============ Pip's room ============ */
+.room{
+  position:relative;width:100%;border-radius:18px;overflow:hidden;
+  aspect-ratio:3/2;min-height:300px;max-height:430px;
+  border:1px solid var(--edge);box-shadow:var(--sh-2);
+  margin-top:4px;
+}
+.room .wall{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.10),transparent 60%),
+    linear-gradient(var(--wall-a),var(--wall-b));
+}
+.room .floor{
+  position:absolute;left:0;right:0;bottom:0;height:27%;
+  background:linear-gradient(var(--floor),color-mix(in srgb,var(--floor) 55%,#000));
+  box-shadow:0 -14px 30px -18px #000 inset;
+}
+.room .rug{
+  position:absolute;left:50%;bottom:5%;transform:translateX(-50%);
+  width:46%;height:9%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.34),transparent);
+}
+
+/* the bookcase */
+.room .bookcase{position:absolute;left:4%;bottom:27%;width:44%}
+.room .books{
+  display:flex;align-items:flex-end;gap:3px;height:84px;padding:0 8px;
+}
+.room .spine{
+  display:block;border-radius:2px 2px 0 0;position:relative;flex:none;
+  box-shadow:inset -2px 0 0 rgba(0,0,0,.28),inset 2px 0 0 rgba(255,255,255,.16);
+}
+.room .spine i{
+  position:absolute;left:2px;right:2px;top:18%;height:2px;
+  background:rgba(255,255,255,.4);box-shadow:0 5px 0 rgba(255,255,255,.28);
+}
+.room .spinemore{
+  align-self:flex-end;font-size:.66rem;color:rgba(255,255,255,.62);padding-bottom:4px;
+}
+.room .emptyshelf{
+  align-self:flex-end;font-size:.72rem;color:rgba(255,255,255,.38);padding-bottom:6px;font-style:italic;
+}
+.room .board{
+  height:9px;border-radius:3px;background:var(--rail);
+  box-shadow:0 3px 8px -2px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+/* framed work */
+.room .frames{position:absolute;left:6%;top:15%;display:flex;gap:10px}
+.room .frame{
+  padding:4px;border-radius:4px;background:var(--rail);border:0;
+  box-shadow:0 6px 14px -6px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.18);
+  transform:rotate(-1.5deg);transition:transform .16s var(--ease);
+}
+.room .frame:nth-child(2){transform:rotate(1.8deg)}
+.room .frame:nth-child(3){transform:rotate(-.8deg)}
+.room .frame img{display:block;width:52px;height:52px;object-fit:cover;border-radius:2px}
+
+/* streak plaque */
+.room .plaque{
+  position:absolute;right:5%;top:16%;text-align:center;
+  padding:9px 15px;border-radius:7px;
+  background:linear-gradient(var(--rail),color-mix(in srgb,var(--rail) 60%,#000));
+  box-shadow:0 6px 16px -8px #000,inset 0 1px 0 rgba(255,255,255,.22);
+}
+.room .plaque .k{display:block;font-size:.58rem;letter-spacing:.14em;color:rgba(255,255,255,.6)}
+.room .plaque .v{
+  display:block;font-family:var(--serif);font-size:1.5rem;color:#FFD583;line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+.room .plaque .v small{font-family:var(--sans);font-size:.58rem;color:rgba(255,255,255,.65)}
+
+/* trophy plinth */
+.room .plinth{position:absolute;right:6%;bottom:27%;width:26%;max-width:190px}
+.room .trophies{display:flex;align-items:flex-end;justify-content:center;gap:4px;padding-bottom:3px}
+.room .trophy{width:26px;height:26px;display:block}
+.room .trophy svg{width:100%;height:100%;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.room .trophymore{font-size:.66rem;color:rgba(255,255,255,.6);align-self:flex-end;padding-bottom:3px}
+.room .plinth .top{
+  height:8px;border-radius:3px;background:var(--rail);
+  box-shadow:0 3px 8px -2px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+.room .pipstand{
+  position:absolute;left:50%;bottom:8%;transform:translateX(-50%);
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.45));
+}
+@media(max-width:620px){
+  .room{aspect-ratio:4/3;min-height:320px}
+  .room .bookcase{left:3%;width:56%;bottom:30%}
+  .room .books{height:62px}
+  .room .plinth{right:4%;bottom:30%;width:32%}
+  .room .frames{top:6%;left:4%}
+  .room .frame img{width:40px;height:40px}
+  .room .pipstand{bottom:6%}
+  .room .pipstand .pip{width:118px;height:118px}
+}
+
+.wallpick{
+  width:44px;height:30px;border-radius:8px;border:1px solid var(--edge);
+}
+.wallpick.on{box-shadow:0 0 0 2px var(--brand-hi);border-color:transparent}
+.spinechip{width:10px;height:26px;border-radius:2px;flex:none}
+@media (hover:hover) and (pointer:fine){
+  .room .frame:hover{transform:rotate(0deg) scale(1.06)}
+  .wallpick:hover{border-color:var(--brand-hi)}
+}
 </style>
 </head>
 <body>
@@ -1577,6 +1686,7 @@ function load(){
     /* Readers who already had a picture keep it until they say otherwise. */
     if(!p.face)p.face=p.avatar?'picture':'pip';
     if(!Array.isArray(p.entries))p.entries=[];
+    if(!p.room)p.room={wall:'dusk'};
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1613,7 +1723,7 @@ function newProfile(name){
     avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
     streaks:[],wish:null,
     pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'},face:'pip',
-    entries:[]};
+    entries:[],room:{wall:'dusk'}};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -2934,6 +3044,12 @@ function viewProfile(){
 
   var tests=list.length;
   h+='<div class="mecards">'+
+    '<button class="mecard" data-go="room">'+
+      '<span class="ic" style="display:grid;place-items:center">'+ico('star')+'</span>'+
+      '<span><span class="t">Pip&rsquo;s room</span>'+
+      '<span class="d">'+finishedTitles(p).length+' finished, '+
+      pts(lifetimeEarned(p))+' earned in all</span></span>'+
+      '<span class="go">&rsaquo;</span></button>'+
     '<button class="mecard" data-go="records">'+
       '<span class="ic" style="display:grid;place-items:center">'+ico('file')+'</span>'+
       '<span><span class="t">Records</span>'+
@@ -3381,7 +3497,7 @@ var VIEWS={gate:viewGate,catalog:viewCatalog,title:viewTitle,results:viewResults
   records:viewRecords,profile:viewProfile,titles:viewTitles,settings:viewSettings,
   store:viewStore,redemptions:viewRedemptions,
   activities:viewActivities,approvals:viewApprovals,
-  events:viewEvents,reviews:viewReviews};
+  events:viewEvents,reviews:viewReviews,room:viewRoom};
 
 function go(v,arg){
   S.view=v;S.arg=(arg===undefined?null:arg);
@@ -3404,7 +3520,7 @@ function render(){
   $('#footbar').classList.toggle('hide',onGate);
   var active={title:'catalog',quiz:'catalog',results:'catalog',
     redemptions:'store',approvals:'activities',reviews:'events',
-    profile:'',records:''}[S.view];
+    profile:'',records:'',room:''}[S.view];
   if(active===undefined)active=S.view;
   $$('#nav button').forEach(function(b){
     if(b.dataset.go===active)b.setAttribute('aria-current','page');
@@ -3429,7 +3545,8 @@ function render(){
   var p=me();
   $('#chip').innerHTML=p?(avatarHTML(p,28)+'<span class="nm">'+esc(p.name)+'</span>'):'';
   $('#chip').classList.toggle('hide',!p);
-  $('#chip').classList.toggle('on',S.view==='profile'||S.view==='records');
+  $('#chip').classList.toggle('on',
+    S.view==='profile'||S.view==='records'||S.view==='room');
 
   $('#foot-left').textContent=S.modules.length+(S.modules.length===1?' title':' titles')+
     ', '+pts(S.modules.reduce(function(s,m){return s+titlePoints(m);},0))+' points available';
@@ -3505,6 +3622,10 @@ document.addEventListener('click',function(e){
   else if(act==='theme-set'){setTheme(b.dataset.t);}
   else if(act==='export-csv'){exportCSV();}
   else if(act==='buy'){buyItem(id);}
+  else if(act==='room-wall'){
+    var rp=me();
+    if(rp){rp.room=rp.room||{};rp.room.wall=b.dataset.w;save();render();}
+  }
   else if(act==='ev-do'){var ev=eventById(id);if(ev)entryModal(ev);}
   else if(act==='ev-new'){requireAdmin('Adding an event needs the instructor key.',function(){eventEditor(null);});}
   else if(act==='ev-edit'){requireAdmin('Editing an event needs the instructor key.',function(){
@@ -7246,6 +7367,204 @@ function eventEditor(existing){
     });
   }
   openModal(body(),mount,{dismissable:false});
+}
+
+/* =========================================================
+   Pip's room.
+
+   Everything else in PipHub is a balance, and a balance goes
+   down when it is used. This is the opposite: a place that
+   only ever fills up. Nothing here is stored specially —
+   the shelf, the frames and the plinth are all read back
+   out of records that already exist.
+   ========================================================= */
+
+var ROOM_WALLS={
+  dusk:   {name:'Dusk',   a:'#2A3560', b:'#151B2E', floor:'#3A2E4C', rail:'#4A3F66'},
+  meadow: {name:'Meadow', a:'#2F5A46', b:'#16281F', floor:'#3E3326', rail:'#55452F'},
+  ember:  {name:'Ember',  a:'#5A3326', b:'#231414', floor:'#442A1E', rail:'#5E3B28'},
+  sea:    {name:'Sea',    a:'#1E4A66', b:'#0E2030', floor:'#27384A', rail:'#36506A'},
+  plum:   {name:'Plum',   a:'#452A5E', b:'#1C1229', floor:'#3B2A48', rail:'#523A66'},
+  sand:   {name:'Sand',   a:'#6A5436', b:'#2B2118', floor:'#54422C', rail:'#6E5738'}
+};
+function roomOf(p){
+  p=p||me();
+  var r=(p&&p.room)||{};
+  return{wall:ROOM_WALLS[r.wall]?r.wall:'dusk'};
+}
+
+/* ---------- what the room is made of ---------- */
+function finishedTitles(p){
+  p=p||me();
+  var out=[];
+  S.modules.forEach(function(m){
+    var chapters=(m.chapters||[]).length;
+    var total=chapters+(hasBookTest(m)?1:0);
+    if(!total)return;
+    var done=0;
+    (m.chapters||[]).forEach(function(ch){
+      if((p.records||[]).some(function(r){return r.moduleId===m.id&&r.chapterId===ch.id&&r.passed;}))done++;
+    });
+    if(hasBookTest(m)&&(p.records||[]).some(function(r){
+      return r.moduleId===m.id&&!r.chapterId&&r.passed;}))done++;
+    if(done===total)out.push(m);
+  });
+  /* A title removed from the shelf is still a book they finished. */
+  var seen={};
+  out.forEach(function(m){seen[m.id]=1;});
+  (p.records||[]).filter(function(r){return r.passed&&!r.chapterId&&!seen[r.moduleId];})
+    .forEach(function(r){
+      if(seen[r.moduleId])return;
+      if(byId(r.moduleId))return;
+      seen[r.moduleId]=1;
+      out.push({id:r.moduleId,title:r.title,author:r.author||'',gone:true});
+    });
+  return out;
+}
+function lifetimeEarned(p){
+  p=p||me();
+  var plus=adjustmentsOf(p).reduce(function(s,a){
+    return s+(num(a.points,0)>0?num(a.points,0):0);
+  },0);
+  return Math.round((earnedTotal(p.records)+activityPoints(p)+eventPoints(p)+
+    streakTotal(p)+paybackTotal(p)+plus)*10)/10;
+}
+/* The longest run of days on which anything at all was earned. Works
+   whether or not a streak rule has ever been set up. */
+function bestRunEver(p){
+  p=p||me();
+  var days={};
+  function mark(iso){
+    var t=new Date(iso);
+    if(isNaN(t.getTime()))return;
+    days[t.getFullYear()+'-'+t.getMonth()+'-'+t.getDate()]=
+      new Date(t.getFullYear(),t.getMonth(),t.getDate()).getTime();
+  }
+  (p.records||[]).forEach(function(r){if(r.passed)mark(r.date);});
+  logOf(p).forEach(function(r){if(r.approved)mark(r.date);});
+  entriesOf(p).forEach(function(e){if(e.status==='rated')mark(e.at);});
+  var stamps=Object.keys(days).map(function(k){return days[k];}).sort(function(a,b){return a-b;});
+  var best=0,run=0,prev=null;
+  stamps.forEach(function(t){
+    if(prev!==null&&Math.round((t-prev)/86400000)===1)run++;else run=1;
+    if(run>best)best=run;
+    prev=t;
+  });
+  return best;
+}
+function bestRating(p){
+  p=p||me();
+  var top=null;
+  entriesOf(p).forEach(function(e){
+    if(e.status!=='rated')return;
+    if(!top||num(e.points,0)>num(top.points,0))top=e;
+  });
+  return top;
+}
+function trophyEntries(p){
+  p=p||me();
+  /* Anything rated at the top of its event's rubric earns a place. */
+  return entriesOf(p).filter(function(e){
+    if(e.status!=='rated')return false;
+    var ev=eventById(e.eventId);
+    var rubric=(ev&&ev.rubric)||DEFAULT_RUBRIC;
+    var best=rubric.reduce(function(m,r){return Math.max(m,num(r.points,0));},0);
+    return best>0&&num(e.points,0)>=best;
+  });
+}
+function framedEntries(p){
+  p=p||me();
+  return entriesOf(p).filter(function(e){return e.status==='rated'&&e.thumb;})
+    .sort(function(a,b){return num(b.points,0)-num(a.points,0);}).slice(0,3);
+}
+
+/* ---------- the scene ---------- */
+function spineColour(seed){
+  var hues=['#C4453A','#2F7A4E','#2B5EA8','#8A5A05','#6B3FD4','#B8442F','#2E7D7D','#8E2F6B'];
+  return hues[Math.abs(fingerprint(seed).charCodeAt(0)+fingerprint(seed).length)%hues.length];
+}
+function viewRoom(){
+  var p=me();
+  if(!p)return viewGate();
+  var wall=roomOf(p).wall,W=ROOM_WALLS[wall];
+  var books=finishedTitles(p);
+  var trophies=trophyEntries(p);
+  var frames=framedEntries(p);
+  var run=bestRunEver(p);
+  var top=bestRating(p);
+
+  var h='<button class="btn btn-sm btn-ghost" data-go="profile">Back to your profile</button>'+
+    '<div class="pagehead stack"><div><h2>Pip&rsquo;s room</h2>'+
+    '<div class="sub">Everything you have finished, kept</div></div></div>';
+
+  var shelf='';
+  var shown=books.slice(0,16);
+  shown.forEach(function(m){
+    var hgt=74+(fingerprint(m.id).charCodeAt(0)%5)*6;
+    var wid=9+(fingerprint(m.title).charCodeAt(1)%4)*3;
+    shelf+='<span class="spine" style="height:'+hgt+'%;width:'+wid+'px;background:'+
+      spineColour(m.id)+'" title="'+esc(m.title)+(m.author?' — '+esc(m.author):'')+'">'+
+      '<i></i></span>';
+  });
+  if(books.length>shown.length)
+    shelf+='<span class="spinemore">+'+(books.length-shown.length)+'</span>';
+
+  var trophyRow='';
+  trophies.slice(0,6).forEach(function(){
+    trophyRow+='<span class="trophy">'+glyphSVG('trophy','#F4B53F','transparent')+'</span>';
+  });
+  if(trophies.length>6)trophyRow+='<span class="trophymore">+'+(trophies.length-6)+'</span>';
+
+  var frameRow='';
+  frames.forEach(function(e){
+    frameRow+='<button class="frame" data-act="ev-photo" data-id="'+esc(e.id)+'" '+
+      'title="'+esc(e.eventTitle)+'"><img src="'+e.thumb+'" alt=""></button>';
+  });
+
+  h+='<div class="room" data-wall="'+esc(wall)+'" style="'+
+      '--wall-a:'+W.a+';--wall-b:'+W.b+';--floor:'+W.floor+';--rail:'+W.rail+'">'+
+    '<div class="wall"></div><div class="floor"></div>'+
+    (frameRow?'<div class="frames">'+frameRow+'</div>':'')+
+    '<div class="plaque">'+
+      '<span class="k">Best run</span>'+
+      '<span class="v">'+run+'<small> day'+(run===1?'':'s')+'</small></span>'+
+    '</div>'+
+    '<div class="bookcase">'+
+      '<div class="books">'+(shelf||'<span class="emptyshelf">the shelf is waiting</span>')+'</div>'+
+      '<div class="board"></div>'+
+    '</div>'+
+    (trophyRow?'<div class="plinth"><div class="trophies">'+trophyRow+'</div><div class="top"></div></div>':'')+
+    '<div class="pipstand">'+pipSVG(pipLook(p),'idle',150)+'</div>'+
+    '<div class="rug"></div>'+
+    '</div>';
+
+  h+='<div class="stats stack">'+
+    '<div class="stat gold"><div class="k">Earned in all</div><div class="v">'+pts(lifetimeEarned(p))+'</div></div>'+
+    '<div class="stat"><div class="k">Books finished</div><div class="v">'+books.length+'</div></div>'+
+    '<div class="stat"><div class="k">Best run of days</div><div class="v">'+run+'</div></div>'+
+    '<div class="stat"><div class="k">Best rating</div><div class="v" style="font-size:1.1rem">'+
+      (top?esc(top.ratingLabel||'—'):'—')+'</div></div>'+
+    '</div>'+
+    '<p class="tiny muted stack">These never go down. Spending points does not touch them.</p>';
+
+  h+='<div class="panel stack"><h3 style="font-size:1rem">The wall</h3>'+
+    '<div class="row stack">'+Object.keys(ROOM_WALLS).map(function(k){
+      return '<button class="wallpick'+(k===wall?' on':'')+'" data-act="room-wall" data-w="'+k+'" '+
+        'title="'+esc(ROOM_WALLS[k].name)+'" style="background:linear-gradient('+
+        ROOM_WALLS[k].a+','+ROOM_WALLS[k].b+')"></button>';
+    }).join('')+'</div></div>';
+
+  if(books.length){
+    h+='<div class="panel stack"><h3 style="font-size:1rem">On the shelf</h3><div class="stack">';
+    books.forEach(function(m){
+      h+='<div class="receipt"><span class="spinechip" style="background:'+spineColour(m.id)+'"></span>'+
+        '<div style="flex:1;min-width:0"><div class="tiny">'+esc(m.title)+'</div>'+
+        '<div class="tiny muted">'+esc(m.author||'')+(m.gone?' · no longer in the catalogue':'')+'</div></div>'+
+        '</div>';
+    });
+    h+='</div></div>';
+  }
+  return h;
 }
 
 /* =========================================================
