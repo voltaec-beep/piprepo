@@ -210,6 +210,13 @@ Both respect reduced-motion settings.
 - *Odds a sale happens* — below 100% some cycles are skipped, so sales are a surprise rather than a timetable.
 - *Move it to Featured while on sale* — discounted items promote themselves and drop back afterwards.
 
+**A sale belongs to the item, so it cannot outlive it.** The schedule is intersected with the item's own availability before anything is shown:
+
+- An item with three days left never carries a four-day sale. The sale is cut to three days, and the editor says so.
+- A sale scheduled for after the item closes is never advertised. The store does not promise a discount on something that will be gone.
+- A sale *can* appear in an item's final days — that case is useful, so it is allowed and simply clipped.
+- For an item that returns on a cycle, a sale only counts if it lands inside one of its seasons. If the cadences never coincide, the editor says "no sale falls inside the time this item is available" rather than quietly scheduling one that never appears.
+
 The discount amount is **not** rolled at render time. It is a deterministic function of the item and which cycle the calendar is in, so every device shows the same price, a reload never changes it, and the number cannot shift while a reader is deciding. Nothing is stored and nothing needs a background job.
 
 On sale, the card shows the old price struck through, the new price beside it, and a shimmering "25% off" chip. The reader is charged the sale price, and the redemption log keeps what they paid, the full price, and the discount.

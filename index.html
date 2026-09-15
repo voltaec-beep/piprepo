@@ -956,6 +956,8 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
 }
 .item.hero .ribbon{
   position:absolute;top:0;left:0;right:0;height:26px;
+  padding:0 74px 0 14px;box-sizing:border-box;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   border-radius:13px 13px 0 0;
   background:linear-gradient(90deg,var(--fx),var(--fx-hi),var(--fx));
   background-size:220% 100%;
@@ -976,6 +978,26 @@ html.modal-open,body.modal-open{overflow:hidden;touch-action:none}
   width:38px;height:38px;border-radius:11px;border:1px solid var(--edge);
 }
 .fxpick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brand-hi);border-color:transparent}
+
+/* ============ store card rhythm ============ */
+.item{gap:12px;padding:18px 17px 16px}
+.item{padding-top:22px}
+.item.hero{padding-top:50px}          /* 26px ribbon + room to breathe */
+.item.hero.wide{padding-top:46px}
+.item .row:first-of-type{gap:15px}
+.item h4{line-height:1.3;margin:0 0 7px}
+.item .price{margin-top:2px;line-height:1.2}
+.item p{margin-top:-2px}
+.item .foot{padding-top:8px;gap:9px}
+.item .adminrow{padding-top:12px;margin-top:4px}
+.item .ic{margin-top:2px}
+.item.hero .ribbon{
+  letter-spacing:.18em;
+  box-shadow:0 1px 0 rgba(0,0,0,.18);
+}
+.badges{top:-14px;right:-12px}
+.item.hero .badges{top:-16px}
+.item .itemtop{gap:15px}
 </style>
 </head>
 <body>
@@ -3223,21 +3245,37 @@ function discountState(item,now){
     return{happens:happens,pct:pct};
   }
 
+  /* A sale belongs to the item, so it cannot outlive it. An item with three
+     days left never carries a four-day sale; it carries a three-day one. And
+     a sale is never advertised for a day the item will not be there. */
+  var shelf=daysOnShelf(item,now);          /* null = no closing date */
+  if(shelf===0)return off;                  /* off the shelf, so no sale */
+
   var k=(dayIdx<0)?-1:Math.floor(dayIdx/period);
   if(k>=0){
     var into=dayIdx-k*period;
     var cur=roll(k);
     if(cur.happens&&into<lasts){
       var left=lasts-into;
-      return{active:true,pct:cur.pct,endsOn:addDays(today,left),daysLeft:left};
+      if(shelf!==null)left=Math.min(left,shelf);
+      if(left>0){
+        return{active:true,pct:cur.pct,endsOn:addDays(today,left),daysLeft:left,
+               clipped:(shelf!==null&&shelf<lasts-into)};
+      }
     }
   }
-  /* Nothing running: find the next cycle that actually fires. */
-  for(var n=Math.max(0,k+1);n<k+60;n++){
+  /* Nothing running: find the next cycle that both fires and lands on a day
+     the item is actually on the shelf. */
+  for(var n=Math.max(0,k+1);n<k+26;n++){
     var nx=roll(n);
     if(!nx.happens)continue;
     var awayDays=n*period-dayIdx;
-    return{active:false,pct:nx.pct,nextOn:addDays(today,awayDays),daysAway:Math.max(0,awayDays)};
+    var when=addDays(today,awayDays);
+    if(!availability(item,when).open)continue;
+    var room=daysOnShelf(item,when);
+    var runs=(room===null)?lasts:Math.min(lasts,room);
+    if(runs<=0)continue;
+    return{active:false,pct:nx.pct,nextOn:when,daysAway:Math.max(0,awayDays),runs:runs};
   }
   return off;
 }
@@ -3262,11 +3300,11 @@ function availability(item,now){
   if(a.mode==='window'){
     var s=dnum(a.start),e=dnum(a.end);
     if(!s||!e)return{open:true,label:'',tone:'cold'};
-    if(now<s)return{open:false,label:'Opens '+fmtDay(s),tone:'cold'};
-    if(now>addDays(e,1))return{open:false,label:'Finished',tone:'cold'};
+    if(now<s)return{open:false,label:'Opens '+fmtDay(s),tone:'cold',opensOn:s};
+    if(now>addDays(e,1))return{open:false,label:'Finished',tone:'cold',done:true};
     var left=dayDiff(e,now);
     return{open:true,label:left<=0?'Last day':(left===1?'1 day left':left+' days left'),
-           tone:left<=7?'warm':'cold'};
+           tone:left<=7?'warm':'cold',endsExcl:addDays(e,1)};
   }
   if(a.mode==='season'){
     var st=dnum(a.start);
@@ -3282,12 +3320,22 @@ function availability(item,now){
       }
       if(now<oe){
         var l=dayDiff(oe,now);
-        return{open:true,label:l<=1?'Last day':l+' days left',tone:l<=7?'warm':'cold'};
+        return{open:true,label:l<=1?'Last day':l+' days left',tone:l<=7?'warm':'cold',endsExcl:oe};
       }
     }
     return{open:false,label:'Finished',tone:'cold'};
   }
-  return{open:true,label:'',tone:'cold'};
+  return{open:true,label:'',tone:'cold',endsExcl:null};
+}
+
+/* How many whole days the item has left on the shelf, or null if it has
+   no closing date at all. */
+function daysOnShelf(item,now){
+  var av=availability(item,now);
+  if(!av.open)return 0;
+  if(!av.endsExcl)return null;
+  function dayOf(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+  return Math.max(0,Math.round((dayOf(av.endsExcl).getTime()-dayOf(now||new Date()).getTime())/86400000));
 }
 
 /* ---------- may this reader have it ---------- */
@@ -3420,7 +3468,7 @@ function itemCard(it,p,hero){
       (hero?' data-fx="'+fx.style+'"':'')+'>'+
     (hero?'<span class="ribbon">'+esc(fx.label)+'</span>':'')+
     badges+
-    '<div class="row" style="gap:12px;align-items:flex-start">'+itemIcon(it)+
+    '<div class="row itemtop" style="align-items:flex-start">'+itemIcon(it)+
     '<div style="flex:1;min-width:0"><h4>'+esc(it.title)+'</h4>'+
     '<div class="price">'+(pr.active?'<s>'+pts(pr.base)+'</s>':'')+
       pts(pr.now)+' <small>points</small></div></div></div>'+
@@ -3692,13 +3740,27 @@ function itemEditor(existing){
     if(saleBox)saleBox.addEventListener('change',function(){grab(scrim);d.sale.on=saleBox.checked;redraw();});
 
     var sp=scrim.querySelector('#s-preview');
-    if(sp){
+    function refreshPreview(){
+      if(!sp)return;
+      grab(scrim);
       var ds=discountState(d);
+      var shelfLeft=daysOnShelf(d);
       sp.textContent=ds.active
-        ? 'On sale now — '+ds.pct+'% off, '+ds.daysLeft+' day'+(ds.daysLeft===1?'':'s')+' left.'
-        : (ds.nextOn?'Next sale '+(ds.daysAway<=1?'tomorrow':'in '+ds.daysAway+' days')+
-            ' — '+ds.pct+'% off for '+Math.max(1,num(d.sale.lasts,3))+' days.'
-          :'No sale scheduled.');
+        ? 'On sale now — '+ds.pct+'% off, '+ds.daysLeft+' day'+(ds.daysLeft===1?'':'s')+' left'+
+          (ds.clipped?' (cut short because the item goes first).':'.')
+        : (ds.nextOn
+            ? 'Next sale '+(ds.daysAway<=0?'today':(ds.daysAway===1?'tomorrow':'in '+ds.daysAway+' days'))+
+              ' — '+ds.pct+'% off for '+ds.runs+' day'+(ds.runs===1?'':'s')+'.'
+            : (shelfLeft===0
+                ? 'No sale while the item is off the shelf.'
+                : 'No sale falls inside the time this item is available.'));
+    }
+    if(sp){
+      refreshPreview();
+      ['#s-min','#s-max','#s-every','#s-lasts','#s-cool','#s-chance','#s-anchor','#i-cost'].forEach(function(sel){
+        var el=scrim.querySelector(sel);
+        if(el)el.addEventListener('input',refreshPreview);
+      });
     }
 
     var pic=scrim.querySelector('#i-pic');
