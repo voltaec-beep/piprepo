@@ -326,7 +326,17 @@ Two things make them different from ordinary store items. They are **yours for g
 
 Unlocking one puts it on immediately. **Dress Pip**, on the profile page or the store shelf, shows everything owned with a live preview; tap to wear, tap again to take off.
 
-Settings → Pip lets you set the price of every part and look, take any of them off sale, or hide the shelf entirely. A reader who would rather have a photograph still can — **Use a picture instead** keeps the old avatar and cropper, and **Back to Pip** returns.
+Settings → Pip lets you set the price of every part and look, take any of them off sale, or hide the shelf entirely. ### Which face a reader shows
+
+Pip or a picture is an **explicit choice**, not a matter of which field happens to be filled. The profile page shows both side by side; tap to switch. A reader who already had an avatar keeps it until they say otherwise, and switching between them never deletes anything — the picture stays on file, and deleting it is its own deliberate action.
+
+Dressing Pip or unlocking a cosmetic switches the choice to Pip automatically, since otherwise you would be dressing a face nobody could see.
+
+### Cosmetics that move
+
+Wings beat, a cape sways, a jetpack flickers, an aura pulses, sparks twinkle out of step with each other, a wand's star turns, a balloon bobs, a crown's gem catches the light. Pip himself breathes, and blinks every seven seconds.
+
+Motion is scoped to the part that should move rather than the whole figure, and only full-size Pips animate — a grid of thirty swatches in the dressing room stays still. Reduced-motion settings stop all of it.
 
 ## The wishlist
 

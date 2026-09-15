@@ -1238,6 +1238,77 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .dresspick:hover{border-color:var(--brand-hi)}
   .pipcard.buyable:hover,.pippart.buyable:hover{transform:translateY(-2px);border-color:var(--gold)}
 }
+
+/* ============ Pip, alive ============
+   Only instances marked live animate; a grid of small previews stays still. */
+.pip-live .pip-breathe{
+  transform-box:fill-box;transform-origin:50% 100%;
+  animation:pipBreathe 4.4s ease-in-out infinite;
+}
+@keyframes pipBreathe{
+  0%,100%{transform:scale(1,1)}
+  50%{transform:scale(1.015,.985)}
+}
+.pip-live .pip-eyes{
+  transform-box:fill-box;transform-origin:50% 55%;
+  animation:pipBlink 7s infinite;
+}
+@keyframes pipBlink{
+  0%,95.5%,100%{transform:scaleY(1)}
+  97%{transform:scaleY(.08)}
+  98.5%{transform:scaleY(1)}
+}
+/* cosmetics that move */
+.pip-live .pw-wing{transform-box:fill-box;animation:pipFlap 2.6s ease-in-out infinite}
+.pip-live .pw-l{transform-origin:100% 50%}
+.pip-live .pw-r{transform-origin:0% 50%;animation-delay:-.08s}
+@keyframes pipFlap{
+  0%,100%{transform:rotate(0deg) translateY(0)}
+  50%{transform:rotate(-7deg) translateY(-2px)}
+}
+.pip-live .pw-cape{
+  transform-box:fill-box;transform-origin:50% 0%;
+  animation:pipSway 3.8s ease-in-out infinite;
+}
+@keyframes pipSway{
+  0%,100%{transform:skewX(0deg)}
+  50%{transform:skewX(3.2deg)}
+}
+.pip-live .pw-flame{
+  transform-box:fill-box;transform-origin:50% 0%;
+  animation:pipFlame .28s steps(2,end) infinite;
+}
+@keyframes pipFlame{
+  0%{transform:scaleY(1) translateY(0);opacity:1}
+  100%{transform:scaleY(1.35) translateY(1px);opacity:.82}
+}
+.pip-live .pw-glow{animation:pipPulse 3.2s ease-in-out infinite}
+@keyframes pipPulse{0%,100%{opacity:.75}50%{opacity:1}}
+.pip-live .pw-spark{transform-box:fill-box;transform-origin:50% 50%;animation:pipTwinkle 1.9s ease-in-out infinite}
+.pip-live .pw-spark.s1{animation-delay:-.45s}
+.pip-live .pw-spark.s2{animation-delay:-.95s}
+@keyframes pipTwinkle{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.35;transform:scale(.78)}
+}
+.pip-live .pw-twinkle{animation:pipShimmer 2.8s ease-in-out infinite}
+@keyframes pipShimmer{0%,100%{opacity:.7}50%{opacity:1}}
+.pip-live .pw-wandstar{transform-box:fill-box;transform-origin:50% 50%;animation:pipSpin 6s linear infinite}
+@keyframes pipSpin{to{transform:rotate(360deg)}}
+.pip-live .pw-balloon{transform-box:fill-box;transform-origin:50% 100%;animation:pipBob 3.4s ease-in-out infinite}
+@keyframes pipBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}
+.pip-live .pw-gem{animation:pipPulse 2.2s ease-in-out infinite}
+
+/* ============ choosing a face ============ */
+.facepick{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.faceopt{
+  display:grid;justify-items:center;gap:7px;padding:10px 14px;border-radius:14px;
+  border:1px solid var(--edge-soft);background:var(--sunk);transition:.15s var(--ease);
+}
+.faceopt.on{border-color:var(--brand-hi);background:var(--brand-faint);box-shadow:0 0 0 1px var(--brand-hi)}
+.faceopt .l{font-size:.8rem;color:var(--text-2)}
+.faceopt.on .l{color:var(--text-hi)}
+@media (hover:hover) and (pointer:fine){.faceopt:hover{border-color:var(--brand-hi)}}
 </style>
 </head>
 <body>
@@ -1380,6 +1451,8 @@ function load(){
     if(p.wish===undefined)p.wish=null;
     if(!Array.isArray(p.pipOwned))p.pipOwned=['body-sun','eyes-dot'];
     if(!p.pipLook)p.pipLook={body:'sun',eyes:'dot'};
+    /* Readers who already had a picture keep it until they say otherwise. */
+    if(!p.face)p.face=p.avatar?'picture':'pip';
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1415,7 +1488,7 @@ function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
     avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
     streaks:[],wish:null,
-    pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'}};
+    pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'},face:'pip'};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -1426,8 +1499,10 @@ function recs(){var p=me();return p?p.records:[];}
 
 function avatarHTML(p,size,cls){
   var s=size||40;
-  /* A picture wins if the reader chose one; otherwise it is their Pip. */
-  if(p&&p.avatar)return '<img class="av av-'+s+(cls?' '+cls:'')+'" src="'+p.avatar+'" alt="">';
+  /* The reader says which face they want. A picture kept on file no longer
+     silently overrules a Pip they have just dressed. */
+  if(p&&p.face==='picture'&&p.avatar)
+    return '<img class="av av-'+s+(cls?' '+cls:'')+'" src="'+p.avatar+'" alt="">';
   if(p)return '<span class="av av-'+s+' av-pip'+(cls?' '+cls:'')+'" aria-hidden="true">'+
     pipHTML(p,Math.round(s*1.02),'idle',{shadow:false})+'</span>';
   return '<div class="av av-'+s+' av-ph'+(cls?' '+cls:'')+'" aria-hidden="true" style="font-size:'+(s/2.6)+'px">'+
@@ -2693,10 +2768,20 @@ function viewProfile(){
     ', '+pts(earnedTotal())+' points earned'+(p.pin?', shelf locked with a PIN':'')+'</div>'+
     '<div class="row stack">'+
     '<button class="btn btn-sm btn-primary" data-act="dress">Dress Pip</button>'+
-    '<button class="btn btn-sm" data-act="change-avatar">'+ico('camera')+'Use a picture instead</button>'+
     '<button class="btn btn-sm" data-act="edit-profile">Edit name and PIN</button>'+
-    (p.avatar?'<button class="btn btn-sm btn-ghost" data-act="drop-avatar">Back to Pip</button>':'')+
-    '</div></div></div></div>';
+    '</div>'+
+    '<div class="facepick">'+
+      '<button class="faceopt'+(p.face!=='picture'?' on':'')+'" data-act="face-pip">'+
+        '<span class="av av-64 av-pip">'+pipHTML(p,65,'idle',{shadow:false})+'</span>'+
+        '<span class="l">Pip</span></button>'+
+      '<button class="faceopt'+(p.face==='picture'?' on':'')+'" data-act="face-picture">'+
+        (p.avatar?'<img class="av av-64" src="'+p.avatar+'" alt="">'
+                 :'<span class="av av-64 av-ph" style="font-size:24px">'+esc(initials(p.name))+'</span>')+
+        '<span class="l">'+(p.avatar?'Picture':'Add a picture')+'</span></button>'+
+      (p.avatar?'<button class="btn btn-sm btn-ghost" data-act="drop-avatar" '+
+        'style="align-self:center">Delete picture</button>':'')+
+    '</div>'+
+    '</div></div></div>';
 
   var cur=S.settings.theme||'auto';
   h+='<div class="panel"><h3>Appearance</h3>'+
@@ -3221,9 +3306,22 @@ document.addEventListener('click',function(e){
   else if(act==='new-profile'){profileModal(null);}
   else if(act==='edit-profile'){profileModal(me());}
   else if(act==='change-avatar'){
-    avatarPicker(function(uri){me().avatar=uri;save();toast('Picture updated.','good');render();});
+    avatarPicker(function(uri){
+      var ap=me();ap.avatar=uri;ap.face='picture';save();
+      toast('Picture updated.','good');render();
+    });
   }
-  else if(act==='drop-avatar'){me().avatar='';save();render();}
+  else if(act==='face-pip'){me().face='pip';save();render();}
+  else if(act==='face-picture'){
+    var mp=me();
+    if(!mp.avatar)avatarPicker(function(uri){mp.avatar=uri;mp.face='picture';save();render();});
+    else{mp.face='picture';save();render();}
+  }
+  else if(act==='drop-avatar'){
+    var dp=me();
+    confirmModal('Delete the picture?','Your Pip takes its place. The picture itself is gone.',
+      'Delete',function(){dp.avatar='';dp.face='pip';save();render();},true);
+  }
   else if(act==='signout'){S.active=null;S.admin=false;save();go('gate');}
   else if(act==='open'){go('title',id);}
   else if(act==='begin'){requestStart(id,b.dataset.ch||null);}
@@ -5862,7 +5960,7 @@ function streakEditor(existing){
    poses that already exist. Every reader has their own.
    ========================================================= */
 
-var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>"},"backs":{"wings":"<g><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/>"},"auras":{"glow":"<circle cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>"}};
+var PIP_ART={"bodies":{"sun":["#FFE07A","#FFC23D","#F07A15"],"mint":["#B6F7DF","#5FE3B0","#1E9E77"],"berry":["#FFC2E2","#FF7FC0","#D42F84"],"grape":["#D9C6FF","#B79BFF","#6B3FD4"],"ember":["#FFCBA0","#FF9152","#DB3A18"],"frost":["#EAF6FF","#B8DDFA","#5E9FD8"],"midnight":["#8E9BE0","#5A64C0","#242A63"],"moss":["#DDF0A6","#A8D45C","#4F8A22"],"coral":["#FFC7C2","#FF8A7A","#D9422F"],"gold":["#FFEFC0","#F4B53F","#B37A10"]},"bodyPath":"M60 15 C84 15 100 33 100 57 C100 84 83 100 60 100 C37 100 20 84 20 59 C20 44 26 31 37 23 C44 18 52 15 60 15 Z","ink":"#17204A","poses":{"idle":{"tilt":0,"squash":0.0,"head":[60,20],"hand":[19,70],"mouth":"smile"},"read":{"tilt":-5,"squash":0.02,"head":[60,20],"hand":[17,74],"mouth":"soft"},"cheer":{"tilt":4,"squash":-0.04,"head":[60,18],"hand":[15,56],"mouth":"open"},"sleep":{"tilt":-9,"squash":0.05,"head":[60,22],"hand":[20,72],"mouth":"snore"},"sad":{"tilt":0,"squash":0.03,"head":[60,21],"hand":[21,72],"mouth":"frown"},"wait":{"tilt":3,"squash":0.01,"head":[60,20],"hand":[19,68],"mouth":"smile"}},"hats":{"crown":"<g transform=\"translate(0,0)\"><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#F4B53F\"/><path d=\"M38 20 L45 4 L55 15 L64 0 L73 15 L83 4 L90 20 Z\" fill=\"#B37A10\" opacity=\".28\" clip-path=\"url(#skinclip)\"/><rect x=\"37\" y=\"18\" width=\"54\" height=\"8\" rx=\"4\" fill=\"#F4B53F\"/><circle class=\"pw-gem\" cx=\"64\" cy=\"22\" r=\"3\" fill=\"#FFF3C4\"/><circle cx=\"48\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/><circle cx=\"80\" cy=\"22\" r=\"2.2\" fill=\"#FFF3C4\"/></g>","wizard":"<g transform=\"translate(0,0)\"><path d=\"M64 -22 C70 -4 82 18 90 26 L38 26 C46 18 58 -4 64 -22 Z\" fill=\"#6B4FD6\"/><path d=\"M64 -22 C70 -4 82 18 90 26 L64 26 Z\" fill=\"#4A33A8\" opacity=\".55\"/><rect x=\"33\" y=\"24\" width=\"62\" height=\"9\" rx=\"4.5\" fill=\"#3B2A86\"/><path d=\"M58 2 l2.4 4.8 5.2.8 -3.8 3.6 .9 5.2 -4.7-2.5 -4.7 2.5 .9-5.2 -3.8-3.6 5.2-.8z\" fill=\"#FFD84D\"/></g>","party":"<g transform=\"translate(0,0)\"><path d=\"M64 -18 L80 24 L48 24 Z\" fill=\"#FF7FC0\"/><path d=\"M64 -18 L80 24 L64 24 Z\" fill=\"#D42F84\" opacity=\".45\"/><circle cx=\"64\" cy=\"-19\" r=\"4.5\" fill=\"#FFD84D\"/><circle cx=\"57\" cy=\"12\" r=\"2.6\" fill=\"#fff\"/><circle cx=\"71\" cy=\"4\" r=\"2.6\" fill=\"#fff\"/></g>","cap":"<g transform=\"translate(0,0)\"><path d=\"M36 24 C38 2 90 2 92 24 Z\" fill=\"#1163F0\"/><path d=\"M64 3 C80 5 91 12 92 24 L64 24 Z\" fill=\"#0B4AC4\" opacity=\".5\"/><path d=\"M90 21 q18 3 15 9 q-11 3 -18 -3 z\" fill=\"#0B4AC4\"/></g>","flower":"<g transform=\"translate(0,0)\"><g><circle cx=\"78.0\" cy=\"18.0\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"70.96599467048418\" cy=\"30.143925158316236\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"56.932154535601995\" cy=\"30.084931133084233\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"50.00001775581445\" cy=\"18.022297140830815\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"57.014673106474035\" cy=\"5.86718465521778\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"71.0485893996296\" cy=\"5.903827569208959\" r=\"7.5\" fill=\"#FF7FC0\"/><circle cx=\"64\" cy=\"18\" r=\"6\" fill=\"#FFD84D\"/></g></g>"},"helds":{"book":"<g transform=\"translate(0,0)\"><g transform=\"translate(-16,-6) rotate(-8)\"><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"#FEFBF4\"/><path d=\"M13 4 v18\" stroke=\"#CFC3A6\" stroke-width=\"1.6\"/><path d=\"M0 4 q13 -6 26 0 v18 q-13 -5 -26 0 z\" fill=\"none\" stroke=\"#C0B294\" stroke-width=\"1.6\"/></g></g>","wand":"<g transform=\"translate(0,0)\"><g transform=\"rotate(-24)\"><rect x=\"-2\" y=\"-2\" width=\"4.5\" height=\"30\" rx=\"2.2\" fill=\"#7A5C34\"/><path class=\"pw-wandstar\" d=\"M0 -12 l3 6.2 6.8 1 -4.9 4.7 1.2 6.8 -6.1-3.2 -6.1 3.2 1.2-6.8 -4.9-4.7 6.8-1z\" fill=\"#FFD84D\"/></g></g>","balloon":"<g transform=\"translate(0,0)\"><g class=\"pw-balloon\"><path d=\"M2 0 q-2 -18 -14 -22\" stroke=\"#C9BFA6\" stroke-width=\"1.5\" fill=\"none\"/><ellipse cx=\"-12\" cy=\"-30\" rx=\"12\" ry=\"14\" fill=\"#FF7FC0\"/><ellipse cx=\"-16\" cy=\"-34\" rx=\"3.5\" ry=\"4.5\" fill=\"#fff\" opacity=\".55\"/></g></g>"},"backs":{"wings":"<g class=\"pw-wing pw-l\"><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(34 6 34)\"/><ellipse cx=\"6\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(34 6 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(8 0 52)\"/><ellipse cx=\"0\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(8 0 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-20 6 68)\"/><ellipse cx=\"6\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-20 6 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g><g class=\"pw-wing pw-r\"><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(-34 114 34)\"/><ellipse cx=\"114\" cy=\"34\" rx=\"20\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-34 114 34) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#FFF8E2\" transform=\"rotate(-8 120 52)\"/><ellipse cx=\"120\" cy=\"52\" rx=\"23\" ry=\"10\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(-8 120 52) translate(0,4)\" clip-path=\"url(#featherclip)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#FFF8E2\" transform=\"rotate(20 114 68)\"/><ellipse cx=\"114\" cy=\"68\" rx=\"19\" ry=\"9\" fill=\"#E7D6A8\" opacity=\".45\" transform=\"rotate(20 114 68) translate(0,4)\" clip-path=\"url(#featherclip)\"/></g>","cape":"<g class=\"pw-cape\"><path d=\"M40 26 C6 48 0 96 14 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#C4453A\"/><path d=\"M40 26 C22 56 20 92 26 116 L14 116 C0 96 6 48 40 26 Z\" fill=\"#8E2318\" opacity=\".55\"/><path d=\"M80 26 C98 56 100 92 94 116 L106 116 C120 96 114 48 80 26 Z\" fill=\"#8E2318\" opacity=\".35\"/><path d=\"M60 30 C58 64 56 94 58 116 L52 116 C50 94 52 64 54 30 Z\" fill=\"#9E2F26\" opacity=\".45\"/><path d=\"M38 28 q22 14 44 0 l-3 -9 q-19 11 -38 0 z\" fill=\"#E8695E\"/></g>","jet":"<rect x=\"36\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><rect x=\"68\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#B8C3D6\"/><g class=\"pw-flame\"><path d=\"M44 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/><path d=\"M76 82 q4 14 0 20 q-4 -6 0 -20z\" fill=\"#FF9152\"/></g>"},"auras":{"glow":"<circle class=\"pw-glow\" cx=\"60\" cy=\"58\" r=\"58\" fill=\"url(#aura)\"/>","sparks":"<g><rect class=\"pw-spark s0\" x=\"104\" y=\"12\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#FFD84D\" transform=\"rotate(22 107 20)\"/><rect class=\"pw-spark s1\" x=\"114\" y=\"30\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#5FE3B0\" transform=\"rotate(40 117 38)\"/><rect class=\"pw-spark s2\" x=\"116\" y=\"52\" width=\"6\" height=\"17\" rx=\"3\" fill=\"#B79BFF\" transform=\"rotate(66 119 60)\"/></g>"},"patterns":{"spots":"<g clip-path=\"url(#skinclip)\" opacity=\".30\"><circle cx=\"34\" cy=\"44\" r=\"9\" fill=\"__HI__\"/><circle cx=\"88\" cy=\"70\" r=\"11\" fill=\"__HI__\"/><circle cx=\"52\" cy=\"90\" r=\"7\" fill=\"__HI__\"/><circle cx=\"82\" cy=\"34\" r=\"6\" fill=\"__HI__\"/></g>","stripes":"<g clip-path=\"url(#skinclip)\" opacity=\".26\"><rect x=\"18\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"42\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"66\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/><rect x=\"90\" y=\"0\" width=\"9\" height=\"120\" fill=\"__HI__\" transform=\"rotate(-18 60 60)\"/></g>","starry":"<g class=\"pw-twinkle\" clip-path=\"url(#skinclip)\" opacity=\".7\"><path d=\"M36 36 l1.9 4.0 4.3 .1 -3.4 3.1 1.2 4.3 -4.1 -2.4 -4.1 2.4 1.2 -4.3 -3.4 -3.1 4.3 -.1 z\" fill=\"#fff\"/><path d=\"M86 57 l2.2 4.6 5.0 .1 -3.9 3.6 1.4 5.0 -4.8 -2.8 -4.8 2.8 1.4 -5.0 -3.9 -3.6 5.0 -.1 z\" fill=\"#fff\"/><path d=\"M58 83 l1.6 3.3 3.6 .1 -2.8 2.6 1.0 3.6 -3.4 -2.0 -3.4 2.0 1.0 -3.6 -2.8 -2.6 3.6 -.1 z\" fill=\"#fff\"/></g>"}};
 
 function pipSlots(){return ['body','pattern','eyes','hat','back','held','aura'];}
 
@@ -5960,6 +6058,7 @@ function pipSVG(look,pose,size,opts){
 
   var g='url(#skin'+n+')';
   var body=
+    '<g class="pip-breathe">'+
     '<g transform="rotate('+tilt+' 60 62) translate(0,'+(sq*14).toFixed(1)+') '+
       'scale('+(1+sq).toFixed(3)+','+(1-sq).toFixed(3)+') '+
       'translate('+(-60*sq).toFixed(1)+','+(62*sq).toFixed(1)+')">'+
@@ -5974,11 +6073,15 @@ function pipSVG(look,pose,size,opts){
       '</g>'+pat+
       '<ellipse cx="38" cy="70" rx="6.5" ry="4" fill="#FF6E93" opacity=".33"/>'+
       '<ellipse cx="88" cy="70" rx="6.5" ry="4" fill="#FF6E93" opacity=".33"/>'+
-      pipEyes(look.eyes||'dot',pose,P.mouth,ink)+pipMouth(P.mouth,ink)+
-    '</g>';
+      '<g class="pip-eyes">'+pipEyes(look.eyes||'dot',pose,P.mouth,ink)+'</g>'+
+      pipMouth(P.mouth,ink)+
+    '</g></g>';
 
   var shade=(opts.shadow===false)?'':'<ellipse cx="62" cy="110" rx="34" ry="7" fill="#000" opacity=".18"/>';
-  return '<svg class="pip" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -14 140 140" '+
+  /* Small previews stay still: a grid of thirty animating Pips is a lot of
+     work for no benefit. */
+  var live=(opts.still===true)?false:(size>=64);
+  return '<svg class="pip'+(live?' pip-live':'')+'" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -14 140 140" '+
     'width="'+size+'" height="'+size+'" aria-hidden="true">'+
     '<defs>'+defs+'</defs>'+aura+shade+back+body+held+hat+'</svg>';
 }
@@ -6086,6 +6189,7 @@ function equipPip(id){
   if(!ownsPip(id,p)){toast('Not unlocked yet.','bad');return;}
   if(!p.pipLook)p.pipLook={};
   p.pipLook[part.slot]=(p.pipLook[part.slot]===part.v&&part.price>0)?null:part.v;
+  if(p.face!=='pip'){p.face='pip';toast('Showing your Pip instead of your picture.');}
   if(part.slot==='body'&&!p.pipLook.body)p.pipLook.body='sun';
   if(part.slot==='eyes'&&!p.pipLook.eyes)p.pipLook.eyes='dot';
   save();render();
@@ -6119,6 +6223,7 @@ function buyPip(id){
         var part=pipPart(g);
         if(part)p.pipLook[part.slot]=part.v;
       });
+      if(p.face!=='pip')p.face='pip';
       save();
       snapshot('after unlocking '+thing.name);
       toast(thing.name+' unlocked, and Pip is wearing it.','good',6000);
@@ -6148,7 +6253,7 @@ function dressingRoom(){
         preview[pt.slot]=pt.v;
         if(pt.slot!=='body')preview.body=look.body;
         h+='<button type="button" class="dresspick'+(on?' on':'')+'" data-equip="'+esc(pt.id)+
-           '" title="'+esc(pt.name)+'">'+pipSVG(preview,'idle',54,{shadow:false})+'</button>';
+           '" title="'+esc(pt.name)+'">'+pipSVG(preview,'idle',54,{shadow:false,still:true})+'</button>';
       });
       h+='</div></div>';
     });
@@ -6213,7 +6318,7 @@ function pipShelf(){
       var preview={body:pipLook(p).body};
       preview[pt.slot]=pt.v;
       h+='<button class="pippart'+(afford?' buyable':'')+'" data-act="pip-buy" data-id="'+esc(pt.id)+'">'+
-        pipSVG(preview,'idle',52,{shadow:false})+
+        pipSVG(preview,'idle',52,{shadow:false,still:true})+
         '<span class="n">'+esc(pt.name)+'</span>'+
         '<span class="p">'+pts(price)+'</span></button>';
     });
