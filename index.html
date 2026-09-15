@@ -869,9 +869,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   display:flex;flex-direction:column;align-items:flex-end;gap:7px;
   pointer-events:none;
 }
-/* When a card carries both, they take opposite corners. Stacked, the
-   second one lands on the title. */
-.badges.left{right:auto;left:-12px;align-items:flex-start}
 .item{padding-top:20px}
 
 /* the sale rosette */
@@ -949,17 +946,6 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
   box-shadow:0 0 0 1px color-mix(in srgb,var(--fx) 34%,transparent),
              0 0 34px -8px var(--fx),var(--sh-2);
 }
-.item.hero .ribbon{
-  position:absolute;top:0;left:0;right:0;height:26px;
-  padding:0 74px 0 14px;box-sizing:border-box;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  border-radius:13px 13px 0 0;
-  background:linear-gradient(90deg,var(--fx),var(--fx-hi),var(--fx));
-  background-size:220% 100%;
-  color:var(--fx-ink);font-size:.62rem;font-weight:700;letter-spacing:.16em;
-  display:flex;align-items:center;justify-content:center;
-  animation:drift 7s linear infinite;
-}
 @keyframes drift{to{background-position:-220% 0}}
 .item.hero .ic{--ib:42px;width:68px;height:68px;border-radius:17px}
 .item.hero h4{font-size:1.2rem}
@@ -987,25 +973,10 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .scaler{display:flex;align-items:center;gap:11px}
 .scaler input[type=range]{flex:1;accent-color:var(--brand)}
 .scaler .v{font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--text-2);min-width:44px;text-align:right}
-.item.hero .ribbon{
-  letter-spacing:.18em;
-  box-shadow:0 1px 0 rgba(0,0,0,.18);
-}
 .badges{top:-14px;right:-12px}
 .item.hero .badges{top:-16px}
 .item .itemtop{gap:15px}
 
-/* Reserve the corner the rosette occupies, so a long title cannot run
-   underneath it. */
-.item.has-sale .itemtop{padding-right:58px}
-.item.has-sale.sale-big .itemtop{padding-right:68px}
-.item.badge-left{padding-top:30px}
-.item.badge-left .itemtop{padding-left:0}
-/* a featured card still needs its banner clearance, which is larger */
-.item.hero.badge-left{padding-top:52px}
-.item.hero.badge-left .ribbon{padding-left:92px}
-@media(max-width:360px){
-  .item.has-sale .itemtop,.item.has-sale.sale-big .itemtop{padding-right:52px}
 }
 
 /* ============ chapters ============ */
@@ -1084,6 +1055,54 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 .glyphgrid button:hover{border-color:var(--brand-hi)}
 
 .actrow.open:hover{border-color:var(--gold);transform:translateY(-1px)}
+}
+
+/* ============ the card's top bar ============
+   Both the sale rosette and the countdown want the space above the card,
+   and stacking them put the second one on the title. So the rosette keeps
+   the top-right corner to itself, and when a card also has something to
+   say — that it is featured, or how long it has left — that goes in a bar
+   across the top instead of floating. */
+.cardbar{
+  position:absolute;top:0;left:0;right:0;height:26px;
+  border-radius:13px 13px 0 0;
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px;box-sizing:border-box;
+  font-size:.62rem;font-weight:700;letter-spacing:.15em;
+  color:var(--fx-ink);
+  background:linear-gradient(90deg,var(--fx),var(--fx-hi),var(--fx));
+  background-size:220% 100%;
+  animation:drift 7s linear infinite;
+  box-shadow:0 1px 0 rgba(0,0,0,.18);
+}
+.item.has-sale .cardbar{padding-right:58px}
+.item.has-sale.sale-big .cardbar{padding-right:68px}
+.cardbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.cardbar .cd{
+  margin-left:auto;flex:none;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:999px;white-space:nowrap;
+  background:rgba(0,0,0,.26);color:#fff;letter-spacing:.09em;
+}
+.cardbar .cd .dot{
+  width:6px;height:6px;border-radius:50%;background:#fff;
+  animation:blip 1.3s ease-in-out infinite;
+}
+/* no feature banner, so the bar belongs to the countdown */
+.cardbar.timeonly{--fx:var(--gold-lo);--fx-hi:var(--gold);--fx-ink:var(--on-gold)}
+.cardbar.timeonly .cd{margin-left:0;background:rgba(0,0,0,.22)}
+.cardbar.soon{animation-duration:3.4s}
+.cardbar.last{--fx:#B8402F;--fx-hi:var(--fail);--fx-ink:#fff;animation-duration:2.2s}
+.cardbar.last .cd{background:rgba(0,0,0,.3)}
+
+/* any card wearing a bar needs the same clearance a featured one has */
+.item.has-bar{padding-top:50px}
+.item.has-bar.wide{padding-top:46px}
+.item.has-sale .itemtop{padding-right:58px}
+.item.has-sale.sale-big .itemtop{padding-right:68px}
+@media(max-width:360px){
+  .item.has-sale .itemtop,.item.has-sale.sale-big .itemtop{padding-right:52px}
+  .cardbar{letter-spacing:.08em}
 }
 </style>
 </head>
@@ -3835,34 +3854,48 @@ function itemCard(it,p,hero){
   var av=availability(it);
   var fx=featureOf(it);
 
-  /* Corner badges. A sale takes the right corner; a countdown takes
-     whichever corner is free, so the two never stack onto the title. */
-  var saleBadge='',timeBadge='',extra='';
+  /* The rosette keeps the top-right corner. A countdown floats there too
+     when it is the only thing on the card; as soon as a sale is present —
+     or the card is featured — it moves into the top bar, where it cannot
+     land on the title. */
+  var saleBadge='',extra='',barLabel='',cd='',urgency='';
   if(pr.active){
-    saleBadge='<span class="bsale'+(pr.pct>=30?' big':'')+'">'+
-      '<span><span class="n">'+pr.pct+'%</span><br><span class="u">OFF</span></span></span>';
+    saleBadge='<span class="badges" aria-hidden="true">'+
+      '<span class="bsale'+(pr.pct>=30?' big':'')+'">'+
+      '<span><span class="n">'+pr.pct+'%</span><br><span class="u">OFF</span></span></span></span>';
     extra+=' has-sale'+(pr.pct>=30?' sale-big':'');
   }
-  if(av.open&&av.label&&/day|Last/.test(av.label)){
+  var hasTime=(av.open&&av.label&&/day|Last/.test(av.label));
+  var timeText='';
+  if(hasTime){
     var isLast=/Last/.test(av.label);
     var left=isLast?0:parseInt(av.label,10);
-    var urgency=(isLast||left<=1?'last':(left<=5?'soon':''));
-    timeBadge='<span class="btime '+urgency+'"><span class="dot"></span>'+
-      esc(isLast?'LAST DAY':av.label.toUpperCase())+'</span>';
-  }
-  var badges='';
-  if(saleBadge)badges+='<span class="badges" aria-hidden="true">'+saleBadge+'</span>';
-  if(timeBadge){
-    var onLeft=!!saleBadge;
-    if(onLeft)extra+=' badge-left';
-    badges+='<span class="badges'+(onLeft?' left':'')+'" aria-hidden="true">'+timeBadge+'</span>';
+    urgency=(isLast||left<=1?'last':(left<=5?'soon':''));
+    timeText=isLast?'LAST DAY':av.label.toUpperCase();
   }
 
+  var wantsBar=hero||(hasTime&&pr.active);
+  var floatTime='';
+  if(hasTime&&!wantsBar){
+    floatTime='<span class="badges" aria-hidden="true"><span class="btime '+urgency+'">'+
+      '<span class="dot"></span>'+esc(timeText)+'</span></span>';
+  }
+  var bar='';
+  if(wantsBar){
+    extra+=' has-bar';
+    if(hasTime)cd='<span class="cd"><span class="dot"></span>'+esc(timeText)+'</span>';
+    barLabel=hero?'<span class="lab">'+esc(fx.label)+'</span>':'';
+    bar='<span class="cardbar'+(hero?'':' timeonly')+(hasTime?' '+urgency:'')+
+      '" aria-hidden="true">'+barLabel+cd+'</span>';
+  }
+  var badges=bar+saleBadge+floatTime;
+
+  /* Not affordable yet is a goal, not a closed door — only genuinely shut
+     items are dimmed. */
   var dim=(!el.can&&el.why!=='cost');
   return '<div class="item'+(el.can?' buyable':'')+(dim?' shut':'')+extra+
       (hero?' hero'+(fx.wide?' wide':'')+(fx.glow?' glow':''):'')+'"'+
       (hero?' data-fx="'+fx.style+'"':'')+'>'+
-    (hero?'<span class="ribbon">'+esc(fx.label)+'</span>':'')+
     badges+
     '<div class="row itemtop" style="align-items:flex-start">'+itemIcon(it)+
     '<div style="flex:1;min-width:0"><h4>'+esc(it.title)+'</h4>'+

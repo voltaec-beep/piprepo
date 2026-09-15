@@ -218,7 +218,9 @@ Two more switches: **Locked** shows an item but refuses redemption, which is use
 
 ### Featured, countdowns and sales
 
-**Corner badges.** Anything urgent hangs off the top-right corner of the card, stacked, so it reads before the price does.
+**Corner badges.** The sale rosette owns the top-right corner of the card, overhanging it.
+
+The countdown floats in that same corner when it is the only thing to say. As soon as a card carries both — or is featured — the countdown moves into a bar across the top of the card instead, because two things hanging off one corner either stack onto the title or spill off the edge of the shelf. The bar carries the feature banner on the left and the countdown on the right; with no feature banner, the bar belongs to the countdown alone and takes its colour, turning coral on the last day.
 
 A sale wears a green rosette with the number large and "OFF" beneath, ringed by a slowly turning dashed circle, bobbing gently with a shine sweeping across it. Discounts of 30% or more get a larger rosette.
 
