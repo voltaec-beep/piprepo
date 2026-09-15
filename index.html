@@ -1104,6 +1104,85 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .item.has-sale .itemtop,.item.has-sale.sale-big .itemtop{padding-right:52px}
   .cardbar{letter-spacing:.08em}
 }
+
+/* ============ wishlist ============ */
+.wishbox{
+  display:flex;align-items:center;gap:14px;position:relative;
+  padding:16px 18px;border-radius:15px;margin:16px 0 4px;
+  background:linear-gradient(120deg,rgba(244,181,63,.14),rgba(46,140,255,.10));
+  border:1px solid var(--gold-soft);box-shadow:var(--sh-1);
+}
+.wishbox.ready{
+  border-color:var(--pass);
+  background:linear-gradient(120deg,rgba(79,192,126,.20),rgba(244,181,63,.12));
+}
+.wishbox.empty-wish{background:none;border-style:dashed;border-color:var(--edge)}
+.wishbox .wishmark{
+  width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:radial-gradient(circle at 36% 30%,var(--gold-hi),var(--gold) 60%,var(--gold-lo));
+}
+.wishbox.ready .wishmark{background:radial-gradient(circle at 36% 30%,#9FEFC0,var(--pass) 60%,#2C7A4E)}
+.wishbox .wishmark svg{width:19px;height:19px;fill:var(--on-gold);stroke:none}
+.wishbox.ready .wishmark svg{fill:#06230F}
+.wishbox .t{font-family:var(--serif);font-size:1.1rem;color:var(--text-hi);line-height:1.25}
+.wishbox .d{font-size:.8rem;color:var(--text-2);margin-top:5px}
+.wbar{
+  display:block;height:7px;border-radius:4px;margin-top:8px;overflow:hidden;
+  background:var(--sunk);box-shadow:inset 0 1px 2px rgba(0,0,0,.25);
+}
+.wbar span{
+  display:block;height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-hi));
+  transition:width .6s var(--ease);
+}
+.wishbox.ready .wbar span{background:linear-gradient(90deg,var(--pass),#9FEFC0)}
+.wishline{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 14px;border-radius:11px;margin-bottom:14px;
+  border:1px solid var(--gold-soft);background:var(--gold-faint);
+  font-size:.85rem;color:var(--gold-hi);
+}
+.wishline.ready{border-color:var(--pass);background:var(--pass-faint);color:var(--pass)}
+.wishline svg{width:15px;height:15px;fill:currentColor;stroke:none;flex:none}
+.wishline .wbar{margin-top:0;height:6px}
+
+/* ============ streaks ============ */
+.streaks{display:grid;gap:9px;margin-bottom:16px}
+.streak{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 16px;border-radius:13px;
+  background:linear-gradient(var(--surface),var(--sunk));
+  border:1px solid var(--edge-soft);box-shadow:var(--sh-1);
+}
+.streak.alive{border-color:var(--gold-soft)}
+.streak .flame{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.15rem;color:var(--text-3);
+  background:var(--sunk);border:1px solid var(--edge-soft);
+}
+.streak.alive .flame{
+  color:var(--on-gold);border-color:transparent;
+  background:radial-gradient(circle at 38% 28%,var(--gold-hi),var(--gold) 62%,var(--gold-lo));
+  box-shadow:0 0 18px -6px var(--gold);
+}
+.streak .t{font-size:.97rem;color:var(--text-hi)}
+.streak .d{font-size:.79rem;color:var(--text-2);margin-top:2px}
+.streak .dots{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.streak .dots i{
+  width:18px;height:6px;border-radius:3px;background:var(--edge);
+  transition:background .3s var(--ease);
+}
+.streak .dots i.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hi))}
+.streak .now{
+  flex:none;text-align:right;font-family:var(--serif);
+  font-size:1.15rem;color:var(--gold-hi);font-variant-numeric:tabular-nums;line-height:1.1;
+}
+.streak .now span{display:block;font-family:var(--sans);font-size:.68rem;color:var(--text-3)}
+@media(max-width:420px){
+  .streak{flex-wrap:wrap}
+  .streak .now{margin-left:56px;text-align:left}
+}
 </style>
 </head>
 <body>
@@ -1157,7 +1236,7 @@ var SCHEMA='pip-module/1';
 var IDLE_MS=15*60*1000;
 
 var S={
-  profiles:[],active:null,modules:[],store:[],activities:[],settings:{},
+  profiles:[],active:null,modules:[],store:[],activities:[],streaks:[],settings:{},
   snaps:[],lastSnapCheck:null,nagged:false,
   admin:false,idleAt:0,
   view:'catalog',arg:null,run:null,last:null,
@@ -1194,6 +1273,8 @@ var ICON={
   sync:'<path d="M20 11a8 8 0 0 0-14-4.5L4 9"/><path d="M4 5v4h4"/><path d="M4 13a8 8 0 0 0 14 4.5L20 15"/><path d="M20 19v-4h-4"/>',
   trash:'<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/>',
   plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+  star:'<path d="M12 3.6l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 10l6-.8z"/>',
+  flame:'<path d="M12 3c4 4 6 6.6 6 10a6 6 0 0 1-12 0c0-2 1-3.6 2.5-5 .3 1.6 1.2 2.4 2 2.4 1.2 0 1.7-1.6 1.5-7.4z"/>',
   print:'<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7" rx="2"/><path d="M7 14h10v6H7z"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4L7 17M17 7l1.4-1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
@@ -1222,8 +1303,10 @@ function load(){
   S.modules=Array.isArray(d.modules)?d.modules:[];
   S.store=Array.isArray(d.store)?d.store:[];
   S.activities=Array.isArray(d.activities)?d.activities:[];
+  S.streaks=Array.isArray(d.streaks)?d.streaks:[];
   S.active=d.active||null;
-  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
+  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',
+    wish:{on:true,shortfall:25,payback:10,cap:0},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
   /* Earlier builds kept these in subfolders. GitHub's uploader flattens
      folders, so the layout moved and stored paths need bringing along. */
@@ -1237,6 +1320,8 @@ function load(){
     if(!Array.isArray(p.purchases))p.purchases=[];
     if(!Array.isArray(p.activities))p.activities=[];
     if(!Array.isArray(p.adjustments))p.adjustments=[];
+    if(!Array.isArray(p.streaks))p.streaks=[];
+    if(p.wish===undefined)p.wish=null;
   });
   if(S.active&&!profile(S.active))S.active=null;
 }
@@ -1259,7 +1344,7 @@ function save(){
   try{
     localStorage.setItem(KEY,JSON.stringify({
       v:2,profiles:S.profiles,active:S.active,modules:S.modules,store:S.store,
-      activities:S.activities,settings:S.settings
+      activities:S.activities,streaks:S.streaks,settings:S.settings
     }));
   }catch(e){
     storageOK=false;
@@ -1270,7 +1355,8 @@ function save(){
 /* ---------- profiles ---------- */
 function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
-    avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[]};
+    avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
+    streaks:[],wish:null};
 }
 function profile(id){
   for(var i=0;i<S.profiles.length;i++)if(S.profiles[i].id===id)return S.profiles[i];
@@ -1929,7 +2015,7 @@ function exportAll(){
   download('pip-backup-'+new Date().toISOString().slice(0,10)+'.json',
     JSON.stringify({schema:'pip-backup/1',exported:nowISO(),
       profiles:S.profiles,modules:S.modules,store:S.store,
-      activities:S.activities,settings:S.settings},null,2));
+      activities:S.activities,streaks:S.streaks,settings:S.settings},null,2));
 }
 function restoreBackup(d){
   var counts=countsOf(d);
@@ -2057,6 +2143,8 @@ function finish(){
   if(p)p.records.push(rec);
   S.last={rec:rec,missed:missed};
   S.run=null;save();
+  settleStreaks();
+  checkWishReached();
   snapshot('after '+(p?p.name:'a')+'\u2019s test',{force:true});
   go('results');
 }
@@ -2202,6 +2290,8 @@ function viewCatalog(){
     '<div class="v" style="color:var(--gold-hi)">'+pts(balance(p))+'</div></div></div></div>';
 
   if(S.admin)h+=adminBar();
+  h+=wishLine();
+  h+=streakStrip('quiz');
 
   if(!S.modules.length){
     return h+'<div class="empty"><h3>Nothing on the shelf yet</h3>'+
@@ -2692,8 +2782,60 @@ function viewSettings(){
   });
   h+='</tbody></table></div></div>';
 
+  h+=viewIncentives();
   h+=viewBackups();
   return h;
+}
+
+/* ---------- wishes and streaks (instructor) ---------- */
+function viewIncentives(){
+  var cfg=wishCfg();
+  var h='<div class="panel"><h3>Wishlist</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">A reader marks one item they are '+
+    'saving for. It can only be something out of reach, and redeeming it pays a slice back — the '+
+    'reward is for having saved rather than spent along the way.</p>'+
+    '<label class="check stack"><input type="checkbox" id="w-on"'+(cfg.on?' checked':'')+
+    '><span>Let readers set a wish</span></label>'+
+    '<div class="row" style="gap:10px">'+
+      '<label class="field" style="flex:1"><span>Must cost this much more than they have (%)</span>'+
+      '<input class="inp" id="w-short" type="number" min="0" max="500" value="'+cfg.shortfall+'"></label>'+
+      '<label class="field" style="flex:1"><span>Paid back on redeeming (%)</span>'+
+      '<input class="inp" id="w-back" type="number" min="0" max="100" value="'+cfg.payback+'"></label>'+
+      '<label class="field" style="flex:1"><span>Most that can come back &mdash; 0 for no limit</span>'+
+      '<input class="inp" id="w-cap" type="number" min="0" step="0.5" value="'+cfg.cap+'"></label>'+
+    '</div>'+
+    '<button class="btn btn-primary" data-act="save-wishcfg">Save wishlist settings</button></div>';
+
+  h+='<div class="panel"><div class="row" style="justify-content:space-between">'+
+    '<h3>Streaks</h3>'+
+    '<button class="btn btn-sm btn-primary" data-act="streak-new">'+ico('plus')+'Add a streak</button></div>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">A run of days or weeks in which a '+
+    'reader did enough. Worked out from the results and activity logs they already have, so it is '+
+    'right even if PipHub was closed.</p>';
+  var rules=streakRules();
+  if(!rules.length){
+    h+='<p class="tiny muted stack">None set up. Nothing appears to readers until you add one.</p>';
+  }else{
+    h+='<div class="stack">';
+    rules.forEach(function(r){
+      var word=r.unit==='week'?'week':'day';
+      h+='<div class="receipt">'+
+        '<span class="pill '+(r.on!==false?'good':'cold')+'" style="min-width:60px;text-align:center">'+
+          (r.on!==false?'running':'paused')+'</span>'+
+        '<div style="flex:1;min-width:0"><div class="tiny">'+esc(r.title||'Streak')+'</div>'+
+        '<div class="tiny muted">'+r.perPeriod+' '+
+          (r.source==='activity'?'activit'+(r.perPeriod===1?'y':'ies'):'quiz'+(r.perPeriod===1?'':'zes'))+
+          ' a '+word+' for '+r.periods+' '+word+(r.periods===1?'':'s')+
+          ' &nbsp;·&nbsp; '+pts(num(r.points,0))+' points'+(r.repeat===false?' once':' each time')+
+        '</div></div>'+
+        '<div class="row" style="gap:6px">'+
+          '<button class="btn btn-sm btn-ghost" data-act="streak-edit" data-id="'+esc(r.id)+'">Edit</button>'+
+          '<button class="btn btn-sm btn-danger" data-act="streak-del" data-id="'+esc(r.id)+'">Remove</button>'+
+        '</div></div>';
+    });
+    h+='</div>';
+  }
+  return h+'</div>';
 }
 
 /* ---------- backups ---------- */
@@ -2804,7 +2946,7 @@ function profileModal(existing){
 }
 function signIn(id){
   var p=profile(id);if(!p)return;
-  if(!p.pin){S.active=id;S.admin=false;save();go('catalog');return;}
+  if(!p.pin){S.active=id;S.admin=false;save();settleStreaks();checkWishReached();go('catalog');return;}
   openModal(
     '<h3>'+esc(p.name)+'</h3><p class="lede">Type your PIN to open your shelf.</p>'+
     '<label class="field" style="margin-top:16px"><span>PIN</span>'+
@@ -2820,7 +2962,8 @@ function signIn(id){
             scrim.querySelector('#pinin').value='';scrim.querySelector('#pinin').focus();
             return;
           }
-          closeModal();S.active=id;S.admin=false;save();go('catalog');
+          closeModal();S.active=id;S.admin=false;save();
+          settleStreaks();checkWishReached();go('catalog');
         });
       }
       scrim.querySelector('#pingo').addEventListener('click',attempt);
@@ -3017,6 +3160,28 @@ document.addEventListener('click',function(e){
   else if(act==='theme-set'){setTheme(b.dataset.t);}
   else if(act==='export-csv'){exportCSV();}
   else if(act==='buy'){buyItem(id);}
+  else if(act==='wish-set'){setWish(id);}
+  else if(act==='wish-clear'){clearWish();}
+  else if(act==='streak-new'){requireAdmin('Adding a streak needs the instructor key.',function(){streakEditor(null);});}
+  else if(act==='streak-edit'){requireAdmin('Editing a streak needs the instructor key.',function(){
+    var r=ruleById(id);if(r)streakEditor(r);});}
+  else if(act==='streak-del'){
+    requireAdmin('Removing a streak needs the instructor key.',function(){
+      var r=ruleById(id);if(!r)return;
+      confirmModal('Remove "'+r.title+'"?','Points already earned from it are kept.',
+        'Remove',function(){
+          S.streaks=streakRules().filter(function(x){return x.id!==id;});
+          save();toast('"'+r.title+'" removed.');render();
+        },true);
+    });
+  }
+  else if(act==='save-wishcfg'){
+    S.settings.wish={on:$('#w-on').checked,
+      shortfall:Math.max(0,num($('#w-short').value,25)),
+      payback:Math.max(0,Math.min(100,num($('#w-back').value,10))),
+      cap:Math.max(0,num($('#w-cap').value,0))};
+    save();toast('Wishlist settings saved.','good');render();
+  }
   else if(act==='act-do'){logActivity(id);}
   else if(act==='act-new'){requireAdmin('Adding an activity needs the instructor key.',function(){activityEditor(null);});}
   else if(act==='act-edit'){requireAdmin('Editing an activity needs the instructor key.',function(){
@@ -3693,7 +3858,8 @@ function adjustedTotal(p){
 function balance(p){
   p=p||me();
   if(!p)return 0;
-  return Math.round((earnedTotal(p.records)+activityPoints(p)+adjustedTotal(p)-spentTotal(p))*10)/10;
+  return Math.round((earnedTotal(p.records)+activityPoints(p)+adjustedTotal(p)
+    +bonusTotal(p)-spentTotal(p))*10)/10;
 }
 
 /* ---------- dates ---------- */
@@ -3910,6 +4076,8 @@ function viewStore(){
     pts(earnedTotal(p?p.records:[]))+' from tests<br>'+
     pts(activityPoints(p))+' from activities<br>'+
     (adjustedTotal(p)?(adjustedTotal(p)>0?'+':'')+pts(adjustedTotal(p))+' from your instructor<br>':'')+
+    (paybackTotal(p)?'+'+pts(paybackTotal(p))+' paid back on wishes<br>':'')+
+    (streakTotal(p)?'+'+pts(streakTotal(p))+' from streaks<br>':'')+
     pts(spentTotal(p))+' spent</div></div>';
 
   if(S.admin){
@@ -3949,6 +4117,7 @@ function viewStore(){
     if(ra!==rb)return ra-rb;
     return priceOf(a).now-priceOf(b).now;
   }
+  h+=wishPanel();
   h+='<div class="shelf stack">'+
      visible.slice().sort(order).map(function(it){
        return itemCard(it,p,isFeatured(it));
@@ -4023,7 +4192,10 @@ function itemCard(it,p,hero){
       (el.can
         ? '<button class="btn btn-sm btn-primary" data-act="buy" data-id="'+esc(it.id)+'">Redeem</button>'
         : '<span class="pill '+el.tone+'">'+esc(el.label)+'</span>')+
+      (isWish(it)?'<span class="pill warm">your wish</span>':'')+
       (el.owned?'<span class="pill cold">redeemed '+el.owned+'&times;</span>':'')+
+      (canWish(it,p)?'<button class="btn btn-sm btn-ghost" data-act="wish-set" data-id="'+
+        esc(it.id)+'" title="Save up for this">'+ico('star')+'Wish</button>':'')+
       (it.hidden?'<span class="pill cold">hidden</span>':'')+
     '</div>'+
     (S.admin?'<div class="adminrow">'+
@@ -4052,13 +4224,19 @@ function buyItem(id){
       var again=eligibility(it,p);
       if(!again.can){toast(again.label,'bad');return;}
       var paid=priceOf(it);
+      var w=wishOf(p);
+      var back=(w&&w.itemId===it.id)?wishPayback(paid.now):0;
       p.purchases=purchasesOf(p).concat([{
         id:uid(),itemId:it.id,title:it.title,cost:paid.now,full:paid.base,
-        discount:paid.active?paid.pct:0,icon:it.icon,date:nowISO(),given:false
+        discount:paid.active?paid.pct:0,payback:back,
+        icon:it.icon,date:nowISO(),given:false
       }]);
+      if(back)p.wish=null;                       /* the wish is granted; pick a new one */
       save();
       snapshot('after redeeming '+it.title);
-      toast(it.title+' redeemed. Balance '+pts(balance(p))+'.','good');
+      toast(back
+        ? it.title+' is yours, and '+pts(back)+' points came back for saving up.'
+        : it.title+' redeemed. Balance '+pts(balance(p))+'.','good',back?7000:4200);
       render();
     });
 }
@@ -4470,6 +4648,8 @@ function logActivity(id){
     icon:a.icon,date:nowISO(),approved:!a.approval};
   p.activities=logOf(p).concat([entry]);
   save();
+  settleStreaks();
+  checkWishReached();
   snapshot('after '+p.name+' logged '+a.title);
   toast(a.approval
     ? '"'+a.title+'" logged. It needs approving before the points land.'
@@ -4504,6 +4684,7 @@ function viewActivities(){
       '</div>';
   }
 
+  h+=streakStrip('activity');
   if(!list.length){
     return h+'<div class="empty stack"><h3>'+(S.admin?'No activities yet':'Nothing to do yet')+'</h3>'+
       '<p class="muted">'+(S.admin
@@ -4910,7 +5091,7 @@ function statePayload(scope){
   var out={schema:'pip-backup/2',exported:nowISO(),scope:scope,app:'PipHub'};
   if(scope!=='content')out.profiles=S.profiles;
   if(scope!=='readers'){
-    out.modules=S.modules;out.store=S.store;out.activities=S.activities;
+    out.modules=S.modules;out.store=S.store;out.activities=S.activities;out.streaks=S.streaks;
     var st={};
     for(var k in S.settings)if(Object.prototype.hasOwnProperty.call(S.settings,k))st[k]=S.settings[k];
     out.settings=st;
@@ -5082,6 +5263,7 @@ function applyPayload(d,mode){
       if(Array.isArray(d.modules))S.modules=d.modules;
       if(Array.isArray(d.store))S.store=d.store;
       if(Array.isArray(d.activities))S.activities=d.activities;
+      if(Array.isArray(d.streaks))S.streaks=d.streaks;
     }
   }
   if(d.settings){
@@ -5163,6 +5345,404 @@ function fillSnapSize(){
       el.textContent=txt+(quota?'  ·  '+niceBytes(used)+' of '+niceBytes(quota)+' used':'');
     },function(){el.textContent=txt;});
   }else el.textContent=txt;
+}
+
+/* =========================================================
+   Two things that reward coming back.
+
+   A wish is the one item a reader is saving for. It can only
+   be set on something out of reach, and redeeming it pays a
+   slice back — the reward is for having saved rather than
+   spent as you went.
+
+   A streak is a run of periods in which a reader did enough:
+   passing quizzes week after week, or doing activities day
+   after day. Runs are worked out from the records that
+   already exist, so nothing drifts and nothing needs
+   ticking over in the background.
+   ========================================================= */
+
+/* ---------- money in from bonuses ---------- */
+function paybackTotal(p){
+  return Math.round(purchasesOf(p).reduce(function(s,r){
+    return s+(Number(r.payback)||0);
+  },0)*10)/10;
+}
+function streakAwardsOf(p){p=p||me();return (p&&p.streaks)?p.streaks:[];}
+function streakTotal(p){
+  return Math.round(streakAwardsOf(p).reduce(function(s,a){
+    return s+(Number(a.points)||0);
+  },0)*10)/10;
+}
+function bonusTotal(p){
+  return Math.round((paybackTotal(p)+streakTotal(p))*10)/10;
+}
+
+/* =========================================================
+   Wishlist
+   ========================================================= */
+function wishCfg(){
+  var w=S.settings.wish||{};
+  return{
+    on:w.on!==false,
+    shortfall:Math.max(0,num(w.shortfall,25)),   /* % the item must exceed the balance by */
+    payback:Math.max(0,Math.min(100,num(w.payback,10))),
+    cap:Math.max(0,num(w.cap,0))                 /* 0 = no cap */
+  };
+}
+function wishOf(p){p=p||me();return (p&&p.wish&&p.wish.itemId)?p.wish:null;}
+function wishItem(p){
+  var w=wishOf(p);
+  return w?itemById(w.itemId):null;
+}
+/* Out of reach by enough to be worth saving for. */
+function canWish(item,p){
+  p=p||me();
+  var cfg=wishCfg();
+  if(!cfg.on||!p||!item)return false;
+  if(item.hidden)return false;
+  var w=wishOf(p);
+  if(w&&w.itemId===item.id)return false;         /* already the wish */
+  var price=priceOf(item).now;
+  if(price<=0)return false;
+  return price>=balance(p)*(1+cfg.shortfall/100)+0.0001;
+}
+function isWish(item){
+  var w=wishOf();
+  return !!(w&&item&&w.itemId===item.id);
+}
+function wishProgress(p){
+  p=p||me();
+  var it=wishItem(p);
+  if(!it)return null;
+  var price=priceOf(it).now;
+  var bal=balance(p);
+  var short=Math.round(Math.max(0,price-bal)*10)/10;
+  return{
+    item:it,price:price,balance:bal,short:short,
+    pct:price>0?Math.min(100,Math.round(bal/price*100)):100,
+    ready:short<=0,
+    payback:wishPayback(price)
+  };
+}
+function wishPayback(price){
+  var cfg=wishCfg();
+  var n=Math.round(price*cfg.payback/100*10)/10;
+  if(cfg.cap)n=Math.min(n,cfg.cap);
+  return n;
+}
+function setWish(id){
+  var p=me(),it=itemById(id);
+  if(!p||!it)return;
+  if(!canWish(it,p)){toast('A wish has to be something you are still saving for.','bad');return;}
+  p.wish={itemId:it.id,setAt:nowISO(),priceAtSet:priceOf(it).now,balanceAtSet:balance(p),reached:false};
+  save();
+  toast('"'+it.title+'" is your wish. Redeem it and '+pts(wishPayback(priceOf(it).now))+
+        ' points come back.','good');
+  render();
+}
+function clearWish(){
+  var p=me();if(!p||!p.wish)return;
+  var it=wishItem(p);
+  p.wish=null;save();
+  toast((it?it.title:'That')+' is no longer your wish.');
+  render();
+}
+/* Called whenever the balance may have moved, so reaching the goal is
+   announced once rather than sitting there unremarked. */
+function checkWishReached(){
+  var p=me();if(!p)return;
+  var w=wishOf(p);if(!w)return;
+  var prog=wishProgress(p);
+  if(!prog)return;
+  if(prog.ready&&!w.reached){
+    w.reached=true;save();
+    toast('You have enough for '+prog.item.title+'.','good',7000);
+  }else if(!prog.ready&&w.reached){
+    w.reached=false;save();
+  }
+}
+
+/* ---------- the wish panel at the top of the store ---------- */
+function wishPanel(){
+  var p=me();
+  var cfg=wishCfg();
+  if(!cfg.on||!p)return '';
+  var prog=wishProgress(p);
+  if(!prog){
+    if(!S.store.length)return '';
+    return '<div class="wishbox empty-wish">'+
+      '<div class="wishmark" aria-hidden="true">'+ico('star')+'</div>'+
+      '<div style="flex:1;min-width:0"><div class="t">Pick something to save for</div>'+
+      '<div class="d">Mark one item as your wish. When you finally redeem it, '+
+      cfg.payback+'% of the cost comes back to you.</div></div></div>';
+  }
+  var el=eligibility(prog.item,p);
+  return '<div class="wishbox'+(prog.ready?' ready':'')+'">'+
+    '<div class="wishmark" aria-hidden="true">'+ico('star')+'</div>'+
+    renderIcon(prog.item.icon)+
+    '<div style="flex:1;min-width:0">'+
+      '<div class="t">'+esc(prog.item.title)+'</div>'+
+      '<div class="wbar"><span style="width:'+prog.pct+'%"></span></div>'+
+      '<div class="d">'+
+        (prog.ready
+          ? 'You have enough. Redeeming it pays '+pts(prog.payback)+' points back.'
+          : pts(prog.short)+' more to go &nbsp;·&nbsp; '+pts(prog.balance)+' of '+pts(prog.price)+
+            ' &nbsp;·&nbsp; '+pts(prog.payback)+' comes back when you get it')+
+      '</div>'+
+    '</div>'+
+    '<div class="row" style="gap:6px;flex:none">'+
+      (prog.ready&&el.can
+        ? '<button class="btn btn-sm btn-primary" data-act="buy" data-id="'+esc(prog.item.id)+'">Redeem it</button>'
+        : '')+
+      '<button class="btn btn-sm btn-ghost" data-act="wish-clear">Change</button>'+
+    '</div></div>';
+}
+/* A one-line nudge for the pages that are not the store. */
+function wishLine(){
+  var prog=wishProgress();
+  if(!prog||!wishCfg().on)return '';
+  return '<div class="wishline'+(prog.ready?' ready':'')+'">'+ico('star')+
+    '<span>'+(prog.ready
+      ? 'You can afford '+esc(prog.item.title)+' now'
+      : pts(prog.short)+' more points to '+esc(prog.item.title))+'</span>'+
+    '<span class="wbar" style="flex:1;max-width:160px"><span style="width:'+prog.pct+'%"></span></span>'+
+    '</div>';
+}
+
+/* =========================================================
+   Streaks
+   ========================================================= */
+var STREAK_LOOKBACK=80;
+
+function streakRules(){return Array.isArray(S.streaks)?S.streaks:[];}
+function liveStreakRules(){
+  return streakRules().filter(function(r){return r.on!==false;});
+}
+function ruleById(id){
+  var l=streakRules();
+  for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];
+  return null;
+}
+function periodStarts(unit,count,now){
+  now=now||new Date();
+  var base=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(unit==='week')base.setDate(base.getDate()-((base.getDay()+6)%7));
+  var out=[];
+  for(var i=0;i<count;i++){
+    out.push(new Date(base.getTime()));
+    base=addDays(base,unit==='week'?-7:-1);
+  }
+  return out;                                    /* newest first */
+}
+function periodKey(unit,start){
+  return unit+':'+start.getFullYear()+'-'+(start.getMonth()+1)+'-'+start.getDate();
+}
+function eventsFor(rule,p){
+  p=p||me();
+  if(!p)return [];
+  if(rule.source==='activity'){
+    return logOf(p).filter(function(r){return r.approved;})
+      .map(function(r){return new Date(r.date);});
+  }
+  return (p.records||[]).filter(function(r){return r.passed;})
+    .map(function(r){return new Date(r.date);});
+}
+/* Everything the UI and the awarder need about one rule, right now. */
+function streakState(rule,p){
+  p=p||me();
+  var unit=rule.unit==='week'?'week':'day';
+  var need=Math.max(1,num(rule.perPeriod,1));
+  var span=Math.max(1,num(rule.periods,3));
+  var starts=periodStarts(unit,STREAK_LOOKBACK);
+  var len=unit==='week'?7:1;
+  var evts=eventsFor(rule,p);
+
+  var counts=starts.map(function(s){
+    var end=addDays(s,len);
+    var n=0;
+    for(var i=0;i<evts.length;i++)if(evts[i]>=s&&evts[i]<end)n++;
+    return n;
+  });
+  var qual=counts.map(function(n){return n>=need;});
+
+  /* The period in progress must not break a run it has not finished. */
+  var i=qual[0]?0:1;
+  var run=0;
+  while(i+run<qual.length&&qual[i+run])run++;
+  var startIdx=i;
+
+  var done=Math.floor(run/span);
+  var into=run%span;
+  var milestones=[];
+  for(var k=1;k<=done;k++){
+    var idx=startIdx+run-k*span;
+    if(idx>=0)milestones.push(periodKey(unit,starts[idx]));
+  }
+  return{
+    unit:unit,need:need,span:span,run:run,
+    thisPeriod:counts[0],inProgress:!qual[0],
+    done:done,into:into,toGo:span-into,
+    milestones:milestones,
+    word:unit==='week'?'week':'day',
+    nowWord:unit==='week'?'this week':'today',
+    /* "Pass 2 quizzes" / "Do 2 activities", with the singular right */
+    ask:(rule.source==='activity')
+      ? 'Do '+need+' activit'+(need===1?'y':'ies')
+      : 'Pass '+need+' quiz'+(need===1?'':'zes')
+  };
+}
+/* Awards are idempotent: each milestone is remembered by the period that
+   completed it, so re-checking never pays twice. */
+function settleStreaks(){
+  var p=me();
+  if(!p)return;
+  if(!Array.isArray(p.streaks))p.streaks=[];
+  var given={},paid=0,names=[];
+  p.streaks.forEach(function(a){given[a.ruleId+'|'+a.key]=1;});
+  liveStreakRules().forEach(function(rule){
+    if(rule.repeat===false&&p.streaks.some(function(a){return a.ruleId===rule.id;}))return;
+    var st=streakState(rule,p);
+    st.milestones.forEach(function(key){
+      if(given[rule.id+'|'+key])return;
+      var pointsFor=Math.max(0,num(rule.points,0));
+      p.streaks.push({id:uid(),ruleId:rule.id,key:key,points:pointsFor,
+        at:nowISO(),title:rule.title||'Streak'});
+      given[rule.id+'|'+key]=1;
+      paid+=pointsFor;names.push(rule.title||'a streak');
+    });
+  });
+  if(paid>0){
+    save();
+    toast(names[0]+' — '+pts(paid)+' points.','good',7000);
+  }
+}
+
+/* ---------- reader-facing strip ---------- */
+function streakStrip(source){
+  var p=me();
+  if(!p)return '';
+  var rules=liveStreakRules().filter(function(r){return (r.source||'quiz')===source;});
+  if(!rules.length)return '';
+  var h='<div class="streaks">';
+  rules.forEach(function(rule){
+    var st=streakState(rule,p);
+    var dots='';
+    for(var k=0;k<st.span;k++){
+      dots+='<i class="'+(k<st.into?'lit':'')+'"></i>';
+    }
+    h+='<div class="streak'+(st.run?' alive':'')+'">'+
+      '<div class="flame" aria-hidden="true">'+(st.run?st.run:'')+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div class="t">'+esc(rule.title||'Streak')+'</div>'+
+        '<div class="d">'+
+          (st.run
+            ? st.run+' '+st.word+(st.run===1?'':'s')+' running &nbsp;·&nbsp; '+
+              st.toGo+' more for '+pts(num(rule.points,0))+' points'
+            : st.ask+' '+st.nowWord+' to start it')+
+        '</div>'+
+        '<div class="dots">'+dots+'</div>'+
+      '</div>'+
+      '<div class="now">'+st.thisPeriod+' / '+st.need+
+        '<span>'+st.nowWord+'</span></div>'+
+      '</div>';
+  });
+  return h+'</div>';
+}
+
+/* ---------- instructor editor ---------- */
+function streakEditor(existing){
+  var d=existing?JSON.parse(JSON.stringify(existing)):{
+    id:uid(),on:true,title:'',source:'quiz',unit:'week',
+    perPeriod:1,periods:3,points:5,repeat:true,created:nowISO()
+  };
+  function seg(field,opts,cur){
+    return '<div class="seg">'+opts.map(function(o){
+      return '<button type="button" data-seg="'+field+'" data-v="'+o[0]+'" aria-pressed="'+
+        (cur===o[0])+'">'+esc(o[1])+'</button>';
+    }).join('')+'</div>';
+  }
+  function body(){
+    var word=d.unit==='week'?'week':'day';
+    var counting=d.source==='activity'?'activities completed':'quizzes passed';
+    return '<h3>'+(existing?'Edit streak':'New streak')+'</h3>'+
+      '<p class="lede">A run of '+word+'s in which a reader did enough. Nothing is tracked '+
+      'separately — it is read from what they have already done.</p>'+
+      '<label class="field" style="margin-top:18px"><span>Name the reader sees</span>'+
+      '<input class="inp" id="k-title" data-focus maxlength="40" value="'+esc(d.title)+'" '+
+      'placeholder="'+(d.source==='activity'?'Every day counts':'Reading week after week')+'"></label>'+
+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">What counts</h4>'+
+      '<div class="stack">'+seg('src',[['quiz','Quizzes passed'],['activity','Activities done']],d.source)+'</div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi);margin-top:16px">Over what period</h4>'+
+      '<div class="stack">'+seg('unit',[['day','Each day'],['week','Each week']],d.unit)+'</div>'+
+
+      '<div class="subfields">'+
+        '<div class="row" style="gap:10px">'+
+          '<label class="field" style="flex:1"><span>'+esc(counting)+' needed per '+word+'</span>'+
+          '<input class="inp" id="k-per" type="number" min="1" value="'+esc(d.perPeriod)+'"></label>'+
+          '<label class="field" style="flex:1"><span>'+word+'s in a row</span>'+
+          '<input class="inp" id="k-span" type="number" min="1" value="'+esc(d.periods)+'"></label>'+
+        '</div>'+
+        '<label class="field"><span>Points when the run is complete</span>'+
+        '<input class="inp" id="k-points" type="number" min="0" step="0.5" value="'+esc(d.points)+'"></label>'+
+        '<p class="tiny" id="k-preview" style="color:var(--gold-hi)"></p>'+
+      '</div>'+
+
+      '<label class="check"><input type="checkbox" id="k-repeat"'+(d.repeat!==false?' checked':'')+
+      '><span>Pay again every time the run is completed, not just the first</span></label>'+
+      '<label class="check"><input type="checkbox" id="k-on"'+(d.on!==false?' checked':'')+
+      '><span>Running — readers can see it and earn from it</span></label>'+
+      '<div class="err" id="k-err"></div>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+      '<button class="btn btn-primary" id="k-save">'+(existing?'Save streak':'Add streak')+'</button></div>';
+  }
+  function grab(scrim){
+    var g=function(s){var el=scrim.querySelector(s);return el?el.value:null;};
+    if(g('#k-title')!==null)d.title=g('#k-title').trim();
+    if(g('#k-per')!==null)d.perPeriod=Math.max(1,num(g('#k-per'),1));
+    if(g('#k-span')!==null)d.periods=Math.max(1,num(g('#k-span'),3));
+    if(g('#k-points')!==null)d.points=Math.max(0,num(g('#k-points'),0));
+    var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:false;};
+    d.repeat=cb('#k-repeat');d.on=cb('#k-on');
+  }
+  function redraw(){redrawModal(body(),mount);}
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var s=e.target.closest('[data-seg]');
+      if(!s)return;
+      grab(scrim);
+      if(s.dataset.seg==='src')d.source=s.dataset.v;else d.unit=s.dataset.v;
+      redraw();
+    });
+    var prev=scrim.querySelector('#k-preview');
+    function refresh(){
+      grab(scrim);
+      var word=d.unit==='week'?'week':'day';
+      prev.textContent='Pass '+d.perPeriod+' '+
+        (d.source==='activity'?'activit'+(d.perPeriod===1?'y':'ies'):'quiz'+(d.perPeriod===1?'':'zes'))+
+        ' every '+word+' for '+d.periods+' '+word+(d.periods===1?'':'s')+' in a row, and earn '+
+        pts(d.points)+' points'+(d.repeat?', every time.':', once.');
+    }
+    refresh();
+    ['#k-per','#k-span','#k-points'].forEach(function(sel){
+      var el=scrim.querySelector(sel);
+      if(el)el.addEventListener('input',refresh);
+    });
+    var rep=scrim.querySelector('#k-repeat');
+    if(rep)rep.addEventListener('change',refresh);
+    scrim.querySelector('#k-save').addEventListener('click',function(){
+      grab(scrim);
+      if(!d.title){scrim.querySelector('#k-err').textContent='Give it a name readers will understand.';return;}
+      var i=-1,l=streakRules();
+      for(var k=0;k<l.length;k++)if(l[k].id===d.id)i=k;
+      if(i>=0)S.streaks[i]=d;else S.streaks.push(d);
+      save();closeModal();
+      toast(existing?'Streak saved.':'"'+d.title+'" added.','good');
+      settleStreaks();render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
 }
 
 /* =========================================================

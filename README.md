@@ -310,6 +310,30 @@ The top bar carries three sections — Catalogue, Activities, Store — and that
 
 The profile page is the hub: your picture and name, quick cards through to **Records** (tests taken, points from reading) and **Points** (balance and what you have redeemed), appearance settings, and the reader switcher. Records has a link straight back.
 
+## The wishlist
+
+A reader marks **one** item as their wish — the thing they are saving for.
+
+It can only be set on something **out of reach**: by default the item must cost at least 25% more than they currently have. You cannot wish for what you could just buy. The test uses the item's price *today*, so a sale that brings something within reach simply means buying it.
+
+Redeeming a wish costs the normal price and then **pays a slice back** — 10% by default, with an optional cap. That payback is the whole point: it rewards having saved rather than spending as you went. It only pays if the wish is still on that item when it is redeemed, and the wish clears afterwards so a new one can be chosen.
+
+The wish appears as a panel above the shelf with a progress bar and how far there is to go, as a marker on the item itself, and as a one-line nudge on the reading catalogue — "36.0 more points to Cinema trip". When the balance finally covers it, the panel turns green, says so once, and offers to redeem there and then.
+
+All three numbers are instructor-set in Settings, and the whole thing can be switched off.
+
+## Streaks
+
+A run of periods in which a reader did enough. Nothing appears to readers until an instructor sets one up.
+
+Each streak says what counts — **quizzes passed** or **activities done** — how many are needed per period, whether the period is a **day** or a **week**, how many periods in a row complete a run, and what the run pays. That covers "two activities a day for three days" and "a quiz a week for four weeks" with the same four fields.
+
+Runs are **worked out from the records that already exist**, not tracked separately, so they are right even if PipHub was closed for a week, and they survive a restore. The period in progress never breaks a run — a streak only ends when a period finishes without enough in it.
+
+Milestones repeat by default, so a run that keeps going keeps paying; there is a switch for once-only. Awards are remembered against the period that completed them, so re-opening the app never pays twice.
+
+Readers see a strip on the page the streak belongs to — activity streaks on Activities, quiz streaks on the reading catalogue — showing the run so far, how much of the current period is done, and how far to the next payout.
+
 ## Backups and restore points
 
 Live data is a single copy in `localStorage`. Two things sit behind it, and they do different jobs.
@@ -346,4 +370,4 @@ Settings → Readers now shows tests taken, points spent and current balance per
 
 ## Verified
 
-Driven headlessly end to end: a simulated year of sales (18 windows, every gap at or above the cooldown, discounts spread across the configured band), activity day and week limits, per-day caps, approval-gated points, emoji icons surviving the editor, store cooldowns, once-only limits, seasonal windows, refunds restoring the balance, erasing a reader's data, every referenced file resolving over http, the full-screen request firing on the sign-in gesture, the back button guarding a test in progress, palette switching and persistence, profile creation, per-reader isolation of records, PIN sign-in, the retake gate closing again after instructor mode locks, folder sync over http, and the cropper — a zoomed-out square image on a brass backdrop exported at 256×256 with transparent corners outside the rounded mask and the source image intact in the middle.
+Driven headlessly end to end: wish eligibility against a moving balance and the 10% payback landing on redemption, streak runs computed from seeded history with milestones paying once and only once, a simulated year of sales (18 windows, every gap at or above the cooldown, discounts spread across the configured band), activity day and week limits, per-day caps, approval-gated points, emoji icons surviving the editor, store cooldowns, once-only limits, seasonal windows, refunds restoring the balance, erasing a reader's data, every referenced file resolving over http, the full-screen request firing on the sign-in gesture, the back button guarding a test in progress, palette switching and persistence, profile creation, per-reader isolation of records, PIN sign-in, the retake gate closing again after instructor mode locks, folder sync over http, and the cropper — a zoomed-out square image on a brass backdrop exported at 256×256 with transparent corners outside the rounded mask and the source image intact in the middle.
