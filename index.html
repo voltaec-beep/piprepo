@@ -1158,6 +1158,7 @@ var IDLE_MS=15*60*1000;
 
 var S={
   profiles:[],active:null,modules:[],store:[],activities:[],settings:{},
+  snaps:[],lastSnapCheck:null,nagged:false,
   admin:false,idleAt:0,
   view:'catalog',arg:null,run:null,last:null,
   filter:{q:'',sort:'title'},
@@ -1222,7 +1223,7 @@ function load(){
   S.store=Array.isArray(d.store)?d.store:[];
   S.activities=Array.isArray(d.activities)?d.activities:[];
   S.active=d.active||null;
-  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
+  S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
   /* Earlier builds kept these in subfolders. GitHub's uploader flattens
      folders, so the layout moved and stored paths need bringing along. */
@@ -1870,7 +1871,7 @@ function addFiles(files,quiet){
       if(r.text==null){t.failed.push({name:r.name,errs:['Could not be read.']});return;}
       var data;
       try{data=JSON.parse(r.text);}catch(e){t.failed.push({name:r.name,errs:['Not valid JSON — '+e.message]});return;}
-      if(data&&data.schema==='pip-backup/1'&&Array.isArray(data.profiles)){restoreBackup(data);return;}
+      if(data&&/^pip-backup\//.test(String(data.schema||''))){restoreBackup(data);return;}
       ingest(data,r.name,t);
     });
     reportTally(t);
@@ -1931,29 +1932,36 @@ function exportAll(){
       activities:S.activities,settings:S.settings},null,2));
 }
 function restoreBackup(d){
-  confirmModal('Restore this backup?',
-    'It holds '+(d.profiles||[]).length+' readers, '+(d.modules||[]).length+
-    ' titles and '+((d.store||[]).length)+' store items. Everything now in this browser is replaced.','Restore',function(){
-      S.profiles=Array.isArray(d.profiles)?d.profiles:[];
-      S.modules=Array.isArray(d.modules)?d.modules:[];
-      S.store=Array.isArray(d.store)?d.store:[];
-      S.activities=Array.isArray(d.activities)?d.activities:[];
-      S.profiles.forEach(function(p){
-        if(!Array.isArray(p.purchases))p.purchases=[];
-        if(!Array.isArray(p.activities))p.activities=[];
-        if(!Array.isArray(p.adjustments))p.adjustments=[];
+  var counts=countsOf(d);
+  var hasReaders=Array.isArray(d.profiles);
+  var hasContent=Array.isArray(d.modules)||Array.isArray(d.store)||Array.isArray(d.activities);
+  if(!hasReaders&&!hasContent){toast('That file holds nothing PipHub can restore.','bad');return;}
+
+  /* A file with no readers in it should never wipe the readers you have. */
+  if(!hasReaders){
+    confirmModal('Add this to what you have?',
+      'This file holds '+describeCounts(counts)+' and no reader data, so your readers are '+
+      'left alone. Titles, store items and activities with matching names are updated.',
+      'Add it',function(){
+        guard('before adding a backup file',function(){
+          applyPayload(d,'merge');save();
+          toast('Added — '+describeCounts(countsOf(statePayload('all')))+' now.','good');
+          loadSnaps().then(function(){go(me()?'settings':'gate');});
+        });
       });
-      if(d.settings){
-        S.settings.folder=d.settings.folder||S.settings.folder;
-        S.settings.assets=d.settings.assets||S.settings.assets;
-        if(d.settings.pw)S.settings.pw=d.settings.pw;
-      }
-      S.active=S.profiles.length?S.profiles[0].id:null;
-      S.settings.seeded=true;save();
-      toast('Backup restored.','good');
-      go(S.active?'catalog':'gate');
+    return;
+  }
+  confirmModal('Restore this backup?',
+    'It holds '+describeCounts(counts)+'. Everything in this browser is replaced. '+
+    'A restore point is taken first, so this can be undone.','Restore',function(){
+      guard('before restoring a backup file',function(){
+        applyPayload(d,'replace');save();
+        toast('Backup restored.','good');
+        loadSnaps().then(function(){go(me()?'settings':'gate');});
+      });
     },true);
 }
+
 function exportCSV(){
   var head=['Date','Reader','Title','Author','Score %','Correct','Total','Points earned','Points possible','Result'];
   var rows=[];
@@ -2049,6 +2057,7 @@ function finish(){
   if(p)p.records.push(rec);
   S.last={rec:rec,missed:missed};
   S.run=null;save();
+  snapshot('after '+(p?p.name:'a')+'\u2019s test',{force:true});
   go('results');
 }
 function verdictFor(m,rec){
@@ -2666,9 +2675,7 @@ function viewSettings(){
     (deferredInstall?'<button class="btn btn-sm btn-primary" data-act="install">'+ico('down')+'Install Pip</button>':'')+
     '</div></div>';
 
-  h+='<div class="panel"><h3>Readers and data</h3>'+
-    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Everything lives in this browser on this device. '+
-    'A backup file carries readers, avatars, points and titles to another one.</p>'+
+  h+='<div class="panel"><h3>Readers</h3>'+
     '<div class="scroll stack"><table><thead><tr><th>Reader</th><th class="n">Tests</th>'+
     '<th class="n">Spent</th><th class="n">Balance</th><th></th></tr></thead><tbody>';
   S.profiles.forEach(function(p){
@@ -2680,13 +2687,67 @@ function viewSettings(){
         '<button class="btn btn-sm" data-act="adjust-points" data-id="'+p.id+'">Points</button> '+
         '<button class="btn btn-sm btn-ghost" data-act="wipe-reader" data-id="'+p.id+'">Erase data</button> '+
         (S.profiles.length>1?
-        '<button class="btn btn-sm btn-danger" data-act="del-profile" data-id="'+p.id+'">Delete</button>':'')+'</td></tr>';
+        '<button class="btn btn-sm btn-danger" data-act="del-profile" data-id="'+p.id+'">Delete</button>':'')+
+      '</td></tr>';
   });
-  h+='</tbody></table></div>'+
-    '<div class="row stack"><button class="btn" data-act="export-all">'+ico('down')+'Download a backup</button>'+
-    '<button class="btn" data-act="pick-files">'+ico('file')+'Restore from a backup</button>'+
-    '<button class="btn btn-sm btn-ghost" data-act="export-csv">All readers as a spreadsheet</button></div></div>';
+  h+='</tbody></table></div></div>';
+
+  h+=viewBackups();
   return h;
+}
+
+/* ---------- backups ---------- */
+function viewBackups(){
+  var overdue=exportOverdue();
+  var h='<div class="panel"><h3>Backups</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Everything lives in this browser '+
+    'on this device. Restore points below undo mistakes; a saved file is what survives the browser '+
+    'being cleared or the device being lost.</p>';
+
+  h+='<div class="'+(overdue?'keyline':'row')+' stack" style="'+(overdue?'':'gap:10px')+'">'+
+    (overdue?ico('down')+'<span>'+
+      (S.settings.lastExport
+        ? 'No copy saved since '+dateShort(S.settings.lastExport)+'.'
+        : 'No copy has ever been saved.')+
+      ' Restore points cannot help if this device is lost.</span>':
+      '<span class="tiny muted">Last saved '+sinceWords(S.settings.lastExport)+'.</span>')+
+    '</div>';
+
+  h+='<div class="row stack">'+
+    '<button class="btn btn-primary" data-act="export-choose">'+ico('down')+'Save a copy</button>'+
+    '<button class="btn" data-act="pick-files">'+ico('file')+'Restore from a file</button>'+
+    '<button class="btn btn-ghost" data-act="snap-now">'+ico('sync')+'Take a restore point</button>'+
+    '<button class="btn btn-sm btn-ghost" data-act="export-csv">All readers as a spreadsheet</button>'+
+    '</div>';
+
+  var snaps=S.snaps||[];
+  h+='<div class="divider"></div>'+
+     '<div class="row" style="justify-content:space-between"><h4 style="font-size:.95rem;color:var(--text-hi)">'+
+     'Restore points</h4><span class="tiny muted" id="snapsize"></span></div>';
+  if(!snaps.length){
+    h+='<p class="tiny muted stack">None yet. PipHub takes one after a test or a redemption, '+
+       'and always before anything is deleted.</p>';
+  }else{
+    h+='<div class="stack">';
+    snaps.slice(0,12).forEach(function(m){
+      h+='<div class="receipt">'+
+        '<span class="pill '+(m.kind==='guard'?'warm':(m.kind==='marked'?'good':'cold'))+
+          '" style="min-width:64px;text-align:center">'+
+          (m.kind==='guard'?'safety':(m.kind==='marked'?'kept':'auto'))+'</span>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="tiny">'+esc(m.reason)+'</div>'+
+          '<div class="tiny muted">'+sinceWords(m.at)+' &nbsp;·&nbsp; '+describeCounts(m.counts)+
+          ' &nbsp;·&nbsp; '+niceBytes(m.bytes)+'</div></div>'+
+        '<div class="row" style="gap:6px">'+
+          '<button class="btn btn-sm" data-act="snap-restore" data-id="'+esc(m.id)+'">Go back</button>'+
+          '<button class="btn btn-sm btn-ghost" data-act="snap-save" data-id="'+esc(m.id)+'">Save</button>'+
+          '<button class="btn btn-sm btn-danger" data-act="snap-del" data-id="'+esc(m.id)+'">&times;</button>'+
+        '</div></div>';
+    });
+    h+='</div>';
+    if(snaps.length>12)h+='<p class="tiny muted stack">'+(snaps.length-12)+' older ones are kept too.</p>';
+  }
+  return h+'</div>';
 }
 
 /* =========================================================
@@ -2900,7 +2961,7 @@ function render(){
   $('#foot-right').textContent=p?(p.name+' has earned '+pts(earnedTotal())):'';
 
   if(S.view==='quiz'&&S.run)wakeOn();else wakeOff();
-  if(S.view==='settings')fillStatus();
+  if(S.view==='settings'){fillStatus();fillSnapSize();}
   if(S.view==='results')animateResults();
   var q=$('#q');
   if(q&&S.filter.q){q.focus();q.setSelectionRange(q.value.length,q.value.length);}
@@ -3036,15 +3097,17 @@ document.addEventListener('click',function(e){
         'Every test result, all earned points, their activity log, their redemption history '+
         'and their picture are removed. '+
         'The reader and their name stay.','Erase data',function(){
-          p.records=[];p.purchases=[];p.activities=[];p.adjustments=[];p.avatar='';
-          if(S.last&&S.active===id)S.last=null;
-          save();toast(p.name+'\u2019s data erased.');render();
+          guard('before erasing '+p.name+'\u2019s data',function(){
+            p.records=[];p.purchases=[];p.activities=[];p.adjustments=[];p.avatar='';
+            if(S.last&&S.active===id)S.last=null;
+            save();toast(p.name+'\u2019s data erased.');render();
+          });
         },true);
     });
   }
 
   /* --- instructor mode --- */
-  else if(act==='unlock'){requireAdmin('Unlock instructor mode.',function(){toast('Instructor mode unlocked.','good');render();});}
+  else if(act==='unlock'){requireAdmin('Unlock instructor mode.',afterUnlock);}
   else if(act==='lock'){lockAdmin();}
 
   /* --- gated --- */
@@ -3075,13 +3138,39 @@ document.addEventListener('click',function(e){
   else if(act==='export-mod'){requireAdmin('Saving a module needs the instructor key.',function(){
     var m=byId(id);if(m)exportModule(m);});}
   else if(act==='export-all'){requireAdmin('A backup holds the answer keys, so it needs the instructor key.',exportAll);}
+  else if(act==='export-choose'){requireAdmin('A copy holds the answer keys, so it needs the instructor key.',exportChooser);}
+  else if(act==='snap-now'){
+    requireAdmin('Instructor key needed.',function(){
+      snapshot('saved by you',{force:true,kind:'marked'}).then(function(m){
+        toast(m?'Restore point taken.':'Nothing has changed since the last one.',m?'good':'');
+        loadSnaps().then(render);
+      });
+    });
+  }
+  else if(act==='snap-restore'){requireAdmin('Going back needs the instructor key.',function(){restoreSnapshot(id);});}
+  else if(act==='snap-save'){
+    requireAdmin('Instructor key needed.',function(){
+      idbGet('snapdata',id).then(unsquash).then(function(json){
+        download('piphub-restorepoint-'+id+'.json',json);
+        S.settings.lastExport=nowISO();save();render();
+      },function(){toast('That restore point could not be read.','bad');});
+    });
+  }
+  else if(act==='snap-del'){
+    requireAdmin('Instructor key needed.',function(){
+      idbDel('snapdata',id).then(function(){return idbDel('snapmeta',id);})
+        .then(function(){loadSnaps().then(render);});
+    });
+  }
   else if(act==='del-mod'){
     requireAdmin('Removing a title needs the instructor key.',function(){
       var m=byId(id);if(!m)return;
       confirmModal('Remove "'+m.title+'"?','The title and its questions come off the shelf. Past results stay in the records.',
         'Remove',function(){
-          S.modules=S.modules.filter(function(x){return x.id!==id;});
-          save();toast('"'+m.title+'" removed.');render();
+          guard('before removing '+m.title,function(){
+            S.modules=S.modules.filter(function(x){return x.id!==id;});
+            save();toast('"'+m.title+'" removed.');render();
+          });
         },true);
     });
   }
@@ -3089,7 +3178,11 @@ document.addEventListener('click',function(e){
     requireAdmin('Clearing records needs the instructor key.',function(){
       var p=me();
       confirmModal('Clear '+p.name+'\u2019s records?','Every test result and all earned points for this reader are erased.',
-        'Clear records',function(){p.records=[];S.last=null;save();toast('Records cleared.');render();},true);
+        'Clear records',function(){
+          guard('before clearing '+p.name+'\u2019s records',function(){
+            p.records=[];S.last=null;save();toast('Records cleared.');render();
+          });
+        },true);
     });
   }
   else if(act==='del-profile'){
@@ -3097,9 +3190,11 @@ document.addEventListener('click',function(e){
       var p=profile(id);if(!p||S.profiles.length<2)return;
       confirmModal('Delete '+p.name+'?','Their picture, points and every result go with them.',
         'Delete reader',function(){
-          S.profiles=S.profiles.filter(function(x){return x.id!==id;});
-          if(S.active===id)S.active=S.profiles[0].id;
-          save();toast(p.name+' deleted.');go('settings');
+          guard('before deleting '+p.name,function(){
+            S.profiles=S.profiles.filter(function(x){return x.id!==id;});
+            if(S.active===id)S.active=S.profiles[0].id;
+            save();toast(p.name+' deleted.');go('settings');
+          });
         },true);
     });
   }
@@ -3151,9 +3246,21 @@ $('#file-any').addEventListener('change',function(e){addFiles(e.target.files,fal
 $('#file-dir').addEventListener('change',function(e){addFiles(e.target.files,true);e.target.value='';});
 $('#chip').addEventListener('click',function(){go('profile');});
 $('#themebtn').addEventListener('click',function(){setTheme(resolvedTheme()==='dark'?'light':'dark');});
+/* Both ways into instructor mode land here, so the reminder to save a copy
+   is not attached to only one of them. */
+function afterUnlock(){
+  toast('Instructor mode unlocked.','good');
+  if(exportOverdue()&&!S.nagged){
+    S.nagged=true;
+    toast('No copy of your data has been saved '+
+      (S.settings.lastExport?'since '+dateShort(S.settings.lastExport):'ever')+
+      '. Settings has a Save a copy button.','bad',9000);
+  }
+  loadSnaps().then(render);
+}
 $('#keybtn').addEventListener('click',function(){
   if(S.admin)lockAdmin();
-  else requireAdmin('Unlock instructor mode.',function(){toast('Instructor mode unlocked.','good');render();});
+  else requireAdmin('Unlock instructor mode.',afterUnlock);
 });
 
 
@@ -3480,8 +3587,18 @@ function bindViewport(){
   sync();
 }
 
+/* The app being backgrounded is the last reliable moment on a phone. */
+function bindSnapshotOnLeave(){
+  var take=function(){snapshot('before leaving the app');};
+  window.addEventListener('pagehide',take);
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden')take();
+  });
+}
+
 function initPlatform(){
   bindViewport();
+  bindSnapshotOnLeave();
   registerSW();
   askPersistence();
   pushView();
@@ -3940,6 +4057,7 @@ function buyItem(id){
         discount:paid.active?paid.pct:0,icon:it.icon,date:nowISO(),given:false
       }]);
       save();
+      snapshot('after redeeming '+it.title);
       toast(it.title+' redeemed. Balance '+pts(balance(p))+'.','good');
       render();
     });
@@ -4352,6 +4470,7 @@ function logActivity(id){
     icon:a.icon,date:nowISO(),approved:!a.approval};
   p.activities=logOf(p).concat([entry]);
   save();
+  snapshot('after '+p.name+' logged '+a.title);
   toast(a.approval
     ? '"'+a.title+'" logged. It needs approving before the points land.'
     : '"'+a.title+'" done. '+pts(a.points)+' points added.', a.approval?'':'good');
@@ -4687,6 +4806,366 @@ function activityEditor(existing){
 }
 
 /* =========================================================
+   Restore points.
+
+   Live data is a single copy in localStorage. These are the
+   safety net: compressed snapshots kept in IndexedDB, taken
+   automatically at safe moments and always before anything
+   destructive. They protect against mistakes, not against
+   losing the device — only a downloaded file does that, so
+   the app also keeps track of how long it has been.
+   ========================================================= */
+
+var DBNAME='piphub', DBVER=1;
+var SNAP_MIN_GAP=90*1000;        /* a floor on automatic snapshots; the content
+                                    check below already stops duplicates */
+var EXPORT_NAG_DAYS=14;
+var snapLast=0, snapBusy=false;
+
+function idb(){
+  return new Promise(function(res,rej){
+    if(!window.indexedDB)return rej(new Error('no IndexedDB'));
+    var r=indexedDB.open(DBNAME,DBVER);
+    r.onupgradeneeded=function(e){
+      var db=e.target.result;
+      if(!db.objectStoreNames.contains('snapmeta'))db.createObjectStore('snapmeta',{keyPath:'id'});
+      if(!db.objectStoreNames.contains('snapdata'))db.createObjectStore('snapdata',{keyPath:'id'});
+    };
+    r.onsuccess=function(){res(r.result);};
+    r.onerror=function(){rej(r.error||new Error('IndexedDB refused'));};
+  });
+}
+function tx(store,mode,fn){
+  return idb().then(function(db){
+    return new Promise(function(res,rej){
+      var t=db.transaction(store,mode);
+      var out=fn(t.objectStore(store[0]||store),t);
+      t.oncomplete=function(){res(out&&out.result!==undefined?out.result:out);};
+      t.onerror=function(){rej(t.error);};
+      t.onabort=function(){rej(t.error);};
+    });
+  });
+}
+function idbAll(store){
+  return idb().then(function(db){
+    return new Promise(function(res,rej){
+      var t=db.transaction(store,'readonly');
+      var r=t.objectStore(store).getAll();
+      r.onsuccess=function(){res(r.result||[]);};
+      r.onerror=function(){rej(r.error);};
+    });
+  });
+}
+function idbPut(store,value){
+  return idb().then(function(db){
+    return new Promise(function(res,rej){
+      var t=db.transaction(store,'readwrite');
+      t.objectStore(store).put(value);
+      t.oncomplete=function(){res(true);};
+      t.onerror=function(){rej(t.error);};
+    });
+  });
+}
+function idbGet(store,id){
+  return idb().then(function(db){
+    return new Promise(function(res,rej){
+      var t=db.transaction(store,'readonly');
+      var r=t.objectStore(store).get(id);
+      r.onsuccess=function(){res(r.result);};
+      r.onerror=function(){rej(r.error);};
+    });
+  });
+}
+function idbDel(store,id){
+  return idb().then(function(db){
+    return new Promise(function(res,rej){
+      var t=db.transaction(store,'readwrite');
+      t.objectStore(store)['delete'](id);
+      t.oncomplete=function(){res(true);};
+      t.onerror=function(){rej(t.error);};
+    });
+  });
+}
+
+/* ---------- compression ---------- */
+function squash(str){
+  if(typeof CompressionStream==='undefined')return Promise.resolve({raw:str});
+  try{
+    var s=new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));
+    return new Response(s).arrayBuffer().then(function(b){return{gz:new Uint8Array(b)};},
+      function(){return{raw:str};});
+  }catch(e){return Promise.resolve({raw:str});}
+}
+function unsquash(rec){
+  if(rec.raw!=null)return Promise.resolve(rec.raw);
+  try{
+    var s=new Blob([rec.gz]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Response(s).text();
+  }catch(e){return Promise.reject(new Error('could not read this restore point'));}
+}
+
+/* ---------- what a snapshot contains ---------- */
+function statePayload(scope){
+  scope=scope||'all';
+  var out={schema:'pip-backup/2',exported:nowISO(),scope:scope,app:'PipHub'};
+  if(scope!=='content')out.profiles=S.profiles;
+  if(scope!=='readers'){
+    out.modules=S.modules;out.store=S.store;out.activities=S.activities;
+    var st={};
+    for(var k in S.settings)if(Object.prototype.hasOwnProperty.call(S.settings,k))st[k]=S.settings[k];
+    out.settings=st;
+  }
+  out.counts=countsOf(out);
+  out.check=fingerprint(JSON.stringify([out.profiles,out.modules,out.store,out.activities]));
+  return out;
+}
+function countsOf(d){
+  return{
+    readers:(d.profiles||[]).length,
+    titles:(d.modules||[]).length,
+    items:(d.store||[]).length,
+    activities:(d.activities||[]).length,
+    records:(d.profiles||[]).reduce(function(s,p){return s+((p.records||[]).length);},0)
+  };
+}
+function fingerprint(str){
+  var h=2166136261>>>0;
+  for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=(h*16777619)>>>0;}
+  return h.toString(16);
+}
+function describeCounts(c){
+  if(!c)return '';
+  var bits=[];
+  if(c.readers)bits.push(c.readers+(c.readers===1?' reader':' readers'));
+  if(c.titles)bits.push(c.titles+(c.titles===1?' title':' titles'));
+  if(c.records)bits.push(c.records+(c.records===1?' result':' results'));
+  if(c.items)bits.push(c.items+(c.items===1?' store item':' store items'));
+  if(c.activities)bits.push(c.activities+(c.activities===1?' activity':' activities'));
+  return bits.join(', ')||'nothing yet';
+}
+function niceBytes(n){
+  if(n<1024)return n+' B';
+  if(n<1024*1024)return (n/1024).toFixed(0)+' KB';
+  return (n/1048576).toFixed(1)+' MB';
+}
+function sinceWords(iso){
+  if(!iso)return 'never';
+  var mins=Math.floor((Date.now()-new Date(iso).getTime())/60000);
+  if(mins<1)return 'just now';
+  if(mins<60)return mins+(mins===1?' minute ago':' minutes ago');
+  var hrs=Math.floor(mins/60);
+  if(hrs<24)return hrs+(hrs===1?' hour ago':' hours ago');
+  var days=Math.floor(hrs/24);
+  if(days<31)return days+(days===1?' day ago':' days ago');
+  return dateShort(iso);
+}
+
+/* ---------- taking one ---------- */
+function snapshot(reason,opts){
+  opts=opts||{};
+  if(!window.indexedDB)return Promise.resolve(null);
+  if(snapBusy)return Promise.resolve(null);
+  if(!opts.force&&Date.now()-snapLast<SNAP_MIN_GAP)return Promise.resolve(null);
+  if(!S.profiles.length&&!S.modules.length&&!S.store.length&&!S.activities.length)
+    return Promise.resolve(null);
+
+  var payload=statePayload('all');
+  /* Nothing has actually changed since the last one, so there is nothing
+     worth keeping. */
+  if(!opts.force&&S.lastSnapCheck===payload.check)return Promise.resolve(null);
+
+  snapBusy=true;
+  var json=JSON.stringify(payload);
+  return squash(json).then(function(packed){
+    var id=uid();
+    var meta={id:id,at:nowISO(),reason:String(reason||'automatic'),
+      kind:opts.kind||(opts.force?'marked':'auto'),
+      counts:payload.counts,check:payload.check,
+      bytes:(packed.gz?packed.gz.length:json.length),
+      plain:json.length,zipped:!!packed.gz};
+    return idbPut('snapdata',{id:id,gz:packed.gz,raw:packed.raw}).then(function(){
+      return idbPut('snapmeta',meta);
+    }).then(function(){
+      snapLast=Date.now();
+      S.lastSnapCheck=payload.check;
+      return prune().then(loadSnaps).then(function(){
+        /* the list is on screen right now, so show it */
+        if(S.view==='settings')render();
+        return meta;
+      });
+    });
+  }).catch(function(){return null;}).then(function(r){snapBusy=false;return r;});
+}
+
+/* ---------- keeping the list sane ----------
+   Recent ones in full, then thinning out: one a day for a week, one a
+   week for a month. Anything taken before a destructive action is kept
+   for a fortnight regardless, because that is when you want it. */
+function prune(){
+  return idbAll('snapmeta').then(function(all){
+    all.sort(function(a,b){return a.at<b.at?1:-1;});
+    var keep={},now=Date.now();
+    all.slice(0,6).forEach(function(m){keep[m.id]=1;});
+    all.forEach(function(m){
+      var age=now-new Date(m.at).getTime();
+      if(m.kind==='guard'&&age<14*864e5)keep[m.id]=1;
+      if(m.kind==='marked'&&age<60*864e5)keep[m.id]=1;
+    });
+    var days={},weeks={};
+    all.forEach(function(m){
+      var t=new Date(m.at),age=now-t.getTime();
+      var dayKey=t.getFullYear()+'-'+t.getMonth()+'-'+t.getDate();
+      var weekKey=t.getFullYear()+'-w'+Math.floor(t.getTime()/(7*864e5));
+      if(age<7*864e5&&!days[dayKey]){days[dayKey]=1;keep[m.id]=1;}
+      else if(age<31*864e5&&!weeks[weekKey]){weeks[weekKey]=1;keep[m.id]=1;}
+    });
+    var drop=all.filter(function(m){return !keep[m.id];});
+    return Promise.all(drop.map(function(m){
+      return idbDel('snapdata',m.id).then(function(){return idbDel('snapmeta',m.id);});
+    }));
+  }).catch(function(){});
+}
+
+/* A snapshot taken deliberately because something is about to be undone. */
+function guard(reason,then){
+  snapshot(reason,{force:true,kind:'guard'}).then(function(){then();},function(){then();});
+}
+
+function loadSnaps(){
+  return idbAll('snapmeta').then(function(all){
+    all.sort(function(a,b){return a.at<b.at?1:-1;});
+    S.snaps=all;
+    return all;
+  },function(){S.snaps=[];return [];});
+}
+
+/* ---------- putting one back ---------- */
+function restoreSnapshot(id){
+  var meta=(S.snaps||[]).filter(function(m){return m.id===id;})[0];
+  if(!meta)return;
+  confirmModal('Go back to this restore point?',
+    dateShort(meta.at)+', '+sinceWords(meta.at)+' — '+describeCounts(meta.counts)+
+    '. Everything in the app now is replaced. A restore point is taken first, '+
+    'so this can be undone.','Restore',function(){
+      guard('before going back to an earlier point',function(){
+        idbGet('snapdata',id).then(unsquash).then(function(json){
+          var d=JSON.parse(json);
+          applyPayload(d,'replace');
+          save();
+          toast('Restored the point from '+dateShort(meta.at)+'.','good');
+          loadSnaps().then(function(){go(me()?'settings':'gate');});
+        }).catch(function(){toast('That restore point could not be read.','bad');});
+      });
+    },true);
+}
+
+/* ---------- shared by restore points and backup files ---------- */
+function applyPayload(d,mode){
+  var hasReaders=Array.isArray(d.profiles);
+  var hasContent=Array.isArray(d.modules)||Array.isArray(d.store)||Array.isArray(d.activities);
+  if(mode==='replace'&&hasReaders){
+    S.profiles=d.profiles;
+    S.active=S.profiles.length?S.profiles[0].id:null;
+  }
+  if(hasContent){
+    if(mode==='merge'){
+      (d.modules||[]).forEach(function(m){var v=validate(m);if(v.ok)put(v.module);});
+      (d.store||[]).forEach(function(it){
+        if(!itemById(it.id))S.store.push(it);
+        else S.store=S.store.map(function(x){return x.id===it.id?it:x;});
+      });
+      (d.activities||[]).forEach(function(a){
+        if(!activityById(a.id))S.activities.push(a);
+        else S.activities=S.activities.map(function(x){return x.id===a.id?a:x;});
+      });
+    }else{
+      if(Array.isArray(d.modules))S.modules=d.modules;
+      if(Array.isArray(d.store))S.store=d.store;
+      if(Array.isArray(d.activities))S.activities=d.activities;
+    }
+  }
+  if(d.settings){
+    ['folder','assets','autoSync','theme','immersive'].forEach(function(k){
+      if(d.settings[k]!==undefined)S.settings[k]=d.settings[k];
+    });
+    if(d.settings.pw&&mode==='replace')S.settings.pw=d.settings.pw;
+  }
+  S.profiles.forEach(function(p){
+    if(!Array.isArray(p.records))p.records=[];
+    if(!Array.isArray(p.purchases))p.purchases=[];
+    if(!Array.isArray(p.activities))p.activities=[];
+    if(!Array.isArray(p.adjustments))p.adjustments=[];
+  });
+  S.settings.seeded=true;
+}
+
+/* ---------- exporting to a file ---------- */
+function exportScoped(scope){
+  var d=statePayload(scope);
+  var name='piphub-'+(scope==='content'?'content':scope==='readers'?'readers':'backup')+
+    '-'+new Date().toISOString().slice(0,10)+'.json';
+  download(name,JSON.stringify(d,null,2));
+  S.settings.lastExport=nowISO();
+  save();
+  toast('Saved '+name+' — '+describeCounts(d.counts)+'.','good');
+  render();
+}
+function exportOverdue(){
+  if(!S.profiles.length)return false;
+  if(!S.settings.lastExport)return true;
+  return (Date.now()-new Date(S.settings.lastExport).getTime())>EXPORT_NAG_DAYS*864e5;
+}
+
+function exportChooser(){
+  openModal(
+    '<h3>Save a copy</h3>'+
+    '<p class="lede">A file you keep. This is the only kind of backup that survives '+
+    'the browser being cleared or the device being lost.</p>'+
+    '<div class="mecards" style="margin-top:18px">'+
+      '<button class="mecard" data-export="all">'+
+        '<span class="ic" style="display:grid;place-items:center">'+ico('down')+'</span>'+
+        '<span><span class="t">Everything</span>'+
+        '<span class="d">'+describeCounts(countsOf(statePayload('all')))+'</span></span>'+
+        '<span class="go">&rsaquo;</span></button>'+
+      '<button class="mecard" data-export="content">'+
+        '<span class="ic" style="display:grid;place-items:center">'+ico('file')+'</span>'+
+        '<span><span class="t">Titles, store and activities</span>'+
+        '<span class="d">No reader data — safe to share with another teacher</span></span>'+
+        '<span class="go">&rsaquo;</span></button>'+
+      '<button class="mecard" data-export="readers">'+
+        '<span class="ic" style="display:grid;place-items:center">'+ico('out')+'</span>'+
+        '<span><span class="t">Readers only</span>'+
+        '<span class="d">Names, pictures, points and history</span></span>'+
+        '<span class="go">&rsaquo;</span></button>'+
+    '</div>'+
+    '<p class="tiny muted" style="margin-top:16px">A full copy holds children&rsquo;s names and '+
+    'pictures alongside every answer key. Keep it somewhere private — not in the repository '+
+    'PipHub is served from.</p>'+
+    '<div class="foot"><button class="btn" data-close>Close</button></div>',
+    function(scrim){
+      scrim.addEventListener('click',function(e){
+        var b=e.target.closest('[data-export]');
+        if(!b)return;
+        closeModal();
+        exportScoped(b.dataset.export);
+      });
+    });
+}
+
+function fillSnapSize(){
+  var el=document.getElementById('snapsize');
+  if(!el)return;
+  var total=(S.snaps||[]).reduce(function(s,m){return s+(m.bytes||0);},0);
+  var txt=(S.snaps||[]).length+' kept, '+niceBytes(total);
+  if(navigator.storage&&navigator.storage.estimate){
+    navigator.storage.estimate().then(function(e){
+      var used=e.usage||0,quota=e.quota||0;
+      el.textContent=txt+(quota?'  ·  '+niceBytes(used)+' of '+niceBytes(quota)+' used':'');
+    },function(){el.textContent=txt;});
+  }else el.textContent=txt;
+}
+
+/* =========================================================
    Boot
    ========================================================= */
 var TEMPLATE={
@@ -4717,6 +5196,7 @@ function boot(){
     save();
     if(!storageOK)toast('This browser is blocking local storage, so readers and results will not be kept.','bad',9000);
     initPlatform();
+    loadSnaps().then(function(){if(S.view==='settings')render();});
     /* Always ask who is reading. On a shared device the last reader must
        not be inherited by whoever opens it next. */
     S.active=null;

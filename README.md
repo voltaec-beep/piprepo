@@ -310,6 +310,32 @@ The top bar carries three sections — Catalogue, Activities, Store — and that
 
 The profile page is the hub: your picture and name, quick cards through to **Records** (tests taken, points from reading) and **Points** (balance and what you have redeemed), appearance settings, and the reader switcher. Records has a link straight back.
 
+## Backups and restore points
+
+Live data is a single copy in `localStorage`. Two things sit behind it, and they do different jobs.
+
+### Restore points
+
+Compressed snapshots in IndexedDB, taken automatically. They undo mistakes.
+
+One is taken **after every finished test**, and after a redemption or a logged activity if a minute and a half has passed since the last. One is taken when the app is backgrounded — the last reliable moment on a phone. And one is always taken **before anything destructive**: removing a title, clearing records, erasing or deleting a reader, restoring a backup file. Those are marked "safety" and kept for a fortnight whatever else is pruned.
+
+Nothing is stored if nothing changed; snapshots are fingerprinted and a duplicate is skipped.
+
+Retention thins out rather than piling up: the last six in full, then one a day for a week, then one a week for a month. Anything you take by hand is marked "kept" and held for two months. Settings lists them with what triggered each one, what it holds and how big it is, alongside how much device storage is in use. Any of them can be restored, saved out as a file, or deleted — and restoring takes a safety point first, so going back is itself undoable.
+
+### Saved copies
+
+A restore point lives in the same storage that a "clear site data" wipes, and that iOS can evict. Only a file survives losing the device, so **Save a copy** offers three scopes:
+
+- **Everything** — readers and content.
+- **Titles, store and activities** — no reader data at all. This is the shareable one: it moves your shelf to another teacher without carrying a child's name or photo. Restoring it *merges*, and never touches the readers already there.
+- **Readers only** — names, pictures, points and history.
+
+Every file carries a schema version, a timestamp, counts and a fingerprint, so a truncated or edited file is caught before it overwrites anything. PipHub records when you last saved one; if it has been more than a fortnight, unlocking instructor mode says so, and the Backups panel says so in amber.
+
+A full copy holds children's names and pictures alongside every answer key. It should not go in the repository PipHub is served from.
+
 ## Erasing a reader's data
 
 Settings → Readers now shows tests taken, points spent and current balance per reader, with two actions. **Points** opens an adjustment panel: quick −10 to +10 buttons or an exact figure, plus a reason the reader sees. It refuses to push anyone below zero, keeps a log of recent adjustments, and each one can be undone. Instructor-granted points show separately in the store's balance breakdown.
