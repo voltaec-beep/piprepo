@@ -465,7 +465,9 @@ Driven headlessly end to end: wish eligibility against a moving balance and the 
 
 Seasonal parts and looks carry a `season` key and only sit on the shelf inside that season's window (`PIP_SEASONS`). Anything already unlocked stays the reader's for good.
 
-**Pricing for new drops:** Basic looks 30–55 points, Complete Looks 100–300, Top Tier 500–700. Every new look carries the standard **1% power** in one category, all year.
+**Pricing for new drops:** Basic looks 30–55 points, Complete Looks 100–150, Top Tier 200–250. Every new look carries the standard **1% power** in one category, all year.
+
+**Items sold on their own** (new parts and companions that belong to no complete look) ship **not offered** in the store. They are meant for events and activities (bonus pools, gifts, companion finds). Tick "Offered" in Settings → Pip to put one on the shelf.
 
 **Festival powers.** Anything above that 1% is tied to a season, so Basic looks stay worth wearing. A look can carry `festival:{season, abilities:[…]}`: those powers only switch on while that season is open, and the shelf card shows them in green with their end date. Out of season the look drops back to its standard 1%.
 
@@ -482,6 +484,24 @@ Seasonal parts and looks carry a `season` key and only sit on the shelf inside t
 - **Carousel Maestro** (680 pts, +1% wish payback all year; **+2.5% points, 2% off and +3% wish payback during the Harvest Fair**): a **colour-shifting body** that slowly cycles pink, gold and teal like carousel lights, a gilded marquee band with chasing bulbs, sparkle eyes, a ringmaster's top hat with a plume, a carousel crest behind him, a grand champion rosette, a turning **Ferris wheel** whose gondolas stay upright, a spinning **carousel deck** under his feet, falling confetti, and a **Carousel pony** companion that rides up and down its golden pole.
 - **Sold on their own** (in no complete look): Apple cider colour, Flannel plaid, Candy heart eyes, Popcorn bucket hat, Fair kite, Hot cider mug, Apple orchard, Hay patch, Popping corn and a **Blue-ribbon lamb** companion (Sleepy).
 - The Harvest Fair also has its own event banner, a confetti weather option, and Pip wears the straw boater on Harvest Fair events.
+
+**Pirate Cove** (a summer season: on the shelf 1 Jun – 31 Aug):
+
+- **Little Buccaneer** (45 pts, +1% companion luck): a sandy body with sailor stripes and a red polka-dot bandana with fluttering tails.
+- **Treasure Hunter** (140 pts, +1% points): a lagoon-blue body with a treasure map (dotted trail and a red X), an eye patch, a tricorn hat with an orange plume, a brass spyglass, and a palm island with waves and seagulls.
+- **Captain Starwake** (240 pts, 1% off all year; **+2% points, +3% companion luck and +2% bonus luck during Pirate Cove, all summer**): a colour-shifting deep-sea body, a captain's coat with gold buttons and an anchor badge, **compass eyes** with swinging needles, a captain's bicorne with a Pip-face medallion, plume and swinging tassels, a rocking ship's wheel, a treasure chest with popping coins, a **ship at sea that follows the clock** (sunshine by day, a sunset in the evening, a crescent moon and a lit lantern at night), a **treasure trail** of footprints that appear one by one on the way to the X, sea spray, and a **Captain's parrot** companion (Proud) in its own tiny tricorn. Wearing every piece also raises the **captain's flag**, a set flourish that only appears with the full look.
+- **For events and activities only** (not offered until ticked): Pearl colour, Anchor print, Diving goggles, Octopus hat, Ship's anchor, Message in a bottle, Lighthouse, Sandy beach, Rising bubbles and a **Hermit crab** companion (Curious). The Harvest Fair extras now start off the shelf too.
+- Pirate Cove has its own event banner, a sea-bubbles weather option, and Pip wears the tricorn on Pirate Cove events.
+
+**Alpine Festival** (on the shelf 16 Sep – 12 Oct; a family-friendly autumn festival of mountains, music and pretzels):
+
+- **Little Pretzel** (45 pts, food powers last 1% longer): a warm, salted pretzel body with a pretzel twist on the tummy and a pretzel perched on top.
+- **Alpine Yodeler** (140 pts, +1% bonus luck): an alpine-meadow body in edelweiss braces, a feathered green alpine hat, a swinging gingerbread heart, crossed skis and snowy peaks.
+- **Summit Serenader** (245 pts, 1% off all year; **+2% points, food powers last 3% longer and +2% wish payback during the Alpine Festival**): a colour-shifting **alpenglow** body (pink, gold and ice blue), an embroidered vest with silver buttons, **snowflake eyes**, a summit hat with a swaying brush, silver chain and edelweiss badge, an **echoing alphorn** with rising notes and sound rings, a ringing **festival cowbell**, alpenglow peaks with a **cable car that rides along its wire**, pine trees and flowers that stand **in front of** Pip (the first two-part aura), an edelweiss meadow, an edelweiss flurry, and a **Mountain kid goat** companion (Curious, hops about) in a tiny flower crown with a swinging bell. Wearing every piece adds a **rainbow and a yodel note** over the peaks.
+- **For events and activities only** (not offered until ticked): Snowcap colour, Alpine knit, Glacier glasses, Meadow wreath, Wooden sled, Little accordion, Mountain chalet, Snowy ledge, Mountain snow and a **Mountain marmot** companion (Sleepy, strolls).
+- The Alpine Festival has its own event banner, an edelweiss weather option, and Pip wears the alpine hat as its flair.
+
+**New art tools (for later drops):** an aura can have a front half (`PIP_ART.auraFront[aura]`) drawn in front of Pip; parts can follow a path with SMIL `<animateMotion>` (only on live Pips, removed with reduced motion); parts can carry day, dusk and night versions (`tod-d`, `tod-e`, `tod-n`), which follow the room clock; a top-tier look can add a set flourish in `PIP_ART.setBonus` that only shows when every piece is worn; items can ship with `offer:false`.
 
 ## Wish lock
 
@@ -615,7 +635,7 @@ Settings → Pip → **Seasons** lists every season with its yearly dates, wheth
 - **Back to the shipped dates** undoes changes to a season that came with PipHub.
 - **New season** creates your own season. You can then use it in seasonal abilities ("Follow a Pip season"), foods and weather. Your own seasons can be deleted; anything using one stops until it is given other dates.
 - Readers always keep items they already own. Changes are stored in `S.settings.pipSeasons` and travel with backups.
-- When several seasons with weather are open, your own seasons show first, then Moon Festival, Halloween, Harvest Fair, Winter, Autumn, Spring and Summer.
+- **Weather and flair when seasons overlap** (under the seasons table): choose which season leads while several seasons with weather are open. The options are **Automatic** (your own seasons first, then Moon Festival, Halloween, Harvest Fair, Alpine Festival, Pirate Cove, Winter, Autumn, Spring, Summer), **Take turns** (a different open season each day), or a named season. A named season leads whenever it is open; while it is closed, the automatic choice is used. The leading season decides the weather across the top of the app and in Pip's room window, and its **flair**: its hat, which Pip wears on the Catalogue, Store and Activities pages and in his room when he has no hat on, and on Events when no themed event is open. A switch turns the flair off. The choice is saved with the seasons (`S.settings.pipSeasons.lead` and `.flair`) and goes into backups.
 
 ## Your own powers (instructor)
 
@@ -767,6 +787,14 @@ Settings → Pip — Companions → **What companions can find**. Each day a fin
 - **Pip items:** from the companion's own season (falling back to everyday items), everyday items only, or only the items you pick from a grid. A reader never finds an item they already own.
 
 Each kind has an on/off switch and a weight that sets how likely it is compared with the others (default food 55, points 40, Pip items 5). Each companion also has a **Finds** setting: anything allowed, food only, points only, Pip items only, or nothing.
+
+## Smoother previews
+
+Opening a Pip preview (or a celebration) no longer makes the app flash. Pips behind an open window stand still, windows that show a moving Pip use a deeper tint instead of a blur, the Pip in a preview starts moving once the window has opened, and switching poses redraws the preview without unfreezing the page behind it.
+
+## Steady pages on Android
+
+On Android Chrome and the installed app, the page no longer slides up and down while Pips move, and toasts stay put. The cause was Pip's speech bubble: near the right edge it poked past the screen for a few seconds, which made the page briefly wider and made Chrome shift and rescale it. Bubbles are now kept on screen (the tail still points at Pip), and the page can no longer be made wider than the screen.
 
 ## Room badge
 
