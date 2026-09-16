@@ -527,3 +527,44 @@ The editor shows whether the current round is open. Cards show "↻ Every day" a
 **Duplicate.** Each event card has a Duplicate button for instructors. It opens the editor on a copy with the same rubric, banner, steps, repeats, link-ups and bonus pool. The copy is hidden until you untick Hidden.
 
 **Review.** Checklist steps, calendar doors and group-goal entries that need approval show a single Approve button. Checklist steps and group-goal entries never count toward room trophies.
+
+## Connected events
+
+**Steps that fill themselves in.** Each checklist step or calendar door can have a "Done when" rule:
+
+- pass N quizzes (any title, or a named one)
+- finish N books (optionally at a minimum reading level)
+- log an activity N times (any activity, or a named one)
+- earn N points
+- get N top ratings on events
+
+Only what happens after the round starts counts (for calendars, after that door's day starts). The step shows a progress bar, and when it is met the reader taps **Claim**. Cards say "2 ready to claim" and get a gold outline.
+
+**Book-linked events.** Tick the books an event belongs to. It then appears on each book's page and on the results screen after a pass. It can optionally stay locked until the reader passes a quiz for one of those books.
+
+**Quests.** "Comes after" locks an event until an earlier one is complete. For repeating events, the earlier one must be complete within the current round.
+
+**Automatic group goals.** A group goal can count by itself from quizzes passed, books finished, activities logged (any activity, or a named one), or points earned during the round. Nothing needs to be typed.
+
+## A living Pip
+
+- **Pip on each page.** On the catalogue he holds a book and points out the title closest to being finished. In the store he waits by your wish and bounces when you can afford it. On activities he holds a balloon, or a trophy once something's done today. On events he wears the theme of an open seasonal event (a witch hat for Halloween, a Santa hat for Christmas, and so on). Tap him to hear what he thinks.
+- **Quiz coach.** A small Pip reads along beside the question count, nods at each answer, cheers on the last question, and dozes after 45 seconds of idling. He never reacts to right or wrong answers, since that would give answers away mid-test.
+- **The room across the day.** A window shows the sky, and the room's light changes through morning, day, evening and night. Pip's pose follows the time, and at night he wears a nightcap if he has no hat on.
+- **Seasonal weather.** Scenery only: snow, blossom, sunshine, leaves, bats or sky lanterns, depending on the season. It shows in the room window and faintly across the top of the app. Winter, Spring and Summer seasons were added for this.
+- **Companions.** A worn pet leaves Pip's side in the room and behaves by personality: the Jade rabbit (Curious) wanders to the shelf, the Ghostling (Sleepy) drifts and naps, and future pets default to Proud. Some days a companion finds something (a food, 1–3 points, or rarely a Pip part), which glows in the room until the reader taps it. There is at most one find a day. Finds are rolled from the reader, the pet and the date, so they can't be farmed, and an unclaimed find is gone the next day.
+- **Instructor controls:** Settings → Wishes and streaks → Living Pip switches each of these on or off, can force or stop the weather, and sets the daily chance of a find.
+
+## Countdown reminders
+
+One strip on the catalogue shows the most pressing item, with "+N more" to expand:
+
+- events closing within 24 hours (1 hour for timed challenges)
+- today's calendar door
+- steps ready to claim
+- group goals at 75% or more with less than two days left
+- a seasonal Pip shelf closing within 3 days
+- the wish lock ending
+- a food power wearing off
+
+Each item can be dismissed until its next stage. The Events tab shows a small count badge. Every reminder type can be switched off in Settings.
