@@ -475,6 +475,14 @@ Seasonal parts and looks carry a `season` key and only sit on the shelf inside t
 - **Lantern Keeper** (240 pts, +1% wish payback): vermilion body with gold clouds, a lantern cap with a swinging tassel, a rabbit lantern and rising sky lanterns.
 - **Jade Moon Sage** (650 pts, 1% off all year; **+2% points, 2% off and +2% wish payback during the Moon Festival**): jade body with moon silk and pearls, moonlit eyes, a crescent diadem with pearl strands, flowing silk ribbons, a moon mirror with a moving glint, a full moon behind, a **Moon pond** under his feet (the new *Ground* slot), rising moon dust, and a **Jade rabbit** companion that hops when Pip cheers, dozes when he sleeps and droops an ear when he is sad.
 
+**Harvest Fair 2026** (on the shelf 16 Sep – 31 Oct):
+
+- **Candy Apple** (45 pts, 1% off): a glossy candy-apple body, a caramel drip with sprinkles, and a wooden stick with a swaying leaf.
+- **Fairground Friend** (260 pts, +1% points): a corn-silk body in picnic gingham with a blue-ribbon badge, happy eyes, a straw boater with a ticket in the band, cotton candy, two spinning pinwheels and swaying fair bunting.
+- **Carousel Maestro** (680 pts, +1% wish payback all year; **+2.5% points, 2% off and +3% wish payback during the Harvest Fair**): a **colour-shifting body** that slowly cycles pink, gold and teal like carousel lights, a gilded marquee band with chasing bulbs, sparkle eyes, a ringmaster's top hat with a plume, a carousel crest behind him, a grand champion rosette, a turning **Ferris wheel** whose gondolas stay upright, a spinning **carousel deck** under his feet, falling confetti, and a **Carousel pony** companion that rides up and down its golden pole.
+- **Sold on their own** (in no complete look): Apple cider colour, Flannel plaid, Candy heart eyes, Popcorn bucket hat, Fair kite, Hot cider mug, Apple orchard, Hay patch, Popping corn and a **Blue-ribbon lamb** companion (Sleepy).
+- The Harvest Fair also has its own event banner, a confetti weather option, and Pip wears the straw boater on Harvest Fair events.
+
 ## Wish lock
 
 Once a reader picks a wish, it is **locked in** for a set number of days (7 by default). A confirmation screen reminds them that choosing a wish is a commitment. While it is locked, the store shows "Locked · N days" instead of Change, and no other item can become their wish. When the wish is granted, the lock ends, unless "Keep the lock running even after the wish is granted" is ticked. An instructor with the key can release a lock. If the wished-for item is removed from the store, its lock ends too. Settings → Wishlist sets the number of days (0 turns the lock off).
@@ -568,3 +576,32 @@ One strip on the catalogue shows the most pressing item, with "+N more" to expan
 - a food power wearing off
 
 Each item can be dismissed until its next stage. The Events tab shows a small count badge. Every reminder type can be switched off in Settings.
+
+## Pip powers: full control
+
+Settings → Pip now manages powers in three places.
+
+**Edit powers (on each complete look).**
+- **All-year powers:** any mix of point boost, store discount and extra wish payback, one of each kind, each with its own percentage. Remove them all to make a look purely cosmetic.
+- **Seasonal abilities:** tick any from the library. Each one uses its own dates, or custom dates for that look only.
+- **Back to the shipped powers** removes your changes.
+
+The Powers column shows each look's powers at a glance, including whether each seasonal ability is on now or when it starts. An asterisk (*) marks custom dates.
+
+**Seasonal abilities (library).** Create, edit and delete named abilities, each with one or more powers and its dates:
+- every year between two month/day dates (this can wrap the new year)
+- specific dates
+- following one of Pip's seasons (Autumn, Halloween, Moon Festival, Winter, Spring, Summer)
+
+The list shows whether each ability is on now, waiting or ended, and which looks use it. Looks that shipped with a festival bonus (such as Jade Moon Sage) appear here as editable abilities. Deleting one removes it from every look straight away.
+
+**Power categories.** Switch a kind of power off everywhere, or cap the total a reader can have of it. The cap covers outfit, seasonal ability and food together; 0 means no cap.
+
+**How powers combine.** A look's powers only count while every piece is worn. For each kind, the strongest all-year or active seasonal value counts, food adds on top, and then the category cap applies. Earlier per-look power settings carry over automatically.
+
+## Top bar
+
+- **Menu icons:** each section has an icon (book, checklist, star, bag). The Store sits at the far right of the menu. The instructor's Titles and Settings show as icons with tooltips, unless one is open.
+- **Narrow screens:** on medium-width screens the menu shows icons only, except the open section. On phones the menu becomes its own scrolling row with labels.
+- **Pip's room button:** a house button next to the palette switch opens Pip's room, and it lights up while you're there.
+- **Logo:** the PipHub logo in the top bar is larger (36px, or 32px on phones).
