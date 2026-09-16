@@ -616,3 +616,35 @@ Settings → Pip → **Seasons** lists every season with its yearly dates, wheth
 - **New season** creates your own season. You can then use it in seasonal abilities ("Follow a Pip season"), foods and weather. Your own seasons can be deleted; anything using one stops until it is given other dates.
 - Readers always keep items they already own. Changes are stored in `S.settings.pipSeasons` and travel with backups.
 - When several seasons with weather are open, your own seasons show first, then Moon Festival, Halloween, Harvest Fair, Winter, Autumn, Spring and Summer.
+
+## Your own powers (instructor)
+
+Settings → **Your own powers** creates new kinds of power. Pick a capability and where it applies:
+
+| Capability | Where it can apply |
+|---|---|
+| Point boost | everything, quizzes only, activities only, events and group goals only, streak payouts only |
+| Store discount | store rewards and food, store rewards only, Pip's food only, **Pip cosmetics** |
+| Extra wish payback | granted wishes |
+| **Longer food powers** (new) | every food Pip eats: food powers last N% longer |
+| **Companion luck** (new) | +N% chance of a daily companion find |
+| **Bonus luck** (new) | +N% chance of bonus cosmetics and food on store items, activities and events |
+
+The three new capabilities are also shipped power kinds you can put on any look. Your own powers show up in "Edit powers", seasonal abilities and the Power categories table (each with its own on/off and cap). A power adds to the shipped power of the same capability where both apply. Deleting a power removes it from every look and seasonal ability.
+
+## Settings page
+
+The palette switch is no longer in the top bar (it stays on the sign-in screen and the profile page). The instructor-mode line is now a slim strip. Every settings panel folds: they start collapsed, "Expand all" and "Collapse all" sit above them, and open panels stay open for the rest of the session.
+
+## Pip Town (community)
+
+A town of **simulated neighbours** with usernames like Aidan16, Bradley and KorKaijen#4623. Each one has a Pip look, a personality (Bookworm, Collector, Crafter, Sporty, Night owl, Easy-going) and always carries a **Pip Town** badge. Everything they do is worked out from the clock, so it holds still on reload and nothing runs in the background. The town is busier after school and at weekends.
+
+- **Town tab:** every neighbour with a live status: **Online**, **Reading** (with the title), **Taking a quiz**, **In Store**, **Recently active** (with how long ago) or **Offline** (last seen). Filters for Online, Reading, In Store and Friends. An "Around town" feed shows what neighbours have been doing.
+- **"N reading this"** on catalogue cards and title pages: how many in the town are reading the title and taking its quiz right now, with the faces of named neighbours on it.
+- **Room visitors:** now and then a neighbour visits Pip's room.
+- **Parcels (items only):** neighbours leave food or cheap Pip items at Pip's door (daily chance set by you), and send a **thank-you gift** the day after a reader gives them something.
+- **Readers giving gifts:** readers can give food from the pantry (and, if you allow it, Pip items they own, which they then lose) on the Town page, from event activity and to room visitors. One gift per neighbour a day, with a daily limit. Gifts build a friendship level (up to five hearts).
+- **Events:** "Neighbours join in" shows their activity on the event card and when a reader takes part. "Town-wide" puts a banner with live progress at the top of every page while the event is open.
+- **Community-driven group goals:** tick "The town helps with this goal" and set where the town alone gets to by the end (presets: finishes it alone 120%, nearly 92%, needs a real push 65%, barely helps 30%), the shape of the climb (steady, slow start, late rush, fast start, in bursts), and how often the town's total moves (every hour, day, week or month). For a goal that doesn't repeat, set how many days it runs. Readers' own numbers add on top, the card shows "you X + Pip Town Y", and when the time is up the goal ends **reached** or **not reached**. Rewards go to real readers only.
+- **Settings → Community:** switch the town on or off, rename it, choose how busy it is (Quiet, Lively, Bustling) and the town size behind the reading counts, switch each surface on or off, set the parcel chance and what parcels can hold, where readers can give and what, and the daily gift limit. You can add your own neighbours, remove them, or move shipped ones away.

@@ -607,10 +607,73 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 
 .locked{opacity:.5}
 .keyline{
-  display:flex;gap:9px;align-items:center;padding:10px 14px;border-radius:10px;
+  display:flex;gap:8px;align-items:center;padding:6px 8px 6px 12px;border-radius:10px;
   border:1px solid var(--gold-soft);background:var(--gold-faint);
-  font-size:.85rem;color:var(--gold-hi);margin-bottom:18px;
+  font-size:.8rem;line-height:1.3;color:var(--gold-hi);margin-bottom:14px;
 }
+.keyline>svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.keyline .btn{flex:none}
+/* Pip Town */
+.townbadge{display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:1px 6px;border-radius:999px;background:var(--gold-faint);color:var(--gold-hi);border:1px solid var(--gold-soft);vertical-align:middle}
+.tdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--text-3);vertical-align:middle;flex:none}
+.tdot.on{background:#2FBF71;box-shadow:0 0 0 3px rgba(47,191,113,.2)}
+.tdot.recent{background:#F4B53F}
+.tdot.off{background:transparent;border:1.5px solid var(--text-3)}
+.towngrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.folkcard{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--edge-soft)}
+.folkcard.away{opacity:.72}
+.folkcard .fav .pip{width:56px;height:56px;display:block}
+.folkcard .fmain{flex:1;min-width:0}
+.folkcard .fname{font-weight:700;color:var(--text-hi);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folkcard .fstat{font-size:.78rem;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hearts{color:#E8467C}
+.tfeed{display:flex;align-items:center;gap:8px;padding:4px 0}
+.tfeed .pip{width:28px;height:28px;flex:none}
+.tfeed .tft{flex:1;min-width:0;font-size:.8rem;line-height:1.35}
+.tfeed .tgift{padding:2px 8px}
+.evtown{margin-top:8px;padding:6px 10px;border-radius:10px;background:var(--sunk);border:1px dashed var(--edge-soft)}
+.tag.town{border-color:#2FBF71;color:var(--text-2)}
+.townnow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.86rem;color:var(--paper-text-2,inherit)}
+.townfaces{display:inline-flex}
+.townfaces .pip{width:30px;height:30px;margin-left:-6px}
+.giftgrid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+.giftpick{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border-radius:12px;border:1px solid var(--edge-soft);background:var(--surface);cursor:pointer;color:var(--text)}
+.giftpick:hover{border-color:var(--gold-soft)}
+.giftpick .gi .pip{width:40px;height:40px}
+.giftpick .gi .ic{--ib:22px;width:40px;height:40px;border-radius:50%}
+.giftpick .gn{font-size:.8rem;font-weight:600;text-align:center}
+.room .visitor{position:absolute;left:3%;bottom:5%;z-index:3;display:flex;align-items:flex-end;gap:6px;max-width:34%}
+.room .visitor .pip{width:64px;height:64px;flex:none}
+.room .visitor .vtag{background:rgba(0,0,0,.45);color:#fff;border-radius:12px;padding:6px 9px;font-size:.7rem;line-height:1.35;max-width:190px}
+.room .visitor .vtag .btn{margin-top:4px}
+.room .parcels{position:absolute;top:40%;left:3%;z-index:3;display:flex;flex-direction:column;gap:6px}
+.room .parcel{display:flex;align-items:center;gap:6px;border:0;background:rgba(0,0,0,.4);border-radius:999px;padding:4px 10px 4px 4px;
+  cursor:pointer;color:#fff;animation:findGlow 1.8s ease-in-out infinite}
+.room .parcel .pfi{font-size:1.3rem;line-height:1}
+.room .parcel .pft{font-size:.66rem;white-space:nowrap}
+@media(max-width:620px){.room .visitor .vtag{display:none}.room .parcel .pft{display:none}}
+.sitebanner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:8px 10px 8px 14px;border-radius:12px;
+  background:linear-gradient(90deg,var(--thb),var(--tha));color:var(--thi);box-shadow:var(--sh-1)}
+.sitebanner .sbtitle{font-weight:700}
+.sitebanner .sbbar{flex:1;min-width:90px;height:8px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden}
+.sitebanner .sbbar span{display:block;height:100%;background:#fff;border-radius:99px}
+.sitebanner .sbnum{font-weight:700;font-variant-numeric:tabular-nums}
+.sitebanner .sbsub{font-size:.78rem;opacity:.92}
+.sitebanner .sbx{border:0;background:transparent;color:inherit;font-size:1.2rem;cursor:pointer;padding:0 4px}
+/* collapsible settings panels */
+.panel.fold>.phead{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.panel.fold>.phead>.pgrow{flex:1;min-width:0}
+.panel.fold>.phead h3{margin:0}
+.panel.fold .pchev{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid var(--edge-soft);
+  background:var(--sunk);color:var(--text-2);display:grid;place-items:center;cursor:pointer;padding:0}
+.panel.fold .pchev svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .2s}
+.panel.fold.shut .pchev svg{transform:rotate(-90deg)}
+.panel.fold.shut>.pbody{display:none}
+.panel.fold>.pbody{margin-top:10px}
+.panel.fold.shut{padding-top:12px;padding-bottom:12px}
+.panel.fold.shut .phead .btn:not(.pchev){display:none}
+.foldbar{display:flex;gap:8px;justify-content:flex-end;margin:-4px 0 10px}
 
 @media(max-width:800px){
   .topbar .inner{flex-wrap:wrap;row-gap:9px}
@@ -2237,13 +2300,13 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
       <button data-go="catalog" data-ico="navbook"><span class="nl">Reading Catalogue</span></button>
       <button data-go="activities" data-ico="navact"><span class="nl">Activities</span></button>
       <button class="hide" data-go="events" data-ico="navevent"><span class="nl">Events</span></button>
+      <button class="hide" data-go="town" data-ico="navtown"><span class="nl">Town</span></button>
       <button class="admin-only hide" data-go="titles" data-ico="navtitles"><span class="nl">Titles</span></button>
       <button class="admin-only hide" data-go="settings" data-ico="navgear"><span class="nl">Settings</span></button>
       <button class="navstore" data-go="store" data-ico="navstore"><span class="nl">Store</span></button>
     </nav>
     <div class="barside">
       <button class="iconbtn roombtn hide" id="roombtn" data-go="room" aria-label="Pip&rsquo;s room" title="Pip&rsquo;s room"></button>
-      <button class="iconbtn" id="themebtn" aria-label="Switch palette"></button>
       <button class="iconbtn" id="keybtn" aria-label="Instructor sign in"></button>
       <button class="chip hide" id="chip" aria-label="Your profile"></button>
     </div>
@@ -2325,6 +2388,7 @@ var ICON={
   navevent:'<path d="M12 3.5l2.4 5 5.4.7-4 3.8 1 5.4-4.8-2.6-4.8 2.6 1-5.4-4-3.8 5.4-.7z"/><path d="M19.5 3v3M18 4.5h3"/>',
   navstore:'<path d="M5 8h14l-1.2 11.2a1.8 1.8 0 0 1-1.8 1.6H8a1.8 1.8 0 0 1-1.8-1.6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>',
   navtitles:'<path d="M5 6h14M5 12h14M5 18h9"/>',
+  navtown:'<path d="M3 20h18"/><path d="M5 20v-7l4-3.5 4 3.5v7"/><path d="M13 20v-9.5l3.5-3 3.5 3V20"/><path d="M8 20v-3h2v3"/><path d="M16 13h1"/>',
   navgear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',
   room:'<path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><circle cx="12" cy="15" r="3"/><circle cx="11" cy="14.6" r=".5"/><circle cx="13" cy="14.6" r=".5"/>'
 };
@@ -2386,6 +2450,7 @@ function load(){
     if(!Array.isArray(p.feeds))p.feeds=[];
   });
   seedFoods();
+  applyPowerKinds();
   migratePowers();
   applySeasons();
   if(S.active&&!profile(S.active))S.active=null;
@@ -3208,7 +3273,7 @@ function finish(){
     if(paper.award==='proportional')earned=Math.round(paper.points*pct/100*10)/10;
     else if(paper.award==='full')earned=paper.points;
   }
-  var boosted=withBoost(earned,p);
+  var boosted=withBoost(earned,p,'quiz');
   earned=boosted.points;
   var rec={id:uid(),moduleId:m.id,title:m.title,author:m.author,date:nowISO(),
     boost:boosted.boost,
@@ -3410,6 +3475,7 @@ function viewCatalog(){
     else tags+='<span class="tag">'+(m.quiz.ask||m.questions.length)+' questions</span>';
     if(best)tags+='<span class="tag '+(best.passed?'pass':'fail')+'">'+
       (best.passed?'Passed at '+best.pct+'%':'Best '+best.pct+'%')+'</span>';
+    tags+=townReadersTag(m);
     h+='<button class="bookcard" data-act="open" data-id="'+esc(m.id)+'" data-st="'+st+'">'+
       '<span class="spine"></span><span class="in">'+
       '<span class="main"><span class="ttl">'+esc(m.title)+'</span>'+
@@ -3423,6 +3489,60 @@ function viewCatalog(){
       '</button>';
   });
   return h+'</div>';
+}
+/* Settings panels fold shut by default; what is open is remembered for the session. */
+var FOLD_OPEN={};
+try{FOLD_OPEN=JSON.parse(sessionStorage.getItem('pip-fold')||'{}')||{};}catch(e){FOLD_OPEN={};}
+function foldSave(){try{sessionStorage.setItem('pip-fold',JSON.stringify(FOLD_OPEN));}catch(e){}}
+function foldPanels(root){
+  var panels=$$('.panel',root).filter(function(p){return !p.parentElement.closest('.panel');});
+  panels.forEach(function(p,i){
+    var h3=p.querySelector('h3');
+    if(!h3)return;
+    var head=h3.parentElement===p?h3:h3.parentElement;
+    if(head.parentElement!==p)return;
+    var key=(h3.textContent||('panel'+i)).trim();
+    var ph=document.createElement('div');ph.className='phead';
+    var grow=document.createElement('div');grow.className='pgrow';
+    p.insertBefore(ph,head);
+    grow.appendChild(head);ph.appendChild(grow);
+    var chev=document.createElement('button');
+    chev.type='button';chev.className='pchev';chev.setAttribute('aria-label','Show or hide '+key);
+    chev.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+    ph.appendChild(chev);
+    var body=document.createElement('div');body.className='pbody';
+    while(ph.nextSibling)body.appendChild(ph.nextSibling);
+    p.appendChild(body);
+    p.classList.add('fold');
+    var open=!!FOLD_OPEN[key];
+    p.classList.toggle('shut',!open);
+    chev.setAttribute('aria-expanded',String(open));
+    ph.addEventListener('click',function(e){
+      var b=e.target.closest('button,a,input,select,label');
+      if(b&&b!==chev)return;
+      var nowOpen=p.classList.contains('shut');
+      p.classList.toggle('shut',!nowOpen);
+      chev.setAttribute('aria-expanded',String(nowOpen));
+      if(nowOpen)FOLD_OPEN[key]=1;else delete FOLD_OPEN[key];
+      foldSave();
+    });
+  });
+  var bar=document.createElement('div');bar.className='foldbar';
+  bar.innerHTML='<button type="button" class="btn btn-sm btn-ghost" data-fold="1">Expand all</button>'+
+    '<button type="button" class="btn btn-sm btn-ghost" data-fold="0">Collapse all</button>';
+  var first=panels[0];
+  if(first)first.parentElement.insertBefore(bar,first);
+  bar.addEventListener('click',function(e){
+    var b=e.target.closest('[data-fold]');if(!b)return;
+    var open=b.dataset.fold==='1';
+    panels.forEach(function(p){
+      if(!p.classList.contains('fold'))return;
+      p.classList.toggle('shut',!open);
+      var k=(p.querySelector('h3').textContent||'').trim();
+      if(open)FOLD_OPEN[k]=1;else delete FOLD_OPEN[k];
+    });
+    foldSave();
+  });
 }
 function adminBar(){
   return '<div class="keyline">'+ico('unlock')+
@@ -3480,6 +3600,7 @@ function viewTitle(){
         '<div style="font-family:var(--serif);font-size:1.3rem" class="tnum">'+esc(f[1])+'</div></div>';
     }).join('')+'</div>';
 
+  h+=townReadersPanel(m);
   if(chapters.length){
     var pctDone=prog.total?Math.round(prog.done/prog.total*100):0;
     h+='<div class="progline"><div class="bar"><span style="width:'+pctDone+'%"></span></div>'+
@@ -3893,6 +4014,7 @@ function viewSettings(){
     '<label class="check stack"><input type="checkbox" id="ev-on"'+(eventsOn()?' checked':'')+
     '><span>Show the Events tab to readers</span></label>'+
     '<button class="btn btn-primary" data-act="save-events">Save</button></div>';
+  h+=townSettingsHTML();
   h+=viewPipShop();
   h+=viewIncentives();
   h+=viewBackups();
@@ -4331,7 +4453,7 @@ var VIEWS={gate:viewGate,catalog:viewCatalog,title:viewTitle,results:viewResults
   records:viewRecords,profile:viewProfile,titles:viewTitles,settings:viewSettings,
   store:viewStore,redemptions:viewRedemptions,
   activities:viewActivities,approvals:viewApprovals,
-  events:viewEvents,reviews:viewReviews,room:viewRoom};
+  events:viewEvents,reviews:viewReviews,room:viewRoom,town:viewTown};
 
 function go(v,arg){
   if(v!==S.view)resetGreetings();
@@ -4342,6 +4464,7 @@ function go(v,arg){
 }
 function render(){
   applySeasons();
+  applyPowerKinds();
   if(!me()&&S.view!=='gate')S.view='gate';
   if(S.view==='quiz'&&!S.run)S.view='catalog';
   if(['titles','settings','redemptions','approvals','reviews'].indexOf(S.view)>=0&&!S.admin)S.view='catalog';
@@ -4349,6 +4472,8 @@ function render(){
 
   var inQuiz=(S.view==='quiz'&&S.run);
   $('#view').innerHTML=inQuiz?viewCatalog():((VIEWS[S.view]||viewCatalog)());
+  if(S.view==='settings')foldPanels($('#view'));
+  if(S.view!=='gate'&&!inQuiz&&S.view!=='settings')$('#view').insertAdjacentHTML('afterbegin',siteBannersHTML());
   mountQuizLayer(inQuiz);
 
   var onGate=(S.view==='gate');
@@ -4377,12 +4502,9 @@ function render(){
   $$('#nav .admin-only').forEach(function(b){b.classList.toggle('hide',!S.admin);});
   var evb=$('#nav [data-go="events"]');
   if(evb)evb.classList.toggle('hide',!eventsOn()&&!S.admin);
+  var twb=$('#nav [data-go="town"]');
+  if(twb)twb.classList.toggle('hide',!townOn()||!me());
 
-  var th=$('#themebtn');
-  var dark=(resolvedTheme()==='dark');
-  th.innerHTML=ico(dark?'sun':'moon');
-  th.setAttribute('aria-label',dark?'Switch to the daylight palette':'Switch to the evening palette');
-  th.title=th.getAttribute('aria-label');
 
   var key=$('#keybtn');
   key.classList.toggle('on',S.admin);
@@ -4548,10 +4670,21 @@ document.addEventListener('click',function(e){
   else if(act==='season-new'){requireAdmin('Instructor key needed.',function(){seasonEditor(null);});}
   else if(act==='season-edit'){requireAdmin('Instructor key needed.',function(){seasonEditor(id);});}
   else if(act==='season-del'){requireAdmin('Instructor key needed.',function(){deleteSeason(id);});}
+  else if(act==='cp-new'){requireAdmin('Instructor key needed.',function(){customPowerEditor(null);});}
+  else if(act==='cp-edit'){requireAdmin('Instructor key needed.',function(){customPowerEditor(id);});}
+  else if(act==='cp-del'){requireAdmin('Instructor key needed.',function(){deleteCustomPower(id);});}
   else if(act==='sab-new'){requireAdmin('Instructor key needed.',function(){seasonalEditor(null);});}
   else if(act==='sab-edit'){requireAdmin('Instructor key needed.',function(){seasonalEditor(id);});}
   else if(act==='sab-del'){requireAdmin('Instructor key needed.',function(){deleteSeasonal(id);});}
   else if(act==='pet-claim'){claimPetFind();}
+  else if(act==='town-give'){townGiveModal(id,b.dataset.place||'town');}
+  else if(act==='town-parcel'){claimParcel(id);}
+  else if(act==='town-filter'){TOWN_FILTER=id;render();}
+  else if(act==='banner-shut'){BANNER_SHUT[id]=1;render();}
+  else if(act==='town-save'){requireAdmin('Instructor key needed.',saveTownSettings);}
+  else if(act==='town-folk-toggle'){requireAdmin('Instructor key needed.',function(){townFolkToggle(id);});}
+  else if(act==='town-folk-add'){requireAdmin('Instructor key needed.',townFolkAdd);}
+  else if(act==='town-folk-del'){requireAdmin('Instructor key needed.',function(){townFolkDel(id);});}
   else if(act==='remind-hide'){hideReminder(id);}
   else if(act==='remind-more'){S.remindAll=!S.remindAll;render();}
   else if(act==='save-alive'){saveAlive();}
@@ -4836,7 +4969,7 @@ document.addEventListener('pointerdown',touchIdle);
 $('#file-any').addEventListener('change',function(e){addFiles(e.target.files,false);e.target.value='';});
 $('#file-dir').addEventListener('change',function(e){addFiles(e.target.files,true);e.target.value='';});
 $('#chip').addEventListener('click',function(){go('profile');});
-$('#themebtn').addEventListener('click',function(){setTheme(resolvedTheme()==='dark'?'light':'dark');});
+/* The palette switch lives on the sign-in screen and the profile page. */
 /* Both ways into instructor mode land here, so the reminder to save a copy
    is not attached to only one of them. */
 function afterUnlock(){
@@ -5393,7 +5526,7 @@ function priceOf(item){
   var d=discountState(item);
   var base=Math.max(0,num(item.cost,0));
   var off=d.active?d.pct:0;
-  var wear=abilityValue('discount');          /* a worn look can cut prices too */
+  var wear=powerTotal('discount',null,'rewards');          /* a worn look can cut prices too */
   var total=Math.min(90,off+wear);
   if(!total)return{base:base,now:base,pct:0,active:false,sale:d,wear:0};
   var now=Math.round(Math.max(0,base*(100-total))/100*10)/10;
@@ -6088,7 +6221,7 @@ function logActivity(id){
   if(!a||!p)return;
   var st=activityState(a,p);
   if(!st.can){toast(st.label,'bad');return;}
-  var ab=withBoost(num(a.points,0),p);
+  var ab=withBoost(num(a.points,0),p,'activity');
   var entry={id:uid(),activityId:a.id,title:a.title,points:ab.points,boost:ab.boost,
     icon:a.icon,date:nowISO(),approved:!a.approval};
   p.activities=logOf(p).concat([entry]);
@@ -6901,7 +7034,7 @@ function wishProgress(p){
 }
 function wishPayback(price){
   var cfg=wishCfg();
-  var pct=cfg.payback+abilityValue('payback');
+  var pct=cfg.payback+powerTotal('payback',null,'wish');
   var n=Math.round(price*pct/100*10)/10;
   if(cfg.cap)n=Math.min(n,cfg.cap);
   return n;
@@ -7105,7 +7238,7 @@ function settleStreaks(){
     var st=streakState(rule,p);
     st.milestones.forEach(function(key){
       if(given[rule.id+'|'+key])return;
-      var sb=withBoost(Math.max(0,num(rule.points,0)),p);
+      var sb=withBoost(Math.max(0,num(rule.points,0)),p,'streak');
       var pointsFor=sb.points;
       p.streaks.push({id:uid(),ruleId:rule.id,key:key,points:pointsFor,boost:sb.boost,
         at:nowISO(),title:rule.title||'Streak'});
@@ -7788,6 +7921,10 @@ function pipPrice(thing){
   var p=cfg.prices[thing.id];
   return (p===undefined||p===null||p==='')?num(thing.price,0):Math.max(0,num(p,0));
 }
+function pipCost(thing){
+  var base=pipPrice(thing),pct=Math.min(90,powerTotal('discount',null,'pip'));
+  return pct?Math.round(base*(100-pct)/10)/10:base;
+}
 function pipOffered(thing){return !pipShopCfg().off[thing.id]&&pipInSeason(thing);}
 
 function ownedPip(p){
@@ -7828,7 +7965,7 @@ function buyPip(id){
   var p=me();if(!p)return;
   var thing=pipPart(id)||pipLookById(id);
   if(!thing)return;
-  var price=pipPrice(thing);
+  var price=pipCost(thing);
   if(ownsPip(id,p)||(thing.grants&&thing.grants.every(function(g){return ownsPip(g,p);}))){
     toast('Already unlocked.','bad');return;
   }
@@ -7932,7 +8069,7 @@ function pipShelf(){
     looks.forEach(function(l){
       var preview={};
       l.grants.forEach(function(g){var pt=pipPart(g);if(pt)preview[pt.slot]=pt.v;});
-      var price=pipPrice(l);
+      var full=pipPrice(l),price=pipCost(l);
       var afford=balance(p)>=price;
       var ab=lookAbility(l);
       h+='<div class="pipcard'+(afford?' buyable':'')+(l.tier==='top'?' top':'')+'">'+
@@ -7949,7 +8086,7 @@ function pipShelf(){
         lookPowers(l).map(function(a){return '<div class="abilnote">'+
           esc(PIP_ABILITIES[a.kind].blurb(a.value))+'</div>';}).join('')+
         (festivalText(l)?'<div class="abilnote fest">'+esc(festivalText(l))+'</div>':'')+
-        '<div class="pc">'+pts(price)+' <small>points</small></div>'+
+        '<div class="pc">'+(price<full?'<s class="muted">'+pts(full)+'</s> ':'')+pts(price)+' <small>points</small></div>'+
         '<button class="btn btn-sm '+(afford?'btn-primary':'btn-ghost')+
           '" data-act="pip-buy" data-id="'+esc(l.id)+'">'+
           (afford?'Unlock':pts(Math.round((price-balance(p))*10)/10)+' more')+'</button>'+
@@ -7960,7 +8097,7 @@ function pipShelf(){
   if(parts.length){
     h+='<div class="pipparts">';
     parts.forEach(function(pt){
-      var price=pipPrice(pt);
+      var price=pipCost(pt);
       var afford=balance(p)>=price;
       var preview={body:pipLook(p).body};
       preview[pt.slot]=pt.v;
@@ -7985,8 +8122,29 @@ var PIP_ABILITIES={
   none:    {name:'None',      unit:'',  blurb:function(v){return 'No special power.';}},
   boost:   {name:'Point boost',unit:'%', blurb:function(v){return '+'+v+'% on every point earned while worn.';}},
   discount:{name:'Store discount',unit:'%',blurb:function(v){return v+'% off everything in the store while worn.';}},
-  payback: {name:'Extra wish payback',unit:'%',blurb:function(v){return v+'% more paid back on a granted wish.';}}
+  payback: {name:'Extra wish payback',unit:'%',blurb:function(v){return v+'% more paid back on a granted wish.';}},
+  foodtime:{name:'Longer food powers',unit:'%',blurb:function(v){return 'Food powers last '+v+'% longer while worn.';}},
+  findluck:{name:'Companion luck',unit:'%',blurb:function(v){return '+'+v+'% chance of a companion find each day.';}},
+  bonusluck:{name:'Bonus luck',unit:'%',blurb:function(v){return '+'+v+'% chance of bonus cosmetics and food on store items, activities and events.';}}
 };
+/* ---------- Power capabilities ----------
+   Every power kind has an effect (what the engine does with it) and a scope
+   (where it applies). The six shipped kinds are their own effect with scope
+   'all'. Instructors can create new kinds on top of any effect, with a
+   narrower scope: "+N% on quiz points", "N% off Pip cosmetics", and so on. */
+var POWER_EFFECTS={
+  boost:{name:'Point boost',scopes:[['all','Everything earned'],['quiz','Quizzes only'],['activity','Activities only'],
+    ['event','Events and group goals only'],['streak','Streak payouts only']]},
+  discount:{name:'Store discount',scopes:[['all','Store rewards and food'],['rewards','Store rewards only'],
+    ['food','Pip’s food only'],['pip','Pip cosmetics (shelf and looks)']]},
+  payback:{name:'Extra wish payback',scopes:[['all','Granted wishes']]},
+  foodtime:{name:'Longer food powers',scopes:[['all','Every food Pip eats']]},
+  findluck:{name:'Companion luck',scopes:[['all','Daily companion finds']]},
+  bonusluck:{name:'Bonus luck',scopes:[['all','Store items, activities and events']]}
+};
+var SCOPE_WORDS={quiz:'quiz points',activity:'activity points',event:'event points',streak:'streak payouts',
+  rewards:'store rewards',food:'food',pip:'Pip cosmetics'};
+var PIP_ABILITIES_BUILTIN=null;
 /* A look can carry one power (ability) or several (abilities). The
    instructor's override wins: {kind,value} for one, {multi:{kind:value}}
    for several. Only powers that actually do something are returned. */
@@ -7994,7 +8152,62 @@ function lookIsMulti(l){return Array.isArray(l.abilities);}
 /* Festival powers: extra power that only works while its season is open.
    The look keeps its standard power all year; the festival tops it up. */
 var PIP_POWER_SHORT={boost:function(v){return '+'+v+'% points';},
-  discount:function(v){return v+'% off';},payback:function(v){return '+'+v+'% wish payback';}};
+  discount:function(v){return v+'% off';},payback:function(v){return '+'+v+'% wish payback';},
+  foodtime:function(v){return '+'+v+'% food time';},findluck:function(v){return '+'+v+'% find luck';},
+  bonusluck:function(v){return '+'+v+'% bonus luck';}};
+var PIP_POWER_SHORT_BUILTIN=null;
+function powerEffect(k){var a=PIP_ABILITIES[k];return (a&&a.effect)||k;}
+function powerScope(k){var a=PIP_ABILITIES[k];return (a&&a.scope)||'all';}
+function customPowerBlurb(c){
+  var sw=SCOPE_WORDS[c.scope];
+  return function(v){
+    if(c.effect==='boost')return '+'+v+'% on '+(sw||'every point earned')+' while worn.';
+    if(c.effect==='discount')return v+'% off '+(sw||'store rewards and food')+' while worn.';
+    return PIP_ABILITIES_BUILTIN[c.effect].blurb(v);
+  };
+}
+function customPowerShort(c){
+  var sw=SCOPE_WORDS[c.scope];
+  return function(v){
+    if(c.effect==='boost'&&sw)return '+'+v+'% '+sw;
+    if(c.effect==='discount'&&sw)return v+'% off '+sw;
+    return PIP_POWER_SHORT_BUILTIN[c.effect](v);
+  };
+}
+/* Rebuild the power kinds from the shipped ones plus the instructor's own. */
+function applyPowerKinds(){
+  if(!PIP_ABILITIES_BUILTIN){
+    PIP_ABILITIES_BUILTIN={};Object.keys(PIP_ABILITIES).forEach(function(k){PIP_ABILITIES_BUILTIN[k]=PIP_ABILITIES[k];});
+    PIP_POWER_SHORT_BUILTIN={};Object.keys(PIP_POWER_SHORT).forEach(function(k){PIP_POWER_SHORT_BUILTIN[k]=PIP_POWER_SHORT[k];});
+  }
+  if(typeof S==='undefined'||!S||!S.settings)return;
+  Object.keys(PIP_ABILITIES).forEach(function(k){if(!PIP_ABILITIES_BUILTIN[k])delete PIP_ABILITIES[k];});
+  Object.keys(PIP_POWER_SHORT).forEach(function(k){if(!PIP_POWER_SHORT_BUILTIN[k])delete PIP_POWER_SHORT[k];});
+  POWER_KINDS.length=0;
+  POWER_KINDS_BUILTIN.forEach(function(k){POWER_KINDS.push(k);});
+  customPowers().forEach(function(c){
+    if(!c||!c.id||!POWER_EFFECTS[c.effect])return;
+    PIP_ABILITIES[c.id]={name:c.name||'Power',unit:'%',effect:c.effect,scope:c.scope||'all',custom:true,blurb:customPowerBlurb(c)};
+    PIP_POWER_SHORT[c.id]=customPowerShort(c);
+    POWER_KINDS.push(c.id);
+  });
+}
+function customPowers(){
+  var c=S.settings.pipPowers;
+  return (c&&Array.isArray(c.custom))?c.custom:[];
+}
+/* Everything of one effect that applies here: the shipped kind plus any
+   instructor powers whose scope matches. Each kind is capped on its own. */
+function powerTotal(effect,p,scope){
+  var v=0;
+  POWER_KINDS.forEach(function(k){
+    if(powerEffect(k)!==effect)return;
+    var sc=powerScope(k);
+    if(sc!=='all'&&sc!==scope)return;
+    v+=abilityValue(k,p);
+  });
+  return Math.round(v*10)/10;
+}
 function lookAbility(l){
   return lookPowers(l)[0]||{kind:'none',value:0};
 }
@@ -8044,8 +8257,8 @@ function abilityValue(kind,p){
 }
 /* Applied when points are earned, not to the running total — so the record
    shows what was actually awarded and changing outfit later rewrites nothing. */
-function withBoost(points,p){
-  var b=abilityValue('boost',p);
+function withBoost(points,p,scope){
+  var b=powerTotal('boost',p,scope);
   if(!b||!points)return{points:points,boost:0,added:0};
   var out=Math.round(points*(1+b/100)*10)/10;
   return{points:out,boost:b,added:Math.round((out-points)*10)/10};
@@ -8547,6 +8760,13 @@ function eventState(ev,p){
     return out({can:true,open:true,label:claim?(claim+' ready to claim'):(ready?prog:(prog+' · keep going')),
       tone:ready?'warm':'cold',progress:prog,done:done,ready:ready,view:true,claim:claim});
   }
+  if(ev.kind==='goal'){
+    var tgx=townGoal(ev);
+    if(tgx.on&&tgx.ended){
+      var gpx=goalProgress(ev);
+      return out({can:false,label:gpx.reached?'Goal reached':'Ended — not reached',tone:gpx.reached?'good':'cold',ended:true});
+    }
+  }
   var gate2=gateBlock(ev,p);
   if(gate2)return out({can:false,label:gate2,tone:'cold',locked:true});
   if(ev.kind==='goal'&&goalAuto(ev)){
@@ -8652,7 +8872,7 @@ function doStep(evId,stepId){
     toast('You have '+PENDING_CAP+' things waiting to be looked at already.','bad',6000);return false;
   }
   var ticket=takeTicket(ev,p,st.mine);
-  var boosted=withBoost(num(step.points,0),p);
+  var boosted=withBoost(num(step.points,0),p,'event');
   var e={id:uid(),eventId:ev.id,eventTitle:ev.title,kind:ev.kind,stepId:step.id,
     stepLabel:(ev.kind==='calendar'?'Day '+(i+1)+': ':'')+step.label,
     at:nowISO(),round:key,note:'',text:'',count:null,thumb:'',
@@ -8677,7 +8897,7 @@ function finishSteps(ev,p,key){
   if(!all)return;
   if(roundEntries(ev,p,key).some(function(e){return e.stepId==='__all';}))return;
   var bonus=num(ev.stepsCfg&&ev.stepsCfg.bonus,0);
-  var boosted=withBoost(bonus,p);
+  var boosted=withBoost(bonus,p,'event');
   p.entries=entriesOf(p).concat([{id:uid(),eventId:ev.id,eventTitle:ev.title,kind:ev.kind,
     stepId:'__all',stepLabel:ev.kind==='calendar'?'Every door opened':'Every step done',
     at:nowISO(),round:key,status:'rated',points:boosted.points,boost:boosted.boost,
@@ -8696,7 +8916,7 @@ function approveEntry(id){
   if(f.e.stepId&&ev){
     (ev.steps||[]).forEach(function(s){if(s.id===f.e.stepId)pts0=num(s.points,0);});
   }else if(ev&&ev.kind==='goal')pts0=num(ev.goal&&ev.goal.perEntry,0);
-  var boosted=withBoost(pts0,f.p);
+  var boosted=withBoost(pts0,f.p,'event');
   f.e.status='rated';f.e.points=boosted.points;f.e.boost=boosted.boost;
   f.e.ratingLabel=f.e.stepId?'Done':'Counted';f.e.ratedAt=nowISO();
   save();
@@ -8743,9 +8963,12 @@ function goalProgress(ev,key){
     total+=got;
   });
   var g=goalCfg(ev);
-  total=Math.round(total*10)/10;
+  var real=Math.round(total*10)/10,realHelpers=helpers;
+  var tg=(key===eventRound(ev).key)?townGoal(ev):{on:false,total:0,helpers:0};
+  total=Math.round((total+tg.total)*10)/10;
   return{total:total,target:g.target,pct:Math.min(100,Math.round(total/g.target*100)),
-    helpers:helpers,reached:total>=g.target,key:key};
+    helpers:helpers+tg.helpers,reached:total>=g.target,key:key,
+    real:real,realHelpers:realHelpers,town:tg.total,townHelpers:tg.helpers,townOn:tg.on,ended:!!tg.ended};
 }
 function goalRewarded(ev,p,key){
   return entriesOf(p).some(function(e){return e.eventId===ev.id&&e.goalReward&&e.round===key;});
@@ -8760,7 +8983,7 @@ function settleGoals(){
       if(!assignedTo(ev,p))return;
       if(goalRewarded(ev,p,pr.key))return;
       if(g.who==='helped'&&!(goalShare(ev,p,pr.key)>0))return;
-      var boosted=withBoost(g.reward,p);
+      var boosted=withBoost(g.reward,p,'event');
       p.entries=entriesOf(p).concat([{id:uid(),eventId:ev.id,eventTitle:ev.title,kind:'goal',
         goalReward:true,stepLabel:'Group goal reached',at:nowISO(),round:pr.key,status:'rated',
         points:boosted.points,boost:boosted.boost,ratingLabel:'Group goal reached',ratedAt:nowISO(),
@@ -8824,7 +9047,10 @@ function eventCardHTML(ev,p){
     var gp=goalProgress(ev);
     h+='<div class="goalbar"><div class="wbar"><span style="width:'+gp.pct+'%"></span></div>'+
       '<div class="tiny">'+pts(gp.total)+' of '+pts(gp.target)+' '+esc(goalUnit(ev))+
-      ' &nbsp;·&nbsp; '+gp.helpers+' helping'+(gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':'')+'</div></div>';
+      (gp.townOn?' &nbsp;·&nbsp; you '+pts(gp.real)+' + '+esc(townCfg().label)+' '+pts(gp.town)+
+        ' &nbsp;·&nbsp; '+gp.realHelpers+' of you and '+gp.townHelpers+' neighbours helping'
+        :' &nbsp;·&nbsp; '+gp.helpers+' helping')+
+      (gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':(gp.ended?' &nbsp;·&nbsp; <b>ended short</b>':''))+'</div></div>';
   }
   if(isStepKind(ev.kind)&&st.progress)h+='<div class="tiny" style="margin-top:6px;color:var(--gold-hi)">'+esc(st.progress)+'</div>';
   h+='<div class="evmeta">'+
@@ -8839,7 +9065,8 @@ function eventCardHTML(ev,p){
       (ev.hidden?'<span class="pill cold">hidden</span>':'')+
       ((ev.books||[]).length?'<span class="pill cold">\ud83d\udcd6 '+esc((ev.books||[]).map(function(id){var m=byId(id);return m?m.title:'';}).filter(Boolean).join(', '))+'</span>':'')+
       (ev.after&&eventById(ev.after)?'<span class="pill cold">After “'+esc(eventById(ev.after).title)+'”</span>':'')+
-    '</div></div>'+
+      (ev.town&&ev.town.sitewide?'<span class="pill warm">Town-wide</span>':'')+
+    '</div>'+eventTownHTML(ev,2)+'</div>'+
     '<div class="evside">'+
       '<span class="upto">'+(ev.kind==='goal'?'':'up to ')+pts(best)+(ev.kind==='goal'?' each':'')+'</span>';
   if(ev.kind==='goal'&&st.auto){
@@ -8889,6 +9116,8 @@ function eventKindDefaults(d){
   if(!d.hours)d.hours={on:false,from:'15:00',to:'17:00'};
   if(!d.link)d.link={look:'',food:'',giftPart:'',giftFood:''};
   if(!d.books)d.books=[];
+  if(!d.town)d.town={join:false,sitewide:false};
+  if(d.kind==='goal'&&d.goal&&!d.goal.town)d.goal.town={on:false,finish:90,pace:'steady',step:'day',days:14};
   if(d.after===undefined)d.after='';
 }
 function h4(t){return '<h4 style="font-size:.95rem;color:var(--text-hi)">'+t+'</h4>';}
@@ -8968,8 +9197,50 @@ function eventKindExtraHTML(d){
       (goalAuto(d)?'<p class="tiny muted">It counts by itself from what readers do during the round, so there is nothing to type.</p>':
       '<label class="check"><input type="checkbox" id="ev-gappr"'+(g.approval?' checked':'')+
       '><span>Numbers only count once an instructor approves them</span></label>');
+    h+=goalTownEditorHTML(d);
   }
+  h+=eventTownEditorHTML(d);
   return h;
+}
+function goalTownEditorHTML(d){
+  var t=d.goal.town||{};
+  var h='<div class="divider"></div>'+h4('Community-driven')+
+    '<p class="tiny muted" style="margin-top:4px">'+esc(townCfg().label)+' neighbours add to the total on a schedule you set. '+
+    'Readers’ own numbers add on top, so the goal can really finish — or really fall short.</p>'+
+    (townOn()?'':'<p class="tiny" style="color:var(--fail)">The town is switched off in Settings, so this has no effect yet.</p>')+
+    '<label class="check"><input type="checkbox" id="ev-gtown"'+(t.on?' checked':'')+'><span>The town helps with this goal</span></label>';
+  if(!t.on)return h;
+  var rd=eventRound(d);
+  h+='<div class="subfields">'+
+    '<label class="field"><span>Where the town alone gets to by the end (% of the target)</span>'+
+    '<input class="inp" id="ev-gtfin" type="number" min="0" max="300" value="'+esc(t.finish)+'"></label>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap">'+[[120,'Finishes it alone'],[92,'Nearly — readers tip it over'],[65,'Needs a real push'],[30,'Barely helps']].map(function(x){
+      return '<button type="button" class="btn btn-sm'+(num(t.finish,0)===x[0]?' btn-primary':'')+'" data-evgtp="'+x[0]+'">'+x[1]+' ('+x[0]+'%)</button>';}).join('')+'</div>'+
+    '<div class="row" style="gap:10px;flex-wrap:wrap;margin-top:8px">'+
+    '<label class="field" style="flex:1;min-width:160px"><span>Shape of the climb</span><select class="inp" id="ev-gtpace">'+Object.keys(TOWN_PACES).map(function(k){
+      return '<option value="'+k+'"'+(t.pace===k?' selected':'')+'>'+TOWN_PACES[k]+'</option>';}).join('')+'</select></label>'+
+    '<label class="field" style="flex:1;min-width:160px"><span>The town’s total moves</span><select class="inp" id="ev-gtstep">'+Object.keys(TOWN_STEPS).map(function(k){
+      return '<option value="'+k+'"'+(t.step===k?' selected':'')+'>'+TOWN_STEPS[k]+'</option>';}).join('')+'</select></label>'+
+    (rd.end?'':'<label class="field" style="flex:1;min-width:160px"><span>Runs for (days)</span><input class="inp" id="ev-gtdays" type="number" min="1" max="366" value="'+esc(t.days||14)+'"></label>')+
+    '</div>';
+  var probe=JSON.parse(JSON.stringify(d));probe.goal.town.on=true;
+  if(!probe.created)probe.created=nowISO();
+  var saveOn=S.settings.town&&S.settings.town.on===false;
+  var tg=saveOn?null:townGoal(probe);
+  if(tg&&tg.on){
+    h+='<p class="tiny" style="color:var(--gold-hi)">Now: the town has added '+pts(tg.total)+' of '+pts(goalCfg(d).target)+
+      ' · by '+fmtDM(new Date(tg.span.end.getTime()-1))+': '+pts(tg.final)+
+      (rd.end?' (each round)':'')+(tg.final>=goalCfg(d).target?' — reaches the goal without readers':' — readers need '+pts(Math.round((goalCfg(d).target-tg.final)*10)/10)+' more')+'</p>';
+  }
+  return h+'</div>';
+}
+function eventTownEditorHTML(d){
+  var t=d.town||{};
+  return '<div class="divider"></div>'+h4(esc(townCfg().label))+
+    '<label class="check"><input type="checkbox" id="ev-tjoin"'+(t.join||(d.kind==='goal'&&d.goal&&d.goal.town&&d.goal.town.on)?' checked':'')+
+      (d.kind==='goal'&&d.goal&&d.goal.town&&d.goal.town.on?' disabled':'')+'><span>Neighbours join in (their activity shows on the card and when a reader takes part)</span></label>'+
+    '<label class="check"><input type="checkbox" id="ev-tsite"'+(t.sitewide?' checked':'')+'><span>Town-wide: show a banner at the top of every page while it is open</span></label>'+
+    '<p class="tiny muted">Tip: pick a seasonal banner below to colour the town-wide banner.</p>';
 }
 function eventRepeatEditorHTML(d){
   var r=d.repeat,h='';
@@ -9065,6 +9336,17 @@ function eventExtraGrab(scrim,d){
   $$('[data-evtl]',scrim).forEach(function(el){var i=+el.dataset.evtl;if(d.steps[i]&&d.steps[i].trigger)d.steps[i].trigger.level=Math.max(0,num(el.value,0));});
   if(g('#ev-gsrc')!==null)d.goal.source=g('#ev-gsrc');
   if(g('#ev-gact')!==null)d.goal.activity=g('#ev-gact');
+  if(d.kind==='goal'&&d.goal){
+    if(!d.goal.town)d.goal.town={on:false,finish:90,pace:'steady',step:'day',days:14};
+    if(cb('#ev-gtown')!==null)d.goal.town.on=cb('#ev-gtown');
+    if(g('#ev-gtfin')!==null)d.goal.town.finish=Math.max(0,Math.min(300,num(g('#ev-gtfin'),90)));
+    if(g('#ev-gtpace')!==null)d.goal.town.pace=g('#ev-gtpace');
+    if(g('#ev-gtstep')!==null)d.goal.town.step=g('#ev-gtstep');
+    if(g('#ev-gtdays')!==null)d.goal.town.days=Math.max(1,Math.min(366,num(g('#ev-gtdays'),14)));
+  }
+  if(!d.town)d.town={join:false,sitewide:false};
+  if(cb('#ev-tjoin')!==null&&!scrim.querySelector('#ev-tjoin').disabled)d.town.join=cb('#ev-tjoin');
+  if(cb('#ev-tsite')!==null)d.town.sitewide=cb('#ev-tsite');
   if(cb('#ev-bgate')!==null)d.booksGate=cb('#ev-bgate');
   if(g('#ev-after')!==null)d.after=g('#ev-after');
   if(g('#ev-yf-m')!==null)d.repeat.from=[+g('#ev-yf-m'),Math.max(1,Math.min(31,num(g('#ev-yf-d'),1)))];
@@ -9079,6 +9361,10 @@ function eventExtraGrab(scrim,d){
 }
 function eventExtraClick(e,d,scrim){
   var t;
+  if((t=e.target.closest('[data-evgtp]'))&&d.goal&&d.goal.town){
+    d.goal.town.finish=+t.dataset.evgtp;
+    return true;
+  }
   if((t=e.target.closest('[data-evrep]'))){
     d.repeat.mode=t.dataset.evrep;
     if(d.repeat.mode==='every'&&!d.repeat.anchor)d.repeat.anchor=dkey(new Date());
@@ -9138,7 +9424,7 @@ function submitEntry(ev,payload){
     hasPhoto:!!payload.photo,round:st.round.key};
   var auto=(ev.kind==='goal'&&!goalCfg(ev).approval);
   if(auto){
-    var bo=withBoost(goalCfg(ev).perEntry,p);
+    var bo=withBoost(goalCfg(ev).perEntry,p,'event');
     entry.status='rated';entry.points=bo.points;entry.boost=bo.boost;
     entry.ratingLabel='Counted';entry.ratedAt=nowISO();
   }
@@ -9182,6 +9468,7 @@ function entryModal(ev){
         :'')+
       '<label class="field"><span>Anything to say about it — optional</span>'+
       '<input class="inp" id="e-note" maxlength="140"></label>'+
+      eventTownHTML(ev,4)+
       '<div class="err" id="e-err"></div>'+
       (ev.kind==='goal'
         ? '<p class="tiny muted">'+(goalCfg(ev).approval?'It joins the group total once your instructor approves it.':'It joins the group total straight away.')+'</p>'
@@ -9374,7 +9661,7 @@ function rateEntry(id,ratingId){
   var rb=null;
   rubric.forEach(function(x){if(x.id===ratingId)rb=x;});
   if(!rb)return;
-  var boosted=withBoost(num(rb.points,0),f.p);
+  var boosted=withBoost(num(rb.points,0),f.p,'event');
   f.e.status='rated';f.e.ratingId=rb.id;f.e.ratingLabel=rb.label;
   f.e.points=boosted.points;f.e.boost=boosted.boost;f.e.ratedAt=nowISO();
   save();
@@ -9584,7 +9871,7 @@ function eventEditor(existing,opts){
     });
     bonusEditorMount(scrim,d,redraw);
     scrim.addEventListener('change',function(e){
-      if(e.target.matches('[data-evtt],#ev-gsrc,#ev-bgate')){grab(scrim);redraw();}
+      if(e.target.matches('[data-evtt],#ev-gsrc,#ev-bgate,#ev-gtown,#ev-gtpace,#ev-gtstep,#ev-gtfin,#ev-gtdays,#ev-gt')){grab(scrim);redraw();}
     });
     var hon=scrim.querySelector('#ev-hon');
     if(hon)hon.addEventListener('change',function(){grab(scrim);redraw();});
@@ -9830,7 +10117,7 @@ function viewRoom(){
     roomFiguresHTML(p)+
     '<div class="pipstand" data-act="pip-poke" data-where="room">'+
       roomPipSVG(p)+'</div>'+
-    roomPetHTML(p)+
+    roomPetHTML(p)+roomTownHTML(p)+
     (function(){
       var fp=foodPower(p);
       if(!fp)return '';
@@ -9948,7 +10235,7 @@ function foodPower(p){
 }
 function foodPrice(f){
   var base=Math.max(0,num(f.cost,0));
-  var wear=abilityValue('discount');
+  var wear=powerTotal('discount',null,'food');
   var pct=Math.min(90,wear);
   return{base:base,now:pct?Math.round(base*(100-pct)/10)/10:base,pct:pct};
 }
@@ -10061,7 +10348,7 @@ function feedPip(id){
   var st=feedState(f,p);
   if(!st.can){toast(st.label,'bad');return;}
   var b=f.benefit||{};
-  var mins=foodMinutes(f);
+  var mins=Math.round(foodMinutes(f)*(1+powerTotal('foodtime',p)/100));
   var rec={id:uid(),foodId:f.id,name:f.name,at:nowISO(),
     until:new Date(Date.now()+mins*60000).toISOString(),
     kind:PIP_ABILITIES[b.kind]?b.kind:'none',value:Math.max(0,num(b.value,0)),season:b.season||''};
@@ -10710,7 +10997,7 @@ function petFindToday(p){
   var day=todayKey();
   if(petFinds(p).some(function(f){return f.day===day;}))return null;
   var seed=p.id+':'+v+':'+day;
-  if(hashUnit(seed)*100>=c.findChance)return null;
+  if(hashUnit(seed)*100>=Math.min(100,c.findChance+powerTotal('findluck',p)))return null;
   var pp=petPart(v);
   var u=hashUnit(seed+'#kind');
   var name=pp?pp.name:'Your companion';
@@ -10772,6 +11059,716 @@ function roomPetHTML(p){
       '<span class="pfi">'+icon+'</span><span class="pft">'+esc(find.petName)+' found something!</span></button>';
   }
   return h;
+}
+
+/* =========================================================
+   Pip Town — a simulated community.
+
+   Neighbours are clearly labelled characters in PipHub's world.
+   Everything they do is worked out from their id, the reader,
+   and the clock (hashUnit), so it holds still on reload, needs
+   no background job, and nothing is stored until a reader acts.
+   ========================================================= */
+var TOWN_FOLK=[
+  {id:'tf-aidan',name:'Aidan16',persona:'bookworm',look:{body:'frost',eyes:'happy',hat:'cap',held:'book'}},
+  {id:'tf-bradley',name:'Bradley',persona:'sporty',look:{body:'ember',eyes:'dot',hat:'cap',back:'jet'}},
+  {id:'tf-korkaijen',name:'KorKaijen#4623',persona:'collector',look:{body:'midnight',eyes:'visor',back:'orbit',aura:'starfield'}},
+  {id:'tf-maya',name:'maya.reads',persona:'bookworm',look:{body:'berry',eyes:'happy',hat:'flower',pattern:'spots'}},
+  {id:'tf-jules',name:'Jules_W',persona:'crafter',look:{body:'mint',eyes:'star',held:'wand',pattern:'stripes'}},
+  {id:'tf-pixel',name:'PixelPanda22',persona:'collector',look:{body:'grape',eyes:'star',hat:'wizard',aura:'sparks'}},
+  {id:'tf-noor',name:'Noor',persona:'bookworm',look:{body:'jade',eyes:'moon',hat:'osmanthus'}},
+  {id:'tf-theo',name:'TheoTheBrave',persona:'sporty',look:{body:'coral',eyes:'dot',hat:'horns',back:'cape'}},
+  {id:'tf-lilbean',name:'lilbean07',persona:'casual',look:{body:'moss',eyes:'button',hat:'acorncap'}},
+  {id:'tf-sofia',name:'Sofia.M',persona:'crafter',look:{body:'straw',eyes:'happy',hat:'strawhat',held:'sunflower'}},
+  {id:'tf-rook',name:'Rook#1188',persona:'nightowl',look:{body:'nightshade',eyes:'glow',back:'batwings'}},
+  {id:'tf-harper',name:'Harper',persona:'casual',look:{body:'sun',eyes:'happy',held:'balloon',hat:'party'}},
+  {id:'tf-zayn',name:'zayn_writes',persona:'nightowl',look:{body:'aurora',eyes:'star',pattern:'galaxy'}},
+  {id:'tf-emmy',name:'Emmy',persona:'crafter',look:{body:'candyapple',eyes:'heart',pattern:'caramel'}},
+  {id:'tf-kofi',name:'Kofi9',persona:'sporty',look:{body:'gold',eyes:'dot',hat:'crown',held:'trophy'}},
+  {id:'tf-lunabee',name:'LunaBee',persona:'casual',look:{body:'cornsilk',eyes:'happy',pattern:'gingham',held:'cottoncandy'}}
+];
+var TOWN_PERSONA={
+  bookworm:{name:'Bookworm',read:.62,store:.08,quiz:.16,late:0,likes:['book','food']},
+  collector:{name:'Collector',read:.2,store:.5,quiz:.08,late:.05,likes:['part']},
+  crafter:{name:'Crafter',read:.3,store:.2,quiz:.1,late:0,likes:['food','part']},
+  sporty:{name:'Sporty',read:.25,store:.15,quiz:.12,late:0,likes:['food']},
+  nightowl:{name:'Night owl',read:.4,store:.2,quiz:.12,late:.35,likes:['part','food']},
+  casual:{name:'Easy-going',read:.3,store:.25,quiz:.1,late:.05,likes:['food']}
+};
+var TOWN_INTENSITY={quiet:{name:'Quiet',f:.45},lively:{name:'Lively',f:1},bustling:{name:'Bustling',f:1.6}};
+/* How busy the town is, hour by hour (local clock). */
+var TOWN_CURVE_WEEK=[.03,.02,.01,.01,.01,.03,.08,.18,.12,.06,.06,.08,.14,.08,.1,.34,.52,.6,.6,.55,.45,.3,.14,.06];
+var TOWN_CURVE_WEEKEND=[.05,.03,.02,.01,.01,.02,.05,.12,.25,.36,.42,.45,.44,.42,.44,.46,.48,.5,.52,.5,.44,.34,.18,.08];
+var TOWN_SLOT=15*60000;
+
+function clampN(v,a,b){return Math.max(a,Math.min(b,v));}
+function townCfg(){
+  var t=S.settings.town||{};
+  var give=t.give||{};
+  return{on:t.on!==false,label:(t.label||'Pip Town').slice(0,24),
+    intensity:TOWN_INTENSITY[t.intensity]?t.intensity:'lively',
+    size:clampN(Math.round(num(t.size,140)),10,5000),
+    statuses:t.statuses!==false,readers:t.readers!==false,feed:t.feed!==false,
+    gifts:t.gifts!==false,giftChance:clampN(num(t.giftChance,35),0,100),thanks:t.thanks!==false,
+    visitors:t.visitors!==false,
+    give:{town:give.town!==false,events:give.events!==false,room:give.room!==false},
+    giveFood:t.giveFood!==false,giveParts:t.giveParts===true,
+    giveLimit:clampN(Math.round(num(t.giveLimit,3)),1,20),
+    poolFoods:t.poolFoods||null,poolBasic:t.poolBasic!==false,poolSeasonal:t.poolSeasonal===true,
+    removed:t.removed||{},custom:Array.isArray(t.custom)?t.custom:[]};
+}
+function townOn(){return townCfg().on;}
+function townFolk(){
+  var c=townCfg();
+  return TOWN_FOLK.filter(function(f){return !c.removed[f.id];}).concat(c.custom.filter(function(f){return f&&f.id&&f.name;}));
+}
+function folkById(id){
+  var l=townFolk();
+  for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];
+  return null;
+}
+function folkLook(f){
+  if(f.look)return f.look;
+  var bodies=['sun','mint','berry','grape','ember','frost','moss','coral'];
+  var hats=[null,'cap','flower','party','crown','wizard'];
+  return{body:bodies[Math.floor(hashUnit(f.id+'#b')*bodies.length)],eyes:hashUnit(f.id+'#e')<.5?'happy':'dot',
+    hat:hats[Math.floor(hashUnit(f.id+'#h')*hats.length)]};
+}
+function townBusy(now,f){
+  var d=now.getDay(),h=now.getHours();
+  var curve=(d===0||d===6)?TOWN_CURVE_WEEKEND:TOWN_CURVE_WEEK;
+  var v=curve[h];
+  if(f){
+    var per=TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual;
+    if(h>=20||h<1)v+=per.late;
+    v*=0.75+hashUnit(f.id+'#act')*0.5;
+  }
+  return v*TOWN_INTENSITY[townCfg().intensity].f;
+}
+function townSlot(now){return Math.floor(now.getTime()/TOWN_SLOT);}
+function agoWords(min){
+  min=Math.max(0,Math.round(min));
+  if(min<1)return 'just now';
+  if(min<60)return min+'m ago';
+  var h=Math.floor(min/60);
+  if(h<24)return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
+function townModules(){return (S.modules||[]).filter(function(m){return m&&m.id;});}
+/* What a neighbour is doing right now. */
+function folkStatus(f,now){
+  now=now||new Date();
+  var slot=townSlot(now);
+  var a=Math.min(.95,townBusy(now,f));
+  var u=hashUnit(f.id+':s:'+slot);
+  var per=TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual;
+  var mods=townModules();
+  if(u<a){
+    var v=hashUnit(f.id+':k:'+slot);
+    var m=mods.length?mods[Math.floor(hashUnit(f.id+':b:'+Math.floor(slot/4))*mods.length)%mods.length]:null;
+    if(m&&v<per.read)return{kind:'reading',dot:'on',label:'Reading',detail:m.title,moduleId:m.id};
+    if(m&&v<per.read+per.quiz)return{kind:'quiz',dot:'on',label:'Taking a quiz',detail:m.title,moduleId:m.id};
+    if(v<per.read+per.quiz+per.store)return{kind:'store',dot:'on',label:'In Store',detail:''};
+    return{kind:'online',dot:'on',label:'Online',detail:''};
+  }
+  if(u<a*2.3)return{kind:'recent',dot:'recent',label:'Recently active',detail:agoWords(4+hashUnit(f.id+':r:'+slot)*50)};
+  return{kind:'offline',dot:'off',label:'Offline',detail:'last seen '+agoWords(90+hashUnit(f.id+':o:'+Math.floor(slot/8))*1300)};
+}
+function folkBadge(){return '<span class="townbadge" title="A '+esc(townCfg().label)+' neighbour">'+esc(townCfg().label)+'</span>';}
+function statusDot(st){return '<span class="tdot '+st.dot+'"></span>';}
+function folkNameHTML(f){return '<b class="folkname">'+esc(f.name)+'</b>';}
+
+/* How many of the wider town are on a title right now. */
+function townReaders(m,now){
+  now=now||new Date();
+  var c=townCfg();
+  if(!c.on||!c.readers||!m)return{reading:0,quiz:0,named:[]};
+  var mods=townModules();
+  var tot=0,w={};
+  mods.forEach(function(x){w[x.id]=.4+hashUnit('tw:'+x.id)*1.2;tot+=w[x.id];});
+  var share=tot?(w[m.id]||0)/tot:0;
+  var slot=Math.floor(now.getTime()/(10*60000));
+  var active=c.size*Math.min(.95,townBusy(now));
+  var reading=Math.round(active*.5*share*(.75+hashUnit(m.id+':n:'+slot)*.5));
+  var quiz=Math.round(reading*.35*(.5+hashUnit(m.id+':q:'+slot)));
+  var named=townFolk().filter(function(f){var st=folkStatus(f,now);return st.moduleId===m.id;});
+  var nr=named.filter(function(f){return folkStatus(f,now).kind==='reading';}).length;
+  var nq=named.length-nr;
+  return{reading:Math.max(reading,nr),quiz:Math.max(quiz,nq),named:named};
+}
+function townReadersTag(m){
+  var r=townReaders(m);
+  if(!r.reading&&!r.quiz)return '';
+  return '<span class="tag town">👥 '+r.reading+' reading'+(r.quiz?' · '+r.quiz+' on the quiz':'')+'</span>';
+}
+function townReadersPanel(m){
+  var c=townCfg();
+  if(!c.on||!c.readers)return '';
+  var r=townReaders(m);
+  if(!r.reading&&!r.quiz)return '';
+  return '<div class="townnow stack"><span class="tdot on"></span><span><b>'+r.reading+'</b> reading this in '+esc(c.label)+
+    (r.quiz?' &nbsp;·&nbsp; <b>'+r.quiz+'</b> taking the quiz':'')+' right now</span>'+
+    (r.named.length?'<span class="townfaces">'+r.named.slice(0,5).map(function(f){
+      return '<span title="'+esc(f.name)+' — '+esc(folkStatus(f).label)+'">'+pipSVG(folkLook(f),'read',30,{still:true,shadow:false})+'</span>';
+    }).join('')+'</span>':'')+'</div>';
+}
+
+/* ---------- the town feed ---------- */
+function townFeed(n,now,opts){
+  now=now||new Date();opts=opts||{};
+  var c=townCfg();
+  if(!c.on||!c.feed)return [];
+  var folk=townFolk(),mods=townModules();
+  var parts=PIP_PARTS.filter(function(pt){return pt.price>0&&pipInSeason(pt);});
+  var foods=foodList().filter(function(f){return !f.hidden;});
+  var evs=eventList().filter(function(ev){return !ev.hidden&&eventOpen(ev).open;});
+  var slot=Math.floor(now.getTime()/(10*60000));
+  var out=[];
+  for(var j=0;j<36&&out.length<n*3;j++){
+    var sl=slot-j,t0=sl*10*60000,at=new Date(t0);
+    folk.forEach(function(f){
+      var key=f.id+'|f|'+sl;
+      if(hashUnit(key)>=Math.min(.6,townBusy(at,f)*.14))return;
+      var time=t0+hashUnit(key+'t')*10*60000;
+      if(time>now.getTime())return;
+      var r=hashUnit(key+'k'),txt='',icon='✨';
+      if(r<.3&&mods.length){var m=mods[Math.floor(hashUnit(key+'m')*mods.length)%mods.length];
+        if(hashUnit(key+'p')<.5){txt='passed the quiz for '+m.title;icon='✅';}else{txt='finished '+m.title;icon='📚';}}
+      else if(r<.5&&parts.length){txt='unlocked '+parts[Math.floor(hashUnit(key+'x')*parts.length)%parts.length].name;icon='🛍️';}
+      else if(r<.65&&foods.length){txt='fed their Pip '+foods[Math.floor(hashUnit(key+'y')*foods.length)%foods.length].name;icon='🍯';}
+      else if(r<.85&&evs.length){var ev=evs[Math.floor(hashUnit(key+'e')*evs.length)%evs.length];txt='joined '+ev.title;icon='🎟️';}
+      else{var o=folk[Math.floor(hashUnit(key+'o')*folk.length)%folk.length];
+        if(o.id===f.id)return;txt='sent a gift to '+o.name;icon='🎁';}
+      out.push({folk:f,text:txt,icon:icon,at:time});
+    });
+  }
+  out.sort(function(a,b){return b.at-a.at;});
+  return out.slice(0,n);
+}
+function feedRowHTML(r,place){
+  var mins=(Date.now()-r.at)/60000;
+  return '<div class="tfeed">'+pipSVG(folkLook(r.folk),'idle',30,{still:true,shadow:false})+
+    '<div class="tft">'+folkNameHTML(r.folk)+' '+esc(r.text)+' '+(r.icon||'')+
+    '<span class="tiny muted"> · '+agoWords(mins)+'</span></div>'+
+    (canGiveAt(place)?'<button class="btn btn-sm btn-ghost tgift" data-act="town-give" data-id="'+esc(r.folk.id)+'" data-place="'+esc(place)+'" title="Send '+esc(r.folk.name)+' a gift">🎁</button>':'')+
+    '</div>';
+}
+
+/* ---------- gifts from neighbours (items only) ---------- */
+function townPool(p){
+  var c=townCfg(),out=[];
+  foodList().forEach(function(f){
+    if(f.hidden)return;
+    if(c.poolFoods&&!c.poolFoods[f.id])return;
+    if(typeof foodOnMenu==='function'&&f.season&&!foodSeasonOpen(f))return;
+    out.push('food:'+f.id);
+  });
+  PIP_PARTS.forEach(function(pt){
+    if(!(pt.price>0)||pt.slot==='pet'||ownsPip(pt.id,p))return;
+    var tier=partTier(pt);
+    if(c.poolBasic&&!pt.season&&tier==='basic'&&pt.price<=20)out.push(pt.id);
+    else if(c.poolSeasonal&&pt.season&&pipInSeason(pt)&&tier!=='top')out.push(pt.id);
+  });
+  return out;
+}
+function itemName(item){
+  if(!item)return '';
+  if(item.indexOf('food:')===0){var f=foodById(item.slice(5));return f?f.name:'a treat';}
+  var pt=pipPart(item);return pt?pt.name:'a Pip item';
+}
+function itemIconHTML(item,size){
+  if(!item)return '';
+  if(item.indexOf('food:')===0)return foodIconHTML(foodById(item.slice(5)));
+  var pt=pipPart(item);if(!pt)return '🎁';
+  var pv={body:'sun'};pv[pt.slot]=pt.v;
+  return pipSVG(pv,'idle',size||34,{shadow:false,still:true});
+}
+function giveItem(p,item){
+  if(item.indexOf('food:')===0){giveFood(p,item.slice(5),1);return true;}
+  if(!pipPart(item))return false;
+  if(!Array.isArray(p.pipOwned))p.pipOwned=[];
+  if(p.pipOwned.indexOf(item)<0)p.pipOwned.push(item);
+  return true;
+}
+function townSentOf(p){return (p&&Array.isArray(p.townSent))?p.townSent:[];}
+function townGotOf(p){return (p&&Array.isArray(p.townGifts))?p.townGifts:[];}
+/* Parcels waiting at the door today: one daily surprise, plus thank-you
+   gifts from neighbours the reader gave something to on an earlier day. */
+function townParcels(p,now){
+  p=p||me();now=now||new Date();
+  var c=townCfg(),out=[];
+  if(!p||!c.on||!c.gifts)return out;
+  var day=todayKey(),got={};
+  townGotOf(p).forEach(function(g){got[g.key]=1;});
+  var pool=townPool(p);
+  if(!pool.length)return out;
+  var folk=townFolk();
+  var seed=p.id+':tg:'+day;
+  if(hashUnit(seed)*100<c.giftChance&&!got['d:'+day]&&folk.length){
+    var at=new Date(dayStart(now).getTime()+(7+hashUnit(seed+'#at')*12)*3600000);
+    if(now>=at){
+      var f=folk[Math.floor(hashUnit(seed+'#who')*folk.length)%folk.length];
+      out.push({key:'d:'+day,from:f,item:pool[Math.floor(hashUnit(seed+'#it')*pool.length)%pool.length],at:at,why:'surprise'});
+    }
+  }
+  if(c.thanks){
+    townSentOf(p).forEach(function(s){
+      if(out.length>=3||got['t:'+s.id]||s.day>=day)return;
+      if(dayDiff(new Date(),new Date(s.at))>7)return;
+      var f=folkById(s.to);
+      if(!f)return;
+      out.push({key:'t:'+s.id,from:f,item:pool[Math.floor(hashUnit(s.id+'#ty')*pool.length)%pool.length],
+        at:dayStart(now),why:'thanks'});
+    });
+  }
+  return out;
+}
+function claimParcel(key){
+  var p=me();if(!p)return;
+  var pc=townParcels(p).filter(function(x){return x.key===key;})[0];
+  if(!pc){toast('That parcel has gone.');render();return;}
+  giveItem(p,pc.item);
+  if(!Array.isArray(p.townGifts))p.townGifts=[];
+  p.townGifts.push({key:pc.key,day:todayKey(),from:pc.from.id,fromName:pc.from.name,item:pc.item,at:nowISO()});
+  if(p.townGifts.length>300)p.townGifts=p.townGifts.slice(-300);
+  save();
+  celebrate({kicker:pc.why==='thanks'?'A thank-you gift':'A parcel at the door',title:itemName(pc.item),
+    line:pc.from.name+(pc.why==='thanks'?' sent this to say thanks for your gift.':' left this for you.'),pose:'cheer',
+    prize:pc.item.indexOf('food:')===0?'In Pip’s pantry now':'Yours to wear'});
+  render();
+}
+
+/* ---------- a neighbour visiting Pip's room ---------- */
+function townVisitor(p,now){
+  p=p||me();now=now||new Date();
+  var c=townCfg();
+  if(!p||!c.on||!c.visitors)return null;
+  var folk=townFolk();
+  if(!folk.length)return null;
+  var slot=Math.floor(now.getTime()/(30*60000));
+  var seed=p.id+':v:'+slot;
+  if(hashUnit(seed)>=Math.min(.7,townBusy(now)*1.1))return null;
+  var f=folk[Math.floor(hashUnit(seed+'#w')*folk.length)%folk.length];
+  var lines=['came over to say hi','is admiring your bookshelf','brought their Pip to play','wants to see your trophies','dropped by after reading'];
+  return{folk:f,line:lines[Math.floor(hashUnit(seed+'#l')*lines.length)%lines.length],
+    until:new Date((slot+1)*30*60000)};
+}
+function roomTownHTML(p){
+  var h='';
+  var v=townVisitor(p);
+  if(v)h+='<div class="visitor" title="'+esc(v.folk.name)+' '+esc(v.line)+'">'+
+    pipSVG(folkLook(v.folk),'cheer',64,{shadow:false})+
+    '<div class="vtag">👋 <b>'+esc(v.folk.name)+'</b> '+esc(v.line)+' '+folkBadge()+
+    (canGiveAt('room')?' <button class="btn btn-sm" data-act="town-give" data-id="'+esc(v.folk.id)+'" data-place="room">🎁 Give a gift</button>':'')+
+    '</div></div>';
+  var ps=townParcels(p);
+  if(ps.length)h+='<div class="parcels">'+ps.map(function(pc){
+    return '<button class="parcel" data-act="town-parcel" data-id="'+esc(pc.key)+'" title="From '+esc(pc.from.name)+'">'+
+      '<span class="pfi">🎁</span><span class="pft">From '+esc(pc.from.name)+
+      (pc.why==='thanks'?' · thank you':' · '+agoWords((Date.now()-pc.at)/60000))+'</span></button>';
+  }).join('')+'</div>';
+  return h;
+}
+
+/* ---------- giving to neighbours ---------- */
+function canGiveAt(place){
+  var c=townCfg();
+  if(!c.on||!me())return false;
+  if(!c.giveFood&&!c.giveParts)return false;
+  return !!c.give[place];
+}
+function giftsToday(p){var d=todayKey();return townSentOf(p).filter(function(s){return s.day===d;});}
+function giveables(p){
+  var c=townCfg(),out=[];
+  if(c.giveFood){
+    var pan=pantryOf(p);
+    Object.keys(pan).forEach(function(id){
+      var f=foodById(id);
+      if(f&&pan[id]>0)out.push({item:'food:'+id,name:f.name,count:pan[id],kind:'food'});
+    });
+  }
+  if(c.giveParts){
+    ownedPip(p).forEach(function(id){
+      var pt=pipPart(id);
+      if(pt&&pt.price>0)out.push({item:id,name:pt.name,count:1,kind:'part',slot:pt.slot});
+    });
+  }
+  return out;
+}
+function townGiveModal(folkId,place){
+  var p=me(),f=folkById(folkId),c=townCfg();
+  if(!p||!f)return;
+  if(!canGiveAt(place)){toast('Gifts are switched off here.','bad');return;}
+  var today=giftsToday(p);
+  if(today.some(function(s){return s.to===f.id;})){toast('You already gave '+f.name+' something today.');return;}
+  if(today.length>=c.giveLimit){toast('That is '+c.giveLimit+' gifts today — the rest can wait for tomorrow.');return;}
+  var list=giveables(p);
+  var per=TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual;
+  var st=folkStatus(f);
+  var body='<div class="row" style="gap:14px;align-items:center">'+pipSVG(folkLook(f),'cheer',72,{still:true})+
+    '<div><h3>A gift for '+esc(f.name)+'</h3><div class="tiny">'+folkBadge()+' '+statusDot(st)+' '+esc(st.label)+
+    ' · '+esc(per.name)+' · likes '+esc(per.likes.map(function(k){return {book:'books',food:'treats',part:'Pip items'}[k];}).join(' and '))+'</div></div></div>'+
+    '<p class="tiny muted stack">Giving it away takes it out of your '+(c.giveParts?'pantry or wardrobe':'pantry')+'. '+
+    'Neighbours sometimes send a thank-you gift the next day.</p>';
+  if(!list.length)body+='<div class="empty stack"><p>Nothing to give yet. '+(c.giveFood?'Buy a treat in Pip’s room first.':'')+'</p></div>';
+  else body+='<div class="giftgrid stack">'+list.map(function(g){
+    var worn=g.kind==='part'&&pipLook(p)[g.slot]===pipPart(g.item).v;
+    return '<button type="button" class="giftpick" data-gitem="'+esc(g.item)+'">'+
+      '<span class="gi">'+itemIconHTML(g.item,40)+'</span><span class="gn">'+esc(g.name)+'</span>'+
+      '<span class="tiny muted">'+(g.kind==='food'?'×'+g.count:(worn?'wearing it':'Pip item'))+'</span></button>';
+  }).join('')+'</div>';
+  body+='<div class="foot"><button class="btn" data-close>Cancel</button></div>';
+  openModal(body,function(scrim){
+    scrim.addEventListener('click',function(e){
+      var b=e.target.closest('[data-gitem]');
+      if(!b)return;
+      var item=b.dataset.gitem;
+      closeModal();
+      confirmModal('Give '+itemName(item)+' to '+f.name+'?',
+        item.indexOf('food:')===0?'One comes out of your pantry.':'It leaves your wardrobe for good, and Pip takes it off if he is wearing it.',
+        'Give it',function(){townGive(f.id,item,place);});
+    });
+  });
+}
+function townGive(folkId,item,place){
+  var p=me(),f=folkById(folkId);
+  if(!p||!f)return;
+  if(item.indexOf('food:')===0){
+    var pan=pantryOf(p),id=item.slice(5);
+    if(!(pan[id]>0)){toast('None left to give.','bad');return;}
+    pan[id]--;
+  }else{
+    var pt=pipPart(item);
+    if(!pt||!ownsPip(item,p)||!(pt.price>0)){toast('You can’t give that.','bad');return;}
+    p.pipOwned=(p.pipOwned||[]).filter(function(x){return x!==item;});
+    if(p.pipLook&&p.pipLook[pt.slot]===pt.v)p.pipLook[pt.slot]=(pt.slot==='body'?'sun':(pt.slot==='eyes'?'dot':null));
+  }
+  if(!Array.isArray(p.townSent))p.townSent=[];
+  p.townSent.push({id:uid(),to:f.id,toName:f.name,item:item,itemName:itemName(item),place:place||'town',day:todayKey(),at:nowISO()});
+  if(p.townSent.length>300)p.townSent=p.townSent.slice(-300);
+  save();
+  var per=TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual;
+  var kind=item.indexOf('food:')===0?'food':'part';
+  var loved=per.likes.indexOf(kind)>=0;
+  celebrate({kicker:'Gift sent',title:f.name+(loved?' loved it!':' says thanks!'),
+    line:itemName(item)+' is on its way. '+friendHearts(p,f.id),pose:'cheer',prize:''});
+  render();
+}
+function friendLevel(p,fid){return Math.min(5,townSentOf(p).filter(function(s){return s.to===fid;}).length);}
+function friendHearts(p,fid){var n=friendLevel(p,fid);return n?'Friendship '+'♥'.repeat(n)+'♡'.repeat(5-n):'';}
+
+/* ---------- the Town page ---------- */
+var TOWN_FILTER='all';
+function viewTown(){
+  var p=me(),c=townCfg();
+  if(!c.on)return '<div class="empty"><h3>'+esc(c.label)+' is closed</h3><div class="stack"><button class="btn" data-go="catalog">Back to the catalogue</button></div></div>';
+  var folk=townFolk();
+  var now=new Date();
+  var rows=folk.map(function(f){return{f:f,st:folkStatus(f,now)};});
+  var online=rows.filter(function(r){return r.st.dot==='on';}).length;
+  var active=Math.round(c.size*Math.min(.95,townBusy(now)));
+  var h='<div class="pagehead"><div><h2>'+esc(c.label)+'</h2>'+
+    '<div class="sub">Your neighbours — characters who live in PipHub’s world</div></div>'+
+    '<div class="row"><div class="stat" style="min-width:120px"><div class="k">Around town now</div>'+
+    '<div class="v">'+Math.max(active,online)+'</div></div></div></div>';
+  var order={on:0,recent:1,off:2};
+  rows.sort(function(a,b){return (order[a.st.dot]-order[b.st.dot])||a.f.name.localeCompare(b.f.name);});
+  var filters=[['all','Everyone'],['on','Online'],['reading','Reading'],['store','In Store'],['friends','Friends']];
+  h+='<div class="seg stack">'+filters.map(function(x){
+    return '<button type="button" data-act="town-filter" data-id="'+x[0]+'" aria-pressed="'+(TOWN_FILTER===x[0])+'">'+x[1]+'</button>';
+  }).join('')+'</div>';
+  var shown=rows.filter(function(r){
+    if(TOWN_FILTER==='on')return r.st.dot==='on';
+    if(TOWN_FILTER==='reading')return r.st.kind==='reading'||r.st.kind==='quiz';
+    if(TOWN_FILTER==='store')return r.st.kind==='store';
+    if(TOWN_FILTER==='friends')return friendLevel(p,r.f.id)>0;
+    return true;
+  });
+  h+='<div class="towngrid stack">';
+  if(!shown.length)h+='<p class="tiny muted">Nobody here just now.</p>';
+  shown.forEach(function(r){
+    var f=r.f,st=r.st,per=TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual;
+    var pose=st.kind==='reading'||st.kind==='quiz'?'read':(st.dot==='off'?'sleep':(st.kind==='store'?'wait':'idle'));
+    var fl=friendLevel(p,f.id);
+    h+='<div class="folkcard'+(st.dot==='off'?' away':'')+'">'+
+      '<div class="fav">'+pipSVG(folkLook(f),pose,64,{still:true})+'</div>'+
+      '<div class="fmain"><div class="fname">'+esc(f.name)+'</div>'+folkBadge()+
+      (c.statuses?'<div class="fstat">'+statusDot(st)+esc(st.label)+(st.detail?'<span class="muted"> · '+esc(st.detail)+'</span>':'')+'</div>':'')+
+      '<div class="tiny muted">'+esc(per.name)+(fl?' · <span class="hearts">'+'♥'.repeat(fl)+'</span>':'')+'</div></div>'+
+      (canGiveAt('town')?'<button class="btn btn-sm" data-act="town-give" data-id="'+esc(f.id)+'" data-place="town">🎁 Gift</button>':'')+
+      '</div>';
+  });
+  h+='</div>';
+  var feed=townFeed(12,now);
+  if(feed.length)h+='<div class="panel stack"><h3 style="font-size:1rem">Around town</h3><div class="stack">'+
+    feed.map(function(r){return feedRowHTML(r,'town');}).join('')+'</div></div>';
+  var sent=townSentOf(p).slice(-5).reverse(),got=townGotOf(p).slice(-5).reverse();
+  if(sent.length||got.length){
+    h+='<div class="panel stack"><h3 style="font-size:1rem">Gifts</h3><div class="stack">'+
+      sent.map(function(s){return '<div class="receipt"><span class="pill cold">sent</span><div class="tiny" style="flex:1">'+esc(s.itemName||itemName(s.item))+' to <b>'+esc(s.toName)+'</b></div><span class="tiny muted">'+esc(dateShort(s.at))+'</span></div>';}).join('')+
+      got.map(function(g){return '<div class="receipt"><span class="pill good">got</span><div class="tiny" style="flex:1">'+esc(itemName(g.item))+' from <b>'+esc(g.fromName)+'</b></div><span class="tiny muted">'+esc(dateShort(g.at))+'</span></div>';}).join('')+
+      '</div></div>';
+  }
+  h+='<p class="tiny muted stack">'+esc(c.label)+' neighbours are part of PipHub’s world. Gifts you give them are items only, and so are gifts they send you.</p>';
+  return h;
+}
+
+/* =========================================================
+   Community-driven group goals.
+
+   The instructor programs how far the town alone gets by the
+   end of the round, the shape of the climb, and how often it
+   moves (hourly, daily, weekly, monthly). Real readers add on
+   top, so the result is a real finish or a real miss.
+   ========================================================= */
+var TOWN_PACES={steady:'Steady',slowstart:'Slow start, strong finish',laterush:'Late rush',faststart:'Fast start, then slows',bursty:'In bursts'};
+var TOWN_STEPS={hour:'Every hour',day:'Every day',week:'Every week',month:'Every month'};
+function goalTownCfg(ev){
+  var t=(ev.goal&&ev.goal.town)||{};
+  return{on:t.on===true,finish:clampN(num(t.finish,90),0,300),
+    pace:TOWN_PACES[t.pace]?t.pace:'steady',step:TOWN_STEPS[t.step]?t.step:'day',
+    days:clampN(Math.round(num(t.days,14)),1,366)};
+}
+function townPaceCurve(pace,f,seed){
+  f=clampN(f,0,1);
+  if(pace==='slowstart')return f*f;
+  if(pace==='laterush')return Math.pow(f,3);
+  if(pace==='faststart')return 1-(1-f)*(1-f);
+  if(pace==='bursty'){
+    var n=20,tot=0,acc=0,i,w=[];
+    for(i=0;i<n;i++){w[i]=Math.pow(hashUnit(seed+'#burst'+i),2.2)+.02;tot+=w[i];}
+    var x=f*n;
+    for(i=0;i<n;i++){
+      if(x>=i+1)acc+=w[i];
+      else if(x>i)acc+=w[i]*(x-i);
+    }
+    return acc/tot;
+  }
+  return f;
+}
+function quantizeTime(t,step){
+  if(step==='hour')return new Date(Math.floor(t.getTime()/3600000)*3600000);
+  if(step==='week')return startOfWeek(t);
+  if(step==='month')return new Date(t.getFullYear(),t.getMonth(),1);
+  return dayStart(t);
+}
+function townGoalSpan(ev,now){
+  var g=goalTownCfg(ev);
+  var rd=eventRound(ev,now);
+  var start=roundStartOf(ev,rd);
+  if(!(start instanceof Date)||isNaN(start))start=dayStart(new Date(ev.created||Date.now()));
+  var end=rd.end||addDays(start,g.days);
+  return{start:start,end:end,key:rd.key,repeats:!!rd.resets};
+}
+function townGoalAt(ev,t,span){
+  var g=goalTownCfg(ev),target=goalCfg(ev).target;
+  var q=quantizeTime(t,g.step);
+  if(q<span.start)q=span.start;
+  var f=(q-span.start)/Math.max(1,(span.end-span.start));
+  var v=target*g.finish/100*townPaceCurve(g.pace,f,ev.id+span.key);
+  return target>=20?Math.floor(v):Math.floor(v*10)/10;
+}
+function townGoal(ev,now){
+  now=now||new Date();
+  var g=goalTownCfg(ev);
+  if(!g.on||!townOn()||ev.kind!=='goal')return{on:false,total:0,helpers:0};
+  var span=townGoalSpan(ev,now);
+  var total=townGoalAt(ev,now<span.end?now:new Date(span.end.getTime()-1),span);
+  var target=goalCfg(ev).target;
+  var crowd=Math.max(3,Math.round(townCfg().size*.3*Math.min(1,g.finish/100)));
+  var helpers=total>0?Math.max(1,Math.round(crowd*Math.min(1,total/Math.max(1,target*g.finish/100)))):0;
+  return{on:true,total:total,helpers:helpers,span:span,ended:!span.repeats&&now>=span.end,
+    final:townGoalAt(ev,new Date(span.end.getTime()-1),span),cfg:g};
+}
+/* Who in town added what, working back through the steps. */
+function townGoalFeed(ev,n,now){
+  now=now||new Date();
+  var tg=townGoal(ev,now);
+  if(!tg.on)return [];
+  var g=tg.cfg,span=tg.span,folk=townFolk(),out=[];
+  if(!folk.length)return out;
+  var stepMs={hour:3600000,day:864e5,week:7*864e5,month:30*864e5}[g.step];
+  var t=quantizeTime(now,g.step);
+  for(var i=0;i<24&&out.length<n;i++){
+    var prevT=new Date(t.getTime()-stepMs);
+    if(t<span.start)break;
+    var d=townGoalAt(ev,t,span)-townGoalAt(ev,prevT<span.start?span.start:prevT,span);
+    if(d>0){
+      var k=Math.min(4,1+Math.floor(hashUnit(ev.id+':'+t.getTime())*4));
+      var left=d;
+      for(var j=0;j<k&&out.length<n;j++){
+        var part=j===k-1?left:Math.max(1,Math.round(d/k*(.6+hashUnit(ev.id+':'+t.getTime()+':'+j)*.8)));
+        part=Math.min(part,left);left-=part;
+        if(part<=0)break;
+        var f=folk[Math.floor(hashUnit(ev.id+':w:'+t.getTime()+':'+j)*folk.length)%folk.length];
+        var at=t.getTime()-hashUnit(ev.id+':at:'+t.getTime()+':'+j)*Math.min(stepMs,3*3600000);
+        out.push({folk:f,text:'added '+String(Math.round(part*10)/10)+' '+(goalUnit(ev)||''),icon:'➕',at:Math.min(at,now.getTime())});
+      }
+    }
+    t=prevT;
+  }
+  return out.sort(function(a,b){return b.at-a.at;}).slice(0,n);
+}
+/* Neighbours joining any other event. */
+var TOWN_VERBS={photo:'sent in a picture',text:'sent in their writing',count:'reported their number',
+  checkin:'marked it done',steps:'ticked off a step',calendar:'opened today’s door',goal:'added to the goal'};
+function townEventFeed(ev,n,now){
+  now=now||new Date();
+  if(ev.kind==='goal'&&goalTownCfg(ev).on)return townGoalFeed(ev,n,now);
+  if(!(ev.town&&ev.town.join)||!townOn())return [];
+  var folk=townFolk(),out=[];
+  var slot=Math.floor(now.getTime()/(20*60000));
+  for(var j=0;j<72&&out.length<n;j++){
+    var sl=slot-j;
+    folk.forEach(function(f){
+      if(out.length>=n*2)return;
+      var key=ev.id+'|'+f.id+'|'+sl;
+      if(hashUnit(key)>=Math.min(.5,townBusy(new Date(sl*20*60000),f)*.2))return;
+      var at=sl*20*60000+hashUnit(key+'t')*20*60000;
+      if(at>now.getTime())return;
+      out.push({folk:f,text:TOWN_VERBS[ev.kind]||'joined in',icon:'🎟️',at:at});
+    });
+  }
+  return out.sort(function(a,b){return b.at-a.at;}).slice(0,n);
+}
+function townJoinCount(ev,now){
+  var f=townEventFeed(ev,40,now),seen={};
+  f.forEach(function(r){seen[r.folk.id]=1;});
+  var named=Object.keys(seen).length;
+  return named?Math.round(named*townCfg().size/Math.max(1,townFolk().length)*.25)+named:0;
+}
+function eventTownHTML(ev,n,place){
+  if(!townOn())return '';
+  var rows=townEventFeed(ev,n||3);
+  if(!rows.length)return '';
+  return '<div class="evtown"><div class="tiny muted">'+esc(townCfg().label)+' activity</div>'+
+    rows.map(function(r){return feedRowHTML(r,place||'events');}).join('')+'</div>';
+}
+
+/* ---------- town-wide banners ---------- */
+var BANNER_SHUT={};
+function siteBannersHTML(){
+  var p=me();
+  if(!p||!townOn())return '';
+  var h='';
+  eventList().forEach(function(ev){
+    if(!(ev.town&&ev.town.sitewide)||ev.hidden||BANNER_SHUT[ev.id])return;
+    if(!assignedTo(ev,p)||!eventOpen(ev).open)return;
+    var th=eventTheme(ev)||{a:'#F4C542',b:'#1163F0',ink:'#fff'};
+    var line='';
+    if(ev.kind==='goal'){
+      var gp=goalProgress(ev);
+      line='<span class="sbbar"><span style="width:'+gp.pct+'%"></span></span><span class="sbnum">'+gp.pct+'%</span>'+
+        '<span class="sbsub">'+(gp.reached?'Reached!':(gp.townHelpers?gp.townHelpers+' neighbours and '+gp.realHelpers+' of you helping':gp.helpers+' helping'))+'</span>';
+    }else{
+      var n=townJoinCount(ev);
+      line='<span class="sbsub">'+(n?n+' in '+esc(townCfg().label)+' have joined':'Everyone’s invited')+'</span>';
+    }
+    h+='<div class="sitebanner" style="--tha:'+th.a+';--thb:'+th.b+';--thi:'+(th.ink||'#fff')+'">'+
+      '<span class="sbtitle">'+esc((th.motif&&th.motif[0])||'🎉')+' '+esc(ev.title)+'</span>'+line+
+      '<button class="btn btn-sm" data-go="events">Join in</button>'+
+      '<button class="sbx" data-act="banner-shut" data-id="'+esc(ev.id)+'" aria-label="Hide for now">&times;</button></div>';
+  });
+  return h;
+}
+
+/* ---------- instructor settings ---------- */
+function sh4(t){return '<h4 style="font-size:.95rem;color:var(--text-hi);margin:16px 0 4px">'+t+'</h4>';}
+function townSettingsHTML(){
+  var c=townCfg();
+  var cb=function(id,on,label){return '<label class="check"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'><span>'+label+'</span></label>';};
+  var h='<div class="panel"><h3>Community ('+esc(c.label)+')</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Simulated neighbours with Pip looks and live statuses. They read, shop, join events, '+
+    'help with community goals and swap gifts (items only). Everything they do is worked out from the clock, so it holds still on reload. '+
+    'Neighbours always carry a "'+esc(c.label)+'" badge.</p>'+
+    '<div class="stack">'+cb('tw-on',c.on,'Switch the town on (adds a Town tab)')+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:160px"><span>Town name</span><input class="inp" id="tw-label" maxlength="24" value="'+esc(c.label)+'"></label>'+
+      '<label class="field" style="flex:1;min-width:160px"><span>How busy</span><select class="inp" id="tw-int">'+Object.keys(TOWN_INTENSITY).map(function(k){
+        return '<option value="'+k+'"'+(c.intensity===k?' selected':'')+'>'+TOWN_INTENSITY[k].name+'</option>';}).join('')+'</select></label>'+
+      '<label class="field" style="flex:1;min-width:160px"><span>Town size (for "N reading" counts)</span><input class="inp" id="tw-size" type="number" min="10" max="5000" value="'+c.size+'"></label>'+
+    '</div>'+
+    sh4('What readers see')+
+    cb('tw-stat',c.statuses,'Statuses: Online, Recently active, Offline, Reading, In Store')+
+    cb('tw-read',c.readers,'"N reading this / taking the quiz" on titles')+
+    cb('tw-feed',c.feed,'Town activity feed')+
+    cb('tw-vis',c.visitors,'Neighbours visit Pip’s room')+
+    sh4('Gifts from neighbours (items only)')+
+    cb('tw-gifts',c.gifts,'Neighbours leave parcels at Pip’s door')+
+    '<label class="field" style="max-width:260px"><span>Daily chance of a parcel (%)</span><input class="inp" id="tw-gch" type="number" min="0" max="100" value="'+c.giftChance+'"></label>'+
+    cb('tw-thanks',c.thanks,'Neighbours send a thank-you gift the day after a reader gives them something')+
+    cb('tw-pbasic',c.poolBasic,'Parcels can hold cheap everyday Pip items')+
+    cb('tw-pseas',c.poolSeasonal,'Parcels can hold in-season Pip items (never top tier)')+
+    '<div class="tiny muted" style="margin-top:6px">Foods parcels can hold</div><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">'+
+      foodList().map(function(f){
+        var on=!c.poolFoods||c.poolFoods[f.id];
+        return '<label class="check" style="margin:0"><input type="checkbox" data-twfood="'+esc(f.id)+'"'+(on?' checked':'')+'><span>'+esc(f.name)+'</span></label>';
+      }).join('')+'</div>'+
+    sh4('Readers giving gifts')+
+    '<div class="row" style="gap:14px;flex-wrap:wrap">'+cb('tw-gtown',c.give.town,'On the Town page')+cb('tw-gev',c.give.events,'In event activity')+cb('tw-groom',c.give.room,'To room visitors')+'</div>'+
+    '<div class="row" style="gap:14px;flex-wrap:wrap">'+cb('tw-gfood',c.giveFood,'Food from the pantry')+cb('tw-gparts',c.giveParts,'Pip items they own (they lose them)')+'</div>'+
+    '<label class="field" style="max-width:260px"><span>Most gifts a reader can give a day</span><input class="inp" id="tw-glim" type="number" min="1" max="20" value="'+c.giveLimit+'"></label>'+
+    '<button class="btn btn-primary" data-act="town-save">Save community settings</button></div>'+
+    '<div class="divider"></div>'+sh4('Neighbours')+
+    '<div class="scroll stack"><table><thead><tr><th>Neighbour</th><th>Type</th><th>Right now</th><th></th></tr></thead><tbody>';
+  TOWN_FOLK.concat(c.custom).forEach(function(f){
+    var gone=!!c.removed[f.id];
+    var st=folkStatus(f);
+    h+='<tr'+(gone?' style="opacity:.5"':'')+'><td><div class="row" style="gap:8px">'+pipSVG(folkLook(f),'idle',28,{still:true,shadow:false})+esc(f.name)+'</div></td>'+
+      '<td class="tiny">'+esc((TOWN_PERSONA[f.persona]||TOWN_PERSONA.casual).name)+(f.custom?' · yours':'')+'</td>'+
+      '<td class="tiny">'+(gone?'moved away':statusDot(st)+esc(st.label))+'</td>'+
+      '<td style="text-align:right">'+(f.custom
+        ?'<button class="btn btn-sm btn-danger" data-act="town-folk-del" data-id="'+esc(f.id)+'">Remove</button>'
+        :'<button class="btn btn-sm btn-ghost" data-act="town-folk-toggle" data-id="'+esc(f.id)+'">'+(gone?'Bring back':'Move away')+'</button>')+'</td></tr>';
+  });
+  h+='</tbody></table></div>'+
+    '<div class="row stack" style="gap:8px;flex-wrap:wrap;align-items:flex-end">'+
+    '<label class="field" style="flex:1;min-width:160px"><span>New neighbour’s name</span><input class="inp" id="tw-nname" maxlength="24" placeholder="Priya_K"></label>'+
+    '<label class="field" style="min-width:140px"><span>Type</span><select class="inp" id="tw-nper">'+Object.keys(TOWN_PERSONA).map(function(k){
+      return '<option value="'+k+'">'+TOWN_PERSONA[k].name+'</option>';}).join('')+'</select></label>'+
+    '<button class="btn" data-act="town-folk-add">'+ico('plus')+'Add</button></div></div>';
+  return h;
+}
+function townStore(){
+  var t=S.settings.town;
+  if(!t||typeof t!=='object'){t={};S.settings.town=t;}
+  return t;
+}
+function saveTownSettings(){
+  var t=townStore();
+  var ck=function(id){var el=$('#'+id);return el?el.checked:null;};
+  var vl=function(id){var el=$('#'+id);return el?el.value:null;};
+  t.on=ck('tw-on');t.label=(vl('tw-label')||'Pip Town').trim()||'Pip Town';t.intensity=vl('tw-int');
+  t.size=clampN(num(vl('tw-size'),140),10,5000);
+  t.statuses=ck('tw-stat');t.readers=ck('tw-read');t.feed=ck('tw-feed');t.visitors=ck('tw-vis');
+  t.gifts=ck('tw-gifts');t.giftChance=clampN(num(vl('tw-gch'),35),0,100);t.thanks=ck('tw-thanks');
+  t.poolBasic=ck('tw-pbasic');t.poolSeasonal=ck('tw-pseas');
+  var pf={};$$('[data-twfood]').forEach(function(el){if(el.checked)pf[el.dataset.twfood]=1;});
+  t.poolFoods=pf;
+  t.give={town:ck('tw-gtown'),events:ck('tw-gev'),room:ck('tw-groom')};
+  t.giveFood=ck('tw-gfood');t.giveParts=ck('tw-gparts');
+  t.giveLimit=clampN(num(vl('tw-glim'),3),1,20);
+  save();toast('Community settings saved.','good');render();
+}
+function townFolkToggle(id){
+  var t=townStore();
+  if(!t.removed)t.removed={};
+  if(t.removed[id])delete t.removed[id];else t.removed[id]=1;
+  save();render();
+}
+function townFolkAdd(){
+  var name=(($('#tw-nname')||{}).value||'').trim();
+  if(!name){toast('Give the neighbour a name.','bad');return;}
+  if(TOWN_FOLK.concat(townCfg().custom).some(function(f){return f.name.toLowerCase()===name.toLowerCase();})){toast('That name is taken.','bad');return;}
+  var t=townStore();
+  if(!Array.isArray(t.custom))t.custom=[];
+  t.custom.push({id:'tf-'+uid(),name:name,persona:($('#tw-nper')||{}).value||'casual',custom:true});
+  save();toast(name+' moved in.','good');render();
+}
+function townFolkDel(id){
+  var t=townStore();
+  t.custom=(t.custom||[]).filter(function(f){return f.id!==id;});
+  save();render();
 }
 
 /* ---------- Pip in every zone ---------- */
@@ -11069,7 +12066,8 @@ setInterval(function(){
    }
    A look with no entry in `looks` keeps the powers it shipped with.
    ========================================================= */
-var POWER_KINDS=['boost','discount','payback'];
+var POWER_KINDS=['boost','discount','payback','foodtime','findluck','bonusluck'];
+var POWER_KINDS_BUILTIN=POWER_KINDS.slice();
 function ppCfg(){
   var c=S.settings.pipPowers;
   if(!c||typeof c!=='object'){c={};S.settings.pipPowers=c;}
@@ -11077,6 +12075,7 @@ function ppCfg(){
   if(!c.looks)c.looks={};
   if(!Array.isArray(c.library))c.library=[];
   if(!c.deleted)c.deleted={};
+  if(!Array.isArray(c.custom))c.custom=[];
   return c;
 }
 function powerKindCfg(k){
@@ -11520,6 +12519,7 @@ function powerPanelsHTML(){
       '<td class="n">'+n+'</td></tr>';
   });
   h+='</tbody></table></div><button class="btn btn-primary stack" data-act="pk-save">Save categories</button></div>';
+  h+=customPowersPanelHTML();
 
   var lib=powerLibrary();
   h+='<div class="panel"><div class="row" style="justify-content:space-between"><h3>Seasonal abilities</h3>'+
@@ -11543,6 +12543,95 @@ function powerPanelsHTML(){
     h+='</div>';
   }
   return h+'</div>';
+}
+/* ---------- instructor-made powers ---------- */
+function customPowersPanelHTML(){
+  var list=customPowers();
+  var h='<div class="panel"><div class="row" style="justify-content:space-between"><h3>Your own powers</h3>'+
+    '<button class="btn btn-sm btn-primary" data-act="cp-new">'+ico('plus')+'New power</button></div>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Create a new kind of power from any capability and choose where it applies, '+
+    'such as "+N% on quiz points" or "N% off Pip cosmetics". It then appears in "Edit powers", seasonal abilities and the categories table. '+
+    'It adds to the shipped power of the same capability; each kind has its own cap.</p>'+
+    '<div class="scroll stack"><table><thead><tr><th>Capability</th><th>Where it applies</th><th>Kind</th></tr></thead><tbody>';
+  Object.keys(POWER_EFFECTS).forEach(function(e){
+    var ef=POWER_EFFECTS[e];
+    h+='<tr><td><b>'+esc(ef.name)+'</b></td><td class="tiny muted">'+esc(ef.scopes.map(function(x){return x[1];}).join(' · '))+'</td>'+
+      '<td class="tiny">'+(['foodtime','findluck','bonusluck'].indexOf(e)>=0?'<span class="pill good">new</span>':'shipped')+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(!list.length)h+='<p class="tiny muted stack">No powers of your own yet.</p>';
+  else{
+    h+='<div class="stack">';
+    list.forEach(function(c){
+      var n=PIP_LOOKS.filter(function(l){
+        return lookPowers(l).some(function(a){return a.kind===c.id;})||
+          lookSeasonals(l).some(function(s){return cleanPowers(s.lib.powers).some(function(a){return a.kind===c.id;});});
+      }).length;
+      h+='<div class="receipt"><span class="pill warm" style="min-width:74px;text-align:center">'+esc(POWER_EFFECTS[c.effect]?POWER_EFFECTS[c.effect].name:'?')+'</span>'+
+        '<div style="flex:1;min-width:0"><div class="tiny"><b>'+esc(c.name)+'</b></div>'+
+        '<div class="tiny muted">'+esc(PIP_ABILITIES[c.id]?PIP_ABILITIES[c.id].blurb('N'):'')+' · on '+n+' look'+(n===1?'':'s')+'</div></div>'+
+        '<div class="row" style="gap:6px"><button class="btn btn-sm btn-ghost" data-act="cp-edit" data-id="'+esc(c.id)+'">Edit</button>'+
+        '<button class="btn btn-sm btn-danger" data-act="cp-del" data-id="'+esc(c.id)+'">Delete</button></div></div>';
+    });
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+function customPowerEditor(id){
+  var list=ppCfg().custom;
+  var ex=null;list.forEach(function(c){if(c.id===id)ex=c;});
+  var d=ex?JSON.parse(JSON.stringify(ex)):{id:'cp-'+uid(),name:'',effect:'boost',scope:'quiz'};
+  function body(){
+    var ef=POWER_EFFECTS[d.effect];
+    if(!ef.scopes.some(function(x){return x[0]===d.scope;}))d.scope=ef.scopes[0][0];
+    var preview=customPowerBlurb(d)(5);
+    return '<h3>'+(ex?'Edit power':'New power')+'</h3>'+
+      '<p class="lede">A new kind of power. Give it to looks with "Edit powers", or put it in a seasonal ability.</p>'+
+      '<label class="field"><span>Name</span><input class="inp" id="cp-name" data-focus maxlength="32" value="'+esc(d.name)+'" placeholder="Bookworm focus"></label>'+
+      '<label class="field"><span>Capability</span><select class="inp" id="cp-effect">'+Object.keys(POWER_EFFECTS).map(function(k){
+        return '<option value="'+k+'"'+(d.effect===k?' selected':'')+'>'+esc(POWER_EFFECTS[k].name)+'</option>';}).join('')+'</select></label>'+
+      '<label class="field"><span>Where it applies</span><select class="inp" id="cp-scope"'+(ef.scopes.length<2?' disabled':'')+'>'+ef.scopes.map(function(x){
+        return '<option value="'+x[0]+'"'+(d.scope===x[0]?' selected':'')+'>'+esc(x[1])+'</option>';}).join('')+'</select></label>'+
+      '<p class="tiny" style="color:var(--gold-hi)">At 5%: '+esc(preview)+'</p>'+
+      (ex?'<p class="tiny muted">Changing the capability changes what every look with this power does.</p>':'')+
+      '<div class="err" id="cp-err"></div>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="cp-save">'+(ex?'Save':'Create')+'</button></div>';
+  }
+  function grab(scrim){
+    d.name=scrim.querySelector('#cp-name').value.trim();
+    d.effect=scrim.querySelector('#cp-effect').value;
+    var sc=scrim.querySelector('#cp-scope');if(sc&&!sc.disabled)d.scope=sc.value;
+  }
+  function mount(scrim){
+    scrim.addEventListener('change',function(e){
+      if(e.target.matches('#cp-effect,#cp-scope')){grab(scrim);redrawModal(body(),mount);}
+    });
+    scrim.querySelector('#cp-save').addEventListener('click',function(){
+      grab(scrim);
+      var err=scrim.querySelector('#cp-err');
+      if(!d.name){err.textContent='Give the power a name.';return;}
+      var taken=POWER_KINDS.some(function(k){return k!==d.id&&PIP_ABILITIES[k].name.toLowerCase()===d.name.toLowerCase();});
+      if(taken){err.textContent='A power already has that name.';return;}
+      var c=ppCfg();
+      c.custom=c.custom.filter(function(x){return x.id!==d.id;}).concat([d]);
+      save();applyPowerKinds();closeModal();toast('"'+d.name+'" saved.','good');render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+function deleteCustomPower(id){
+  var c=ppCfg(),ex=null;
+  c.custom.forEach(function(x){if(x.id===id)ex=x;});
+  if(!ex)return;
+  confirmModal('Delete "'+ex.name+'"?','It is taken off every look and seasonal ability straight away.','Delete',function(){
+    c.custom=c.custom.filter(function(x){return x.id!==id;});
+    Object.keys(c.looks).forEach(function(k){
+      c.looks[k].base=(c.looks[k].base||[]).filter(function(a){return a.kind!==id;});
+    });
+    c.library.forEach(function(l){l.powers=(l.powers||[]).filter(function(a){return a.kind!==id;});});
+    delete c.kinds[id];
+    save();applyPowerKinds();toast('"'+ex.name+'" deleted.');render();
+  },true);
 }
 function savePowerKinds(){
   var c=ppCfg();
@@ -11583,13 +12672,14 @@ function bonusFor(thing,p){
   if(!p||!thing)return null;
   var cfg=bonusCfg(thing);
   if(!cfg.on||!cfg.chance||!cfg.pool.length)return null;
+  var chance=Math.min(100,cfg.chance+powerTotal('bonusluck',p));
   var eligible=cfg.pool.filter(function(id){
     if(id.indexOf('food:')===0)return !!foodById(id.slice(5));
     return pipPart(id)&&!ownsPip(id,p);
   });
   if(!eligible.length)return null;
   var seed=thing.id+':'+p.id+':'+todayKey();
-  if(hashUnit(seed)*100>=cfg.chance)return null;
+  if(hashUnit(seed)*100>=chance)return null;
   var pick=Math.floor(hashUnit(seed+'#pick')*eligible.length);
   var id=eligible[Math.min(pick,eligible.length-1)];
   if(id.indexOf('food:')===0){
