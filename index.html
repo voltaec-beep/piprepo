@@ -661,6 +661,21 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .sitebanner .sbnum{font-weight:700;font-variant-numeric:tabular-nums}
 .sitebanner .sbsub{font-size:.78rem;opacity:.92}
 .sitebanner .sbx{border:0;background:transparent;color:inherit;font-size:1.2rem;cursor:pointer;padding:0 4px}
+.tag.noown{border-color:var(--fail);color:var(--fail)}
+.ownline{padding:8px 12px;border-radius:10px;border:1px dashed var(--fail);color:var(--fail);font-size:.86rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ownline.on{border-color:var(--pass);color:var(--pass)}
+.ownbtn{border:1px solid var(--edge-soft);background:var(--sunk);color:var(--text-2);border-radius:999px;padding:4px 10px;font-size:.74rem;cursor:pointer;white-space:nowrap}
+.ownbtn.on{border-color:var(--pass);background:var(--pass-faint);color:var(--pass-ink)}
+.owntable th .btn{padding:1px 6px;font-size:.66rem;margin-top:3px}
+.connchip{margin-top:8px;padding:6px 10px;border-radius:10px;background:var(--gold-faint);border:1px solid var(--gold-soft);font-size:.78rem;color:var(--text-2)}
+.linkbtn{border:0;background:none;padding:0;color:var(--gold-hi);text-decoration:underline;cursor:pointer;font:inherit}
+.abilnote.earn{color:var(--gold-hi)}
+.sitebanner .sbjoined{font-size:.78rem;font-weight:700}
+.evended{margin-top:22px}
+.evended>summary{cursor:pointer;font-weight:700;color:var(--text-2);padding:10px 12px;border-radius:10px;background:var(--sunk);border:1px solid var(--edge-soft);list-style:none;display:flex;gap:8px;align-items:center}
+.evended>summary::before{content:'▸';transition:transform .2s}
+.evended[open]>summary::before{transform:rotate(90deg)}
+.evended .evcard{opacity:.8}
 /* collapsible settings panels */
 .panel.fold>.phead{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
 .panel.fold>.phead>.pgrow{flex:1;min-width:0}
@@ -2271,6 +2286,9 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 .bpick.t-look{border-color:rgba(46,140,255,.30)}
 .bpick.t-top{border-color:var(--gold-soft);background:linear-gradient(var(--raise),var(--sunk))}
 .bpick.t-top.on{box-shadow:0 0 0 1px var(--gold),0 0 16px -8px var(--gold)}
+.bpick.bpl .pip{width:52px;height:52px}
+.bonusstrip.look.top{background:linear-gradient(90deg,var(--gold-faint),transparent);box-shadow:inset 0 0 0 1px var(--gold-soft)}
+.bonusstrip.look .bpv .pip{width:44px;height:44px}
 
 .poolsum{
   display:flex;flex-wrap:wrap;gap:6px;align-items:center;
@@ -2453,6 +2471,13 @@ function load(){
   applyPowerKinds();
   migratePowers();
   applySeasons();
+  if(!S.settings.booksMigrated){
+    S.profiles.forEach(function(p){
+      if(!p.books)p.books={};
+      S.modules.forEach(function(m){p.books[m.id]=true;});
+    });
+    S.settings.booksMigrated=true;
+  }
   if(S.active&&!profile(S.active))S.active=null;
 }
 function migrate(){
@@ -3345,9 +3370,15 @@ function earnedTotal(list){
   Object.keys(b).forEach(function(k){s+=b[k].points;});
   return s;
 }
-function requestStart(id,chId){
+function requestStart(id,chId,skipGate){
   var m=byId(id);if(!m)return;
   if(!me()){go('gate');return;}
+  if(!ownsBook(m)){
+    confirmModal('You don’t have this book yet','"'+m.title+'" is marked Not yet owned. Once your instructor marks that you have the book, its quiz unlocks.',
+      S.admin?'Mark as owned':'OK',function(){if(S.admin)setOwnsBook(me().id,m.id,true);});
+    return;
+  }
+  if(!skipGate)return connectedGate({type:'quiz',moduleId:m.id},function(){requestStart(id,chId,true);});
   var paper=paperOf(m,chId||null);
   if(chId){
     var ch=chapterById(m,chId);
@@ -3363,6 +3394,48 @@ var BUILTIN_AVATARS=[{"name": "Owl", "uri": "data:image/svg+xml;charset=utf-8,%3
 /* =========================================================
    Views
    ========================================================= */
+/* ---------- books a reader actually has ----------
+   p.books = {moduleId:true}. A title not marked is "Not yet owned": its
+   quiz shows but cannot start. Titles already installed when this arrived
+   were marked owned for existing readers once; anything added later starts
+   as Not yet owned. */
+function booksCfg(){var b=S.settings.books||{};return{on:b.on!==false};}
+function ownsBook(m,p){
+  p=p||me();
+  if(!booksCfg().on||!p||!m)return true;
+  return !!(p.books&&p.books[m.id||m]);
+}
+function setOwnsBook(pid,mid,on){
+  var p=profile(pid);if(!p)return;
+  if(!p.books)p.books={};
+  if(on)p.books[mid]=true;else delete p.books[mid];
+  save();render();
+}
+function bookOwnChip(m,p){
+  if(!booksCfg().on)return '';
+  return ownsBook(m,p)?'':'<span class="tag noown">📕 Not yet owned</span>';
+}
+function bookOwnPanel(){
+  var c=booksCfg();
+  var readers=S.profiles;
+  var h='<div class="panel stack-lg"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h3>Books each reader owns</h3>'+
+    '<label class="check" style="margin:0"><input type="checkbox" id="bk-on"'+(c.on?' checked':'')+' data-act="books-toggle"><span>Only allow quizzes for books a reader owns</span></label></div>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Tap to switch between <b>Owns book</b> and <b>Not yet owned</b>. '+
+    'A quiz for a book the reader doesn’t own yet is still shown, but can’t be started. New titles start as Not yet owned for everyone.</p>';
+  if(!readers.length||!S.modules.length)return h+'<p class="tiny muted">Add a reader and a title first.</p></div>';
+  h+='<div class="scroll stack"><table class="owntable"><thead><tr><th>Title</th>'+readers.map(function(p){
+    return '<th class="n">'+esc(p.name)+'<div><button class="btn btn-sm btn-ghost" data-act="books-all" data-id="'+esc(p.id)+'">All</button>'+
+      '<button class="btn btn-sm btn-ghost" data-act="books-none" data-id="'+esc(p.id)+'">None</button></div></th>';
+  }).join('')+'</tr></thead><tbody>';
+  S.modules.slice().sort(function(a,b){return a.title.localeCompare(b.title);}).forEach(function(m){
+    h+='<tr><td>'+esc(m.title)+'<div class="tiny muted">'+esc(m.author||'')+'</div></td>'+readers.map(function(p){
+      var on=!!(p.books&&p.books[m.id]);
+      return '<td class="n"><button class="ownbtn'+(on?' on':'')+'" data-act="book-own" data-id="'+esc(m.id)+'" data-pid="'+esc(p.id)+'" data-on="'+(on?'0':'1')+'">'+
+        (on?'✓ Owns book':'Not yet owned')+'</button></td>';
+    }).join('')+'</tr>';
+  });
+  return h+'</tbody></table></div></div>';
+}
 function bookLine(m){
   var b=[];
   if(m.author)b.push(esc(m.author));
@@ -3475,6 +3548,7 @@ function viewCatalog(){
     else tags+='<span class="tag">'+(m.quiz.ask||m.questions.length)+' questions</span>';
     if(best)tags+='<span class="tag '+(best.passed?'pass':'fail')+'">'+
       (best.passed?'Passed at '+best.pct+'%':'Best '+best.pct+'%')+'</span>';
+    tags+=bookOwnChip(m);
     tags+=townReadersTag(m);
     h+='<button class="bookcard" data-act="open" data-id="'+esc(m.id)+'" data-st="'+st+'">'+
       '<span class="spine"></span><span class="in">'+
@@ -3568,6 +3642,8 @@ function paperRow(m,paper,locked){
     '</span></span>'+
     (locked
       ? '<span class="pill cold">Locked</span>'
+      : !ownsBook(m)
+      ? '<button class="btn btn-sm btn-ghost" disabled title="Not yet owned">📕 Not yet owned</button>'
       : '<button class="btn btn-sm'+(state==='passed'?'':' btn-primary')+
         '" data-act="begin" data-id="'+esc(m.id)+'"'+
         (paper.id?' data-ch="'+esc(paper.id)+'"':'')+'>'+
@@ -3600,6 +3676,13 @@ function viewTitle(){
         '<div style="font-family:var(--serif);font-size:1.3rem" class="tnum">'+esc(f[1])+'</div></div>';
     }).join('')+'</div>';
 
+  if(booksCfg().on){
+    var own=ownsBook(m);
+    h+='<div class="ownline stack'+(own?' on':'')+'">'+(own?'✓ You have this book':'📕 Not yet owned — the quiz unlocks once your instructor marks that you have the book')+
+      (S.admin&&me()?' <button class="btn btn-sm" data-act="book-own" data-id="'+esc(m.id)+'" data-pid="'+esc(me().id)+'" data-on="'+(own?'0':'1')+'">'+
+        (own?'Mark Not yet owned':'Mark Owns book')+' for '+esc(me().name)+'</button>':'')+'</div>';
+  }
+  h+=connectedChipHTML({type:'quiz',moduleId:m.id});
   h+=townReadersPanel(m);
   if(chapters.length){
     var pctDone=prog.total?Math.round(prog.done/prog.total*100):0;
@@ -3935,6 +4018,7 @@ function viewTitles(){
     '<div class="err" id="paste-err"></div>'+
     '<button class="btn" data-act="paste-add">Add pasted module</button></div>';
 
+  h+=bookOwnPanel();
   if(S.modules.length){
     h+='<div class="scroll stack-lg"><table><thead><tr><th>Title</th><th class="n">Level</th>'+
       '<th class="n">Questions</th><th class="n">Points</th><th></th></tr></thead><tbody>';
@@ -4680,7 +4764,14 @@ document.addEventListener('click',function(e){
   else if(act==='town-give'){townGiveModal(id,b.dataset.place||'town');}
   else if(act==='town-parcel'){claimParcel(id);}
   else if(act==='town-filter'){TOWN_FILTER=id;render();}
-  else if(act==='banner-shut'){BANNER_SHUT[id]=1;render();}
+  else if(act==='ev-join'){joinEvent(id);}
+  else if(act==='book-own'){requireAdmin('Instructor key needed.',function(){setOwnsBook(b.dataset.pid,id,b.dataset.on==='1');});}
+  else if(act==='books-all'||act==='books-none'){requireAdmin('Instructor key needed.',function(){
+    var rp=profile(id);if(!rp)return;rp.books={};
+    if(act==='books-all')S.modules.forEach(function(m){rp.books[m.id]=true;});
+    save();render();});}
+  else if(act==='books-toggle'){requireAdmin('Instructor key needed.',function(){
+    if(!S.settings.books)S.settings.books={};S.settings.books.on=b.checked;save();render();});}
   else if(act==='town-save'){requireAdmin('Instructor key needed.',saveTownSettings);}
   else if(act==='town-folk-toggle'){requireAdmin('Instructor key needed.',function(){townFolkToggle(id);});}
   else if(act==='town-folk-add'){requireAdmin('Instructor key needed.',townFolkAdd);}
@@ -4688,7 +4779,7 @@ document.addEventListener('click',function(e){
   else if(act==='remind-hide'){hideReminder(id);}
   else if(act==='remind-more'){S.remindAll=!S.remindAll;render();}
   else if(act==='save-alive'){saveAlive();}
-  else if(act==='food-buy'){buyFood(id);}
+  else if(act==='food-buy'){connectedGate({type:'food',id:id},function(){buyFood(id);});}
   else if(act==='food-feed'){feedPip(id);}
   else if(act==='food-rules'){requireAdmin('Feeding rules need the instructor key.',foodRulesModal);}
   else if(act==='food-new'){requireAdmin('Adding food needs the instructor key.',function(){foodEditor(null);});}
@@ -4703,7 +4794,7 @@ document.addEventListener('click',function(e){
         S.foods=foodList().filter(function(x){return x.id!==id;});
         save();render();
       },true);});}
-  else if(act==='pip-buy'){buyPip(id);}
+  else if(act==='pip-buy'){connectedGate({type:'pip',id:id},function(){buyPip(id);});}
   else if(act==='wish-set'){setWish(id);}
   else if(act==='wish-clear'){clearWish();}
   else if(act==='streak-new'){requireAdmin('Adding a streak needs the instructor key.',function(){streakEditor(null);});}
@@ -4737,7 +4828,7 @@ document.addEventListener('click',function(e){
       lockAfterGrant:$('#w-lockgrant').checked};
     save();toast('Wishlist settings saved.','good');render();
   }
-  else if(act==='act-do'){logActivity(id);}
+  else if(act==='act-do'){connectedGate({type:'activity',id:id},function(){logActivity(id);});}
   else if(act==='act-new'){requireAdmin('Adding an activity needs the instructor key.',function(){activityEditor(null);});}
   else if(act==='act-edit'){requireAdmin('Editing an activity needs the instructor key.',function(){
     var a=activityById(id);if(a)activityEditor(a);});}
@@ -6303,7 +6394,7 @@ function viewActivities(){
         (a.approval?'<span class="pill cold">needs approving</span>':'')+
         (who?'<span class="pill cold">for '+esc(who)+'</span>':'')+
         (a.hidden?'<span class="pill cold">hidden</span>':'')+
-      '</div>'+bonusStrip(a,p)+'</div>'+
+      '</div>'+connectedChipHTML({type:'activity',id:a.id})+bonusStrip(a,p)+'</div>'+
       '<div style="text-align:right;display:grid;gap:8px;justify-items:end">'+
         '<span class="worth">+'+pts(a.points)+'</span>'+
         (st.can?'<button class="btn btn-sm btn-primary" data-act="act-do" data-id="'+esc(a.id)+'">Mark done</button>':'')+
@@ -8086,6 +8177,7 @@ function pipShelf(){
         lookPowers(l).map(function(a){return '<div class="abilnote">'+
           esc(PIP_ABILITIES[a.kind].blurb(a.value))+'</div>';}).join('')+
         (festivalText(l)?'<div class="abilnote fest">'+esc(festivalText(l))+'</div>':'')+
+        (connectedEvents({type:'pip',id:l.id}).length?'<div class="abilnote earn">🤝 Can be earned in an event</div>':'')+
         '<div class="pc">'+(price<full?'<s class="muted">'+pts(full)+'</s> ':'')+pts(price)+' <small>points</small></div>'+
         '<button class="btn btn-sm '+(afford?'btn-primary':'btn-ghost')+
           '" data-act="pip-buy" data-id="'+esc(l.id)+'">'+
@@ -8537,12 +8629,19 @@ function takeTicket(ev,p,mine){
 }
 function eventGiftText(ev){
   var L=eventLink(ev),out=[];
+  if(L.giftLook&&pipLookById(L.giftLook))out.push('the '+pipLookById(L.giftLook).name+' look');
   if(L.giftPart&&pipPart(L.giftPart))out.push(pipPart(L.giftPart).name);
   if(L.giftFood&&foodById(L.giftFood))out.push(foodById(L.giftFood).name);
   return out.join(' + ');
 }
 function grantGift(ev,p){
   var L=eventLink(ev),got=[];
+  var gl=L.giftLook&&pipLookById(L.giftLook);
+  if(gl&&!ownsLook(gl,p)){
+    giveLook(p,gl);
+    got.push('the complete '+gl.name+' look');
+    lookWonMoment(gl,p,ev.title);
+  }
   var pt=L.giftPart&&pipPart(L.giftPart);
   if(pt&&!ownsPip(pt.id,p)){
     if(!Array.isArray(p.pipOwned))p.pipOwned=[];
@@ -8629,6 +8728,7 @@ function stepTrigger(ev,p,i,key){
   var t=s&&s.trigger;
   if(!t||!t.type||t.type==='none'||!TRIGGERS[t.type])return null;
   var since=(ev.kind==='calendar')?addDays(dayStart(calendarWindow(ev).start),i):roundStartOf(ev);
+  if(needsJoin(ev)){var ja=joinedAt(ev,p);if(!ja)return{have:0,need:Math.max(1,num(t.count,1)),met:false,label:'Join to start counting'};if(ja>since)since=ja;}
   var need=Math.max(1,num(t.count,1)),have=0;
   if(t.type==='quiz')have=passedSince(p,since,null,t.target).length;
   else if(t.type==='book')have=booksSince(p,since,null,t.target,num(t.level,0)).length;
@@ -8737,6 +8837,10 @@ function eventState(ev,p){
   function out(o){for(var k in base)if(!(k in o))o[k]=base[k];return o;}
   if(!assignedTo(ev,p))return out({can:false,label:'Not for you',tone:'cold'});
   if(!op.open)return out({can:false,label:op.label,tone:'cold'});
+  if(needsJoin(ev)&&!hasJoined(ev,p)){
+    var tgj=ev.kind==='goal'?townGoal(ev):null;
+    if(!(tgj&&tgj.on&&tgj.ended))return out({can:false,label:'Join to take part',tone:'warm',needJoin:true});
+  }
   var block=linkBlock(ev,p,key,mine);
   if(isStepKind(ev.kind)){
     var steps=ev.steps||[];
@@ -8943,6 +9047,11 @@ function goalShare(ev,p,key){
   }
   var rd=eventRound(ev);
   var a=roundStartOf(ev,rd),b=rd.end||null,g=ev.goal;
+  if(needsJoin(ev)){
+    var ja=joinedAt(ev,p);
+    if(!ja)return 0;
+    if(!a||ja>a)a=ja;
+  }
   if(g.source==='quizzes')return passedSince(p,a,b).length;
   if(g.source==='books')return booksSince(p,a,b).length;
   if(g.source==='activities')return activitiesSince(p,a,b,g.activity||'').length;
@@ -8968,7 +9077,8 @@ function goalProgress(ev,key){
   total=Math.round((total+tg.total)*10)/10;
   return{total:total,target:g.target,pct:Math.min(100,Math.round(total/g.target*100)),
     helpers:helpers+tg.helpers,reached:total>=g.target,key:key,
-    real:real,realHelpers:realHelpers,town:tg.total,townHelpers:tg.helpers,townOn:tg.on,ended:!!tg.ended};
+    real:real,realHelpers:realHelpers,town:tg.total,townHelpers:tg.helpers,townOn:tg.on,ended:!!tg.ended,
+    joined:needsJoin(ev)?S.profiles.filter(function(p){return assignedTo(ev,p)&&hasJoined(ev,p);}).length:null};
 }
 function goalRewarded(ev,p,key){
   return entriesOf(p).some(function(e){return e.eventId===ev.id&&e.goalReward&&e.round===key;});
@@ -8981,6 +9091,7 @@ function settleGoals(){
     var g=goalCfg(ev);
     S.profiles.forEach(function(p){
       if(!assignedTo(ev,p))return;
+      if(!hasJoined(ev,p))return;
       if(goalRewarded(ev,p,pr.key))return;
       if(g.who==='helped'&&!(goalShare(ev,p,pr.key)>0))return;
       var boosted=withBoost(g.reward,p,'event');
@@ -9048,7 +9159,7 @@ function eventCardHTML(ev,p){
     h+='<div class="goalbar"><div class="wbar"><span style="width:'+gp.pct+'%"></span></div>'+
       '<div class="tiny">'+pts(gp.total)+' of '+pts(gp.target)+' '+esc(goalUnit(ev))+
       (gp.townOn?' &nbsp;·&nbsp; you '+pts(gp.real)+' + '+esc(townCfg().label)+' '+pts(gp.town)+
-        ' &nbsp;·&nbsp; '+gp.realHelpers+' of you and '+gp.townHelpers+' neighbours helping'
+        ' &nbsp;·&nbsp; '+(gp.joined!=null?gp.joined+' of you joined, ':'')+gp.realHelpers+' of you and '+gp.townHelpers+' neighbours helping'
         :' &nbsp;·&nbsp; '+gp.helpers+' helping')+
       (gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':(gp.ended?' &nbsp;·&nbsp; <b>ended short</b>':''))+'</div></div>';
   }
@@ -9066,10 +9177,14 @@ function eventCardHTML(ev,p){
       ((ev.books||[]).length?'<span class="pill cold">\ud83d\udcd6 '+esc((ev.books||[]).map(function(id){var m=byId(id);return m?m.title:'';}).filter(Boolean).join(', '))+'</span>':'')+
       (ev.after&&eventById(ev.after)?'<span class="pill cold">After “'+esc(eventById(ev.after).title)+'”</span>':'')+
       (ev.town&&ev.town.sitewide?'<span class="pill warm">Town-wide</span>':'')+
+      (isCommunityEvent(ev)?'<span class="pill warm">Community</span>':'')+
+      (needsJoin(ev)&&hasJoined(ev,p)?'<span class="pill good">✓ Joined</span>':'')+
     '</div>'+eventTownHTML(ev,2)+'</div>'+
     '<div class="evside">'+
       '<span class="upto">'+(ev.kind==='goal'?'':'up to ')+pts(best)+(ev.kind==='goal'?' each':'')+'</span>';
-  if(ev.kind==='goal'&&st.auto){
+  if(st.needJoin){
+    h+='<button class="btn btn-sm btn-primary" data-act="ev-join" data-id="'+esc(ev.id)+'">Join event</button>';
+  }else if(ev.kind==='goal'&&st.auto){
     h+='<span class="tiny muted">Counts by itself</span>';
   }else if(isStepKind(ev.kind)){
     if(st.view||st.done)h+='<button class="btn btn-sm '+(st.can&&st.ready?'btn-primary':'')+'" data-act="ev-steps" data-id="'+esc(ev.id)+'">'+
@@ -9114,7 +9229,7 @@ function eventKindDefaults(d){
   }
   if(!d.repeat)d.repeat={mode:'none',days:[],n:3,from:[10,1],to:[10,31]};
   if(!d.hours)d.hours={on:false,from:'15:00',to:'17:00'};
-  if(!d.link)d.link={look:'',food:'',giftPart:'',giftFood:''};
+  if(!d.link)d.link={look:'',food:'',giftPart:'',giftFood:'',giftLook:''};
   if(!d.books)d.books=[];
   if(!d.town)d.town={join:false,sitewide:false};
   if(d.kind==='goal'&&d.goal&&!d.goal.town)d.goal.town={on:false,finish:90,pace:'steady',step:'day',days:14};
@@ -9240,7 +9355,9 @@ function eventTownEditorHTML(d){
     '<label class="check"><input type="checkbox" id="ev-tjoin"'+(t.join||(d.kind==='goal'&&d.goal&&d.goal.town&&d.goal.town.on)?' checked':'')+
       (d.kind==='goal'&&d.goal&&d.goal.town&&d.goal.town.on?' disabled':'')+'><span>Neighbours join in (their activity shows on the card and when a reader takes part)</span></label>'+
     '<label class="check"><input type="checkbox" id="ev-tsite"'+(t.sitewide?' checked':'')+'><span>Town-wide: show a banner at the top of every page while it is open</span></label>'+
-    '<p class="tiny muted">Tip: pick a seasonal banner below to colour the town-wide banner.</p>';
+    '<label class="check"><input type="checkbox" id="ev-tjreq"'+(t.joinReq!==false?' checked':'')+'><span>Community events: readers must Join to get credit and rewards</span></label>'+
+    '<label class="check"><input type="checkbox" id="ev-pin"'+(d.pinned?' checked':'')+'><span>Pin to the top of the Events page</span></label>'+
+    '<p class="tiny muted">An event is a community event when the town helps with its goal, or it is town-wide. Tip: pick a seasonal banner below to colour the town-wide banner.</p>';
 }
 function eventRepeatEditorHTML(d){
   var r=d.repeat,h='';
@@ -9306,6 +9423,8 @@ function eventLinkEditorHTML(d){
       '<label class="field" style="flex:1;min-width:180px"><span>Must be wearing</span>'+sel('ev-llook',L.look,looks,'No look needed')+'</label>'+
       '<label class="field" style="flex:1;min-width:180px"><span>Costs one food from the pantry (once a round)</span>'+sel('ev-lfood',L.food,foods,'No food needed')+'</label>'+
     '</div><div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Gift a complete look</span>'+sel('ev-glook',L.giftLook||'',PIP_LOOKS.map(function(l){
+        return [l.id,(l.tier==='top'?'★ Top tier — ':'')+l.name+(l.season&&PIP_SEASONS[l.season]?' ('+PIP_SEASONS[l.season].name+')':'')];}),'No look')+'</label>'+
       '<label class="field" style="flex:1;min-width:180px"><span>Gift a Pip part</span>'+sel('ev-gpart',L.giftPart,parts,'No part')+'</label>'+
       '<label class="field" style="flex:1;min-width:180px"><span>Gift a food</span>'+sel('ev-gfood',L.giftFood,foods,'No food')+'</label>'+
     '</div>';
@@ -9347,6 +9466,8 @@ function eventExtraGrab(scrim,d){
   if(!d.town)d.town={join:false,sitewide:false};
   if(cb('#ev-tjoin')!==null&&!scrim.querySelector('#ev-tjoin').disabled)d.town.join=cb('#ev-tjoin');
   if(cb('#ev-tsite')!==null)d.town.sitewide=cb('#ev-tsite');
+  if(cb('#ev-tjreq')!==null)d.town.joinReq=cb('#ev-tjreq');
+  if(cb('#ev-pin')!==null)d.pinned=cb('#ev-pin');
   if(cb('#ev-bgate')!==null)d.booksGate=cb('#ev-bgate');
   if(g('#ev-after')!==null)d.after=g('#ev-after');
   if(g('#ev-yf-m')!==null)d.repeat.from=[+g('#ev-yf-m'),Math.max(1,Math.min(31,num(g('#ev-yf-d'),1)))];
@@ -9357,6 +9478,7 @@ function eventExtraGrab(scrim,d){
   if(g('#ev-llook')!==null)d.link.look=g('#ev-llook');
   if(g('#ev-lfood')!==null)d.link.food=g('#ev-lfood');
   if(g('#ev-gpart')!==null)d.link.giftPart=g('#ev-gpart');
+  if(g('#ev-glook')!==null)d.link.giftLook=g('#ev-glook');
   if(g('#ev-gfood')!==null)d.link.giftFood=g('#ev-gfood');
 }
 function eventExtraClick(e,d,scrim){
@@ -9576,9 +9698,36 @@ function viewEvents(){
         ico('plus')+'Add an event</button></div>':'')+'</div>';
   }
 
+  var now=new Date();
+  function ended(ev){
+    if(ev.repeat&&ev.repeat.mode&&ev.repeat.mode!=='none')return false;
+    if(ev.kind==='goal'){var tg=townGoal(ev,now);if(tg.on&&tg.ended)return true;}
+    var op=eventOpen(ev,now);
+    return !op.open&&!!(op.av&&(op.av.done||op.av.label==='Finished'));
+  }
+  function rank(ev){
+    var st=eventState(ev,p);
+    if(ev.pinned)return 0;
+    if(isCommunityEvent(ev)&&st.window.open)return 1;
+    if(st.claim||st.needJoin)return 2;
+    if(st.can)return 3;
+    if(st.window.open)return 4;
+    return 5;
+  }
+  var live=[],done=[];
+  list.forEach(function(ev){(ended(ev)?done:live).push(ev);});
+  live.sort(function(a,b){return (rank(a)-rank(b))||String(b.created||'').localeCompare(String(a.created||''));});
+  done.sort(function(a,b){return String(b.created||'').localeCompare(String(a.created||''));});
   h+='<div class="evlist stack">';
-  list.forEach(function(ev){h+=eventCardHTML(ev,p);});
-  return h+'</div>';
+  live.forEach(function(ev){h+=eventCardHTML(ev,p);});
+  if(!live.length)h+='<p class="tiny muted">Nothing open just now.</p>';
+  h+='</div>';
+  if(done.length){
+    h+='<details class="evended stack"><summary>Ended events <span class="pill cold">'+done.length+'</span></summary><div class="evlist stack">';
+    done.forEach(function(ev){h+=eventCardHTML(ev,p);});
+    h+='</div></details>';
+  }
+  return h;
 }
 
 /* ---------- instructor review ---------- */
@@ -11645,29 +11794,149 @@ function eventTownHTML(ev,n,place){
     rows.map(function(r){return feedRowHTML(r,place||'events');}).join('')+'</div>';
 }
 
+/* ---------- joining community events ---------- */
+function isCommunityEvent(ev){
+  return !!ev&&((ev.kind==='goal'&&goalTownCfg(ev).on)||!!(ev.town&&ev.town.sitewide));
+}
+function needsJoin(ev){return isCommunityEvent(ev)&&townOn()&&!(ev.town&&ev.town.joinReq===false);}
+function joinedAt(ev,p){
+  p=p||me();
+  var j=p&&p.joined&&p.joined[ev.id];
+  return j?new Date(j):null;
+}
+function hasJoined(ev,p){return !needsJoin(ev)||!!joinedAt(ev,p);}
+function joinEvent(id,quiet){
+  var p=me(),ev=eventById(id);
+  if(!p||!ev)return;
+  if(!p.joined)p.joined={};
+  if(!p.joined[id])p.joined[id]=nowISO();
+  save();
+  if(!quiet)celebrate({kicker:'You joined',title:ev.title,line:'From now on, what you do counts toward it — and its rewards can be yours.',pose:'cheer',prize:''});
+  render();
+}
+/* Everything open right now that this reader could be helping. */
+function connectedEvents(ctx,p){
+  p=p||me();
+  if(!p)return [];
+  var out=[];
+  eventList().forEach(function(ev){
+    if(ev.hidden||!assignedTo(ev,p)||!eventOpen(ev).open)return;
+    var tg=ev.kind==='goal'?townGoal(ev):null;
+    if(tg&&tg.on&&tg.ended)return;
+    var why='';
+    var g=ev.goal||{},src=ev.kind==='goal'?g.source:'';
+    var trig=(ev.steps||[]).map(function(st){return st.trigger||{};});
+    if(ctx.type==='quiz'){
+      if(src==='quizzes')why='every quiz passed counts toward it';
+      else if(src==='books')why='finishing books counts toward it';
+      else if(src==='points')why='points you earn count toward it';
+      else if((ev.books||[]).indexOf(ctx.moduleId)>=0)why='this book is part of it';
+      else if(trig.some(function(t){return (t.type==='quiz'||t.type==='book')&&(!t.target||t.target===ctx.moduleId);}))why='a step is done by passing quizzes';
+      else if(trig.some(function(t){return t.type==='points';}))why='a step counts points you earn';
+    }else if(ctx.type==='activity'){
+      if(src==='activities'&&(!g.activity||g.activity===ctx.id))why='this activity counts toward it';
+      else if(src==='points')why='points you earn count toward it';
+      else if(trig.some(function(t){return t.type==='activity'&&(!t.target||t.target===ctx.id);}))why='a step is done by logging this activity';
+      else if(trig.some(function(t){return t.type==='points';}))why='a step counts points you earn';
+    }else if(ctx.type==='pip'||ctx.type==='food'){
+      var key=ctx.type==='food'?'food:'+ctx.id:ctx.id;
+      var L=ev.link||{},pool=(ev.bonus&&ev.bonus.on&&ev.bonus.pool)||[];
+      var lk=pipLookById(ctx.id);
+      if(L.giftLook===ctx.id||L.giftPart===ctx.id||(ctx.type==='food'&&L.giftFood===ctx.id))why='it’s a gift for taking part';
+      else if(pool.indexOf(key)>=0||pool.indexOf('look:'+ctx.id)>=0)why='it can be won as a bonus';
+      else if(lk&&(pool.some(function(x){return x.indexOf('look:')===0&&x.slice(5)===lk.id;})))why='it can be won as a bonus';
+      else if(!lk&&pool.some(function(x){var l=x.indexOf('look:')===0&&pipLookById(x.slice(5));return l&&l.grants.indexOf(ctx.id)>=0;}))why='it comes with a look you can win';
+      else if(!lk&&L.giftLook&&pipLookById(L.giftLook)&&pipLookById(L.giftLook).grants.indexOf(ctx.id)>=0)why='it comes with the look given for taking part';
+    }
+    if(!why)return;
+    if(ctx.type==='quiz'||ctx.type==='activity'){if(!needsJoin(ev)||hasJoined(ev,p))return;}
+    out.push({ev:ev,why:why,joined:hasJoined(ev,p),needs:needsJoin(ev)});
+  });
+  return out;
+}
+var GATE_SEEN={};
+var CTX_WORDS={quiz:'This quiz',activity:'This activity',pip:'This Pip item',food:'This food'};
+function connectedGate(ctx,proceed){
+  var p=me();
+  var list=connectedEvents(ctx,p);
+  var key=p?p.id+'|'+ctx.type+'|'+(ctx.moduleId||ctx.id)+'|'+list.map(function(x){return x.ev.id+(x.joined?'j':'');}).join(',')+'|'+todayKey():'';
+  if(!list.length||GATE_SEEN[key]){proceed();return;}
+  var earn=(ctx.type==='pip'||ctx.type==='food');
+  var unjoined=list.filter(function(x){return x.needs&&!x.joined;});
+  var body='<h3>'+(earn?'You could earn this in an event':'Connected to an active community event')+'</h3>'+
+    '<p class="lede">'+esc(CTX_WORDS[ctx.type]||'This')+' is connected to '+(list.length===1?'an ongoing event':'ongoing events')+'. '+
+    (earn?'You may be able to earn it by taking part instead of buying it from the store.':
+      'Join the event on the Events page so your credit helps the community and you can earn its rewards — new Pips included.')+'</p>'+
+    '<div class="stack">'+list.map(function(x){
+      var ev=x.ev,tg=ev.kind==='goal'?goalProgress(ev):null;
+      return '<div class="receipt">'+renderIcon(ev.icon)+'<div style="flex:1;min-width:0"><div><b>'+esc(ev.title)+'</b>'+
+        (isCommunityEvent(ev)?' <span class="townbadge">Community</span>':'')+'</div>'+
+        '<div class="tiny muted">'+esc(x.why)+(tg?' · '+tg.pct+'% of the goal':'')+(eventGiftText(ev)?' · gift: '+esc(eventGiftText(ev)):'')+'</div></div>'+
+        (x.needs?(x.joined?'<span class="pill good">Joined</span>':'<button class="btn btn-sm btn-primary" data-gjoin="'+esc(ev.id)+'">Join</button>'):'')+
+        '</div>';
+    }).join('')+'</div>'+
+    '<div class="foot"><button class="btn btn-ghost" id="cg-events">Open Events</button>'+
+    (unjoined.length&&!earn?'<button class="btn" id="cg-go">Continue without joining</button><button class="btn btn-primary" id="cg-join">Join and continue</button>'
+      :'<button class="btn btn-primary" id="cg-go">'+(earn?'Buy it anyway':'Continue')+'</button>')+'</div>';
+  openModal(body,function(scrim){
+    scrim.addEventListener('click',function(e){
+      var j=e.target.closest('[data-gjoin]');
+      if(j){
+        var pp=me();if(!pp.joined)pp.joined={};
+        pp.joined[j.dataset.gjoin]=nowISO();save();
+        j.outerHTML='<span class="pill good">Joined</span>';
+        toast('Joined — your credit now counts.','good');
+      }
+    });
+    scrim.querySelector('#cg-events').addEventListener('click',function(){GATE_SEEN[key]=1;closeModal();go('events');});
+    scrim.querySelector('#cg-go').addEventListener('click',function(){GATE_SEEN[key]=1;closeModal();proceed();});
+    var cj=scrim.querySelector('#cg-join');
+    if(cj)cj.addEventListener('click',function(){
+      var pp=me();if(!pp.joined)pp.joined={};
+      unjoined.forEach(function(x){if(!pp.joined[x.ev.id])pp.joined[x.ev.id]=nowISO();});
+      save();GATE_SEEN[key]=1;closeModal();
+      toast('Joined '+unjoined.map(function(x){return x.ev.title;}).join(', ')+'.','good');
+      proceed();
+    });
+  },{dismissable:false});
+}
+/* A small, always-visible hint where the connection matters. */
+function connectedChipHTML(ctx){
+  if(!me())return '';
+  var list=connectedEvents(ctx);
+  if(!list.length)return '';
+  var earn=(ctx.type==='pip'||ctx.type==='food');
+  return '<div class="connchip">🤝 '+list.map(function(x){
+    return (earn?'Can be earned in ':'Counts toward ')+'<b>'+esc(x.ev.title)+'</b>'+
+      (x.needs&&!x.joined?' — <button class="linkbtn" data-act="ev-join" data-id="'+esc(x.ev.id)+'">join to get credit</button>':'');
+  }).join(' · ')+'</div>';
+}
+
 /* ---------- town-wide banners ---------- */
-var BANNER_SHUT={};
 function siteBannersHTML(){
   var p=me();
   if(!p||!townOn())return '';
   var h='';
   eventList().forEach(function(ev){
-    if(!(ev.town&&ev.town.sitewide)||ev.hidden||BANNER_SHUT[ev.id])return;
+    if(!(ev.town&&ev.town.sitewide)||ev.hidden)return;
     if(!assignedTo(ev,p)||!eventOpen(ev).open)return;
     var th=eventTheme(ev)||{a:'#F4C542',b:'#1163F0',ink:'#fff'};
     var line='';
     if(ev.kind==='goal'){
       var gp=goalProgress(ev);
       line='<span class="sbbar"><span style="width:'+gp.pct+'%"></span></span><span class="sbnum">'+gp.pct+'%</span>'+
-        '<span class="sbsub">'+(gp.reached?'Reached!':(gp.townHelpers?gp.townHelpers+' neighbours and '+gp.realHelpers+' of you helping':gp.helpers+' helping'))+'</span>';
+        '<span class="sbsub">'+(gp.reached?'Reached!':(gp.townHelpers?gp.townHelpers+' neighbours and '+(gp.joined!=null?gp.joined+' of you joined':gp.realHelpers+' of you helping'):gp.helpers+' helping'))+'</span>';
     }else{
       var n=townJoinCount(ev);
       line='<span class="sbsub">'+(n?n+' in '+esc(townCfg().label)+' have joined':'Everyone’s invited')+'</span>';
     }
+    var joined=hasJoined(ev,p);
     h+='<div class="sitebanner" style="--tha:'+th.a+';--thb:'+th.b+';--thi:'+(th.ink||'#fff')+'">'+
       '<span class="sbtitle">'+esc((th.motif&&th.motif[0])||'🎉')+' '+esc(ev.title)+'</span>'+line+
-      '<button class="btn btn-sm" data-go="events">Join in</button>'+
-      '<button class="sbx" data-act="banner-shut" data-id="'+esc(ev.id)+'" aria-label="Hide for now">&times;</button></div>';
+      (needsJoin(ev)&&!joined
+        ?'<button class="btn btn-sm" data-act="ev-join" data-id="'+esc(ev.id)+'">Join</button>'
+        :'<span class="sbjoined">'+(needsJoin(ev)?'✓ Joined':'')+'</span><button class="btn btn-sm" data-go="events">View</button>')+
+      '</div>';
   });
   return h;
 }
@@ -12675,6 +12944,7 @@ function bonusFor(thing,p){
   var chance=Math.min(100,cfg.chance+powerTotal('bonusluck',p));
   var eligible=cfg.pool.filter(function(id){
     if(id.indexOf('food:')===0)return !!foodById(id.slice(5));
+    if(id.indexOf('look:')===0){var lk=pipLookById(id.slice(5));return !!lk&&!ownsLook(lk,p);}
     return pipPart(id)&&!ownsPip(id,p);
   });
   if(!eligible.length)return null;
@@ -12686,7 +12956,33 @@ function bonusFor(thing,p){
     var f=foodById(id.slice(5));
     return {id:id,food:true,foodId:f.id,name:f.name,icon:f.icon};
   }
+  if(id.indexOf('look:')===0){
+    var l=pipLookById(id.slice(5));
+    return {id:id,look:true,lookId:l.id,name:l.name,top:l.tier==='top',grants:l.grants};
+  }
   return pipPart(id);
+}
+/* A whole complete look: every piece of it owned. */
+function ownsLook(l,p){return l.grants.every(function(g){return ownsPip(g,p);});}
+function lookPreview(l){
+  var pv={};
+  l.grants.forEach(function(g){var pt=pipPart(g);if(pt)pv[pt.slot]=pt.v;});
+  return pv;
+}
+/* Hand over every piece of a complete look and put it on. */
+function giveLook(p,l){
+  if(!Array.isArray(p.pipOwned))p.pipOwned=[];
+  l.grants.forEach(function(g){if(p.pipOwned.indexOf(g)<0)p.pipOwned.push(g);});
+  if(!p.pipLook)p.pipLook={};
+  l.grants.forEach(function(g){var pt=pipPart(g);if(pt)p.pipLook[pt.slot]=pt.v;});
+  if(p.face!=='pip')p.face='pip';
+}
+function lookWonMoment(l,p,why){
+  if(p!==me())return;
+  var pw=powersText(l,' ');
+  celebrate({kicker:(l.tier==='top'?'Top-tier look won':'Complete look won'),title:l.name,
+    line:'Every piece of it is yours'+(why?' — '+why:'')+', and Pip is wearing it.',pose:'cheer',
+    prize:pw+(festivalText(l)?' '+festivalText(l)+'.':'')});
 }
 function grantBonus(thing,p,why){
   var part=bonusFor(thing,p);
@@ -12700,6 +12996,14 @@ function grantBonus(thing,p,why){
     giveFood(p,part.foodId,1);
     save();
     toast('A bonus came with it — '+part.name+'. It is in Pip\u2019s pantry.','good',8000);
+    return part;
+  }
+  if(part.look){
+    var lk=pipLookById(part.lookId);
+    giveLook(p,lk);
+    save();
+    lookWonMoment(lk,p,'a bonus');
+    toast('A bonus came with it — the complete '+lk.name+' look!','good',9000);
     return part;
   }
   if(!Array.isArray(p.pipOwned))p.pipOwned=[];
@@ -12722,6 +13026,14 @@ function bonusStrip(thing,p){
       '<span class="bpv">'+foodIconHTML(foodById(part.foodId))+'</span>'+
       '<span class="btxt"><b>Comes with '+esc(part.name)+'</b>'+
       '<span>a treat for Pip\u2019s pantry, today only</span></span>'+
+      '<span class="bspark">'+ico('star')+'</span></div>';
+  }
+  if(part.look){
+    var lk=pipLookById(part.lookId);
+    return '<div class="bonusstrip look'+(part.top?' top':'')+'">'+
+      '<span class="bpv">'+pipSVG(lookPreview(lk),'cheer',44,{shadow:false,still:true})+'</span>'+
+      '<span class="btxt"><b>Comes with the complete '+esc(lk.name)+' look</b>'+
+      '<span>'+(part.top?'a top-tier Pip, ':'a whole new Pip, ')+'every piece — today only</span></span>'+
       '<span class="bspark">'+ico('star')+'</span></div>';
   }
   var preview={body:pipLook(p).body};
@@ -12762,17 +13074,40 @@ function bonusEditorHTML(d){
   var h='<div class="divider"></div>'+
     '<h4 style="font-size:.95rem;color:var(--text-hi)">Bonus for Pip</h4>'+
     '<p class="tiny muted" style="margin-top:4px;max-width:70ch">Now and then this can carry a '+
-    'cosmetic or a food for Pip as well. The chance is rolled once a day per reader, and a part they already own is '+
+    'cosmetic, a whole complete look (including top tier) or a food for Pip as well. The chance is rolled once a day per reader, and a part they already own is '+
     'never picked. Parts you have taken off sale in the Pip shelf can still be won here — which is '+
     'how something becomes win-only.</p>'+
     '<label class="check stack"><input type="checkbox" id="b-on"'+(cfg.on?' checked':'')+
-    '><span>Sometimes comes with a Pip cosmetic or food</span></label>';
+    '><span>Sometimes comes with a Pip cosmetic, complete look or food</span></label>';
   if(!cfg.on)return h;
   h+='<div class="subfields">'+
     '<label class="field"><span>Chance each day (%)</span>'+
     '<input class="inp" id="b-chance" type="number" min="1" max="100" value="'+cfg.chance+'"></label>'+
     '<div class="tiny muted" style="margin-bottom:7px">Which parts it can give — tick as many as you like</div>';
 
+  /* Whole looks first: the biggest prizes. */
+  [['look','Complete looks','Every piece of the look, worn straight away.'],
+   ['top','Top-tier complete looks','The whole top-tier Pip, powers and all.']].forEach(function(gr){
+    var ls=PIP_LOOKS.filter(function(l){return gr[0]==='top'?l.tier==='top':l.tier!=='top';});
+    if(!ls.length)return;
+    var chosen=ls.filter(function(l){return cfg.pool.indexOf('look:'+l.id)>=0;}).length;
+    h+='<div class="tierhead t-'+gr[0]+'"><span class="tl">'+gr[1]+'</span><span class="tn">'+gr[2]+'</span>'+
+      (chosen?'<span class="tc">'+chosen+' chosen</span>':'')+'</div><div class="bonuspool">';
+    ls.forEach(function(l){
+      var on=cfg.pool.indexOf('look:'+l.id)>=0;
+      var sn=l.season&&PIP_SEASONS[l.season]?PIP_SEASONS[l.season].name:'';
+      h+='<button type="button" class="bpick bpl t-'+gr[0]+(on?' on':'')+'" data-pool="look:'+esc(l.id)+'" '+
+        'title="'+esc(l.name+' — '+l.grants.length+' pieces, '+pts(pipPrice(l))+' points'+(sn?' ('+sn+')':''))+'">'+
+        pipSVG(lookPreview(l),'cheer',52,{shadow:false,still:true})+
+        '<span class="n">'+esc(l.name)+'</span>'+
+        '<span class="in">'+l.grants.length+' pieces'+(sn?' · '+esc(sn):'')+'</span>'+
+        '<span class="pr">'+pts(pipPrice(l))+'</span>'+
+        (pipOffered(l)?'':'<span class="winonly">'+(pipShopCfg().off[l.id]?'win only':'out of season')+'</span>')+
+        '</button>';
+    });
+    h+='</div>';
+  });
+  h+='<div class="tiny muted" style="margin:10px 0 7px">Single parts</div>';
   /* Grouped, so it is obvious whether you are handing out a cap or a piece
      of Starborn. */
   ['basic','look','top'].forEach(function(tier){
@@ -12823,10 +13158,11 @@ function bonusEditorHTML(d){
   }
   var picked=cfg.pool.map(function(id){
     if(id.indexOf('food:')===0){var f=foodById(id.slice(5));return f?{name:f.name,food:true}:null;}
+    if(id.indexOf('look:')===0){var l=pipLookById(id.slice(5));return l?{name:l.name+' (whole look)',look:true,top:l.tier==='top'}:null;}
     return pipPart(id);
   }).filter(Boolean);
   h+=(picked.length?'<div class="poolsum">Giving away: '+picked.map(function(pt){
-        return '<span class="ps t-'+(pt.food?'food':partTier(pt))+'">'+esc(pt.name)+'</span>';
+        return '<span class="ps t-'+(pt.food?'food':(pt.look?(pt.top?'top':'look'):partTier(pt)))+'">'+esc(pt.name)+'</span>';
       }).join('')+'</div>':'')+
     (cfg.pool.length?'':'<p class="tiny" style="color:var(--fail);margin-top:8px">'+
       'Pick at least one part, or the bonus can never happen.</p>')+

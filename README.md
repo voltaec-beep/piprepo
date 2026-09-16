@@ -648,3 +648,33 @@ A town of **simulated neighbours** with usernames like Aidan16, Bradley and KorK
 - **Events:** "Neighbours join in" shows their activity on the event card and when a reader takes part. "Town-wide" puts a banner with live progress at the top of every page while the event is open.
 - **Community-driven group goals:** tick "The town helps with this goal" and set where the town alone gets to by the end (presets: finishes it alone 120%, nearly 92%, needs a real push 65%, barely helps 30%), the shape of the climb (steady, slow start, late rush, fast start, in bursts), and how often the town's total moves (every hour, day, week or month). For a goal that doesn't repeat, set how many days it runs. Readers' own numbers add on top, the card shows "you X + Pip Town Y", and when the time is up the goal ends **reached** or **not reached**. Rewards go to real readers only.
 - **Settings → Community:** switch the town on or off, rename it, choose how busy it is (Quiet, Lively, Bustling) and the town size behind the reading counts, switch each surface on or off, set the parcel chance and what parcels can hold, where readers can give and what, and the daily gift limit. You can add your own neighbours, remove them, or move shipped ones away.
+
+## Whole looks as bonus awards
+
+The "Bonus for Pip" pool in the event, activity and store editors now starts with two new groups: **Complete looks** and **Top-tier complete looks**. Tick any look and, on the days the bonus rolls, the card says "Comes with the complete *name* look". Winning it hands over every piece of the look, puts it on straight away, and plays the look-won celebration (listing its powers, including any seasonal bonus). A look the reader already fully owns is never picked. Looks that are out of season or taken off sale can still be won, which makes them win-only. Set the chance to 100% to make the look a certain prize.
+
+Events also have a **guaranteed** "Gift a complete look" in Pip link-ups (top-tier looks are starred). It lands with the other gifts: when an entry is rated, a checklist or calendar is finished, or a group goal is reached.
+
+## Books a reader owns
+
+Titles → **Books each reader owns** is a grid of titles against readers. Tap a cell to switch between **Owns book** and **Not yet owned**; "All" and "None" set a whole reader at once. A title that isn't owned still appears in the catalogue with a red "Not yet owned" tag, and its quiz buttons read "Not yet owned" and can't be started. The title page says so too, and in instructor mode it has a one-tap "Mark Owns book" for the signed-in reader.
+
+- Every title added from now on starts as **Not yet owned** for every reader, and so does every title for a reader created from now on.
+- When this update first opens, readers who already exist are marked as owning the titles already installed, so nobody is locked out of books they were already reading.
+- The switch "Only allow quizzes for books a reader owns" turns the whole rule off.
+
+## Events page order
+
+Pinned events come first ("Pin to the top of the Events page" in the event editor), then open community events, then events waiting for a Join or a Claim, then everything else that's open, then upcoming ones. Events that don't repeat and have finished (their dates are over, or their community goal's time ran out) move into a collapsed **Ended events** section at the bottom.
+
+## Joining community events
+
+An event is a **community event** when the town helps with its group goal, or when it is town-wide. By default readers must **Join** it to take part: until they do, the card shows "Join event", its steps and entries are closed, nothing they do counts toward it, and it pays them no rewards. Once they join, only what they do **after joining** counts. The editor has a switch to drop the Join requirement for a particular event. The town-wide banner no longer has a close button; it shows **Join** (or "✓ Joined" and View).
+
+**Connected-event alerts.** PipHub checks what a reader is about to do against every open event they could take part in:
+
+- **Starting a quiz** that would count toward a community event they haven't joined (goals counting quizzes passed, books finished or points earned, events linked to that book, or steps done by passing quizzes or earning points).
+- **Marking an activity done** that would count toward one (goals counting that activity or points, or steps done by logging it).
+- **Buying a Pip item, look or food** that can be earned in an open event (as a guaranteed gift, a bonus, or as part of a look that can be won).
+
+It shows a message naming the events and why each is connected, with **Join** buttons and **Join and continue**, **Continue without joining** (or **Buy it anyway**) and **Open Events**. Each alert shows once a day for the same thing. The same connections appear as a small "🤝 Counts toward … — join to get credit" line on title pages and activity rows, and as "Can be earned in an event" on Pip shelf looks.
