@@ -676,6 +676,86 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .evended>summary::before{content:'▸';transition:transform .2s}
 .evended[open]>summary::before{transform:rotate(90deg)}
 .evended .evcard{opacity:.8}
+/* banner → event */
+.sitebanner{cursor:pointer}
+.sitebanner:hover{filter:brightness(1.05)}
+.evcard.evflash{animation:evFlash 1.2s ease-in-out 2}
+@keyframes evFlash{0%,100%{box-shadow:var(--sh-1)}50%{box-shadow:0 0 0 3px var(--gold),0 0 28px -4px var(--gold)}}
+.townpace{margin-top:4px;color:var(--gold-hi)}
+/* what's new */
+.sheet.wnsheet{width:min(760px,100%);padding:0;overflow:hidden}
+.wn .wnhero{position:relative;padding:26px 26px 10px;text-align:center;color:#fff;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 0%,#F2B4C9 0%,#7B4FB8 45%,#1C1440 100%)}
+.wn .wnkick{font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.9}
+.wn .wnver{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.18);letter-spacing:.06em}
+.wn .wntitle{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.05;margin:10px 0 6px;color:#fff;font-weight:800;
+  text-shadow:0 2px 0 #5B3690,0 0 24px rgba(255,214,120,.55);letter-spacing:-.01em}
+.wn .wnlede{max-width:52ch;margin:0 auto;font-size:.95rem;opacity:.92}
+.wn .wnstage{display:flex;justify-content:center;align-items:flex-end;gap:4px;margin-top:6px}
+.wn .wnmain .pip{width:170px;height:170px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
+.wn .wnside .pip{width:96px;height:96px;opacity:.95}
+.wn .wnconf i{position:absolute;top:-10px;width:7px;height:12px;border-radius:2px;background:#FFE58A;animation:wnFall 5s linear infinite;opacity:.85}
+.wn .wnconf i:nth-child(3n){background:#7FD6D0}.wn .wnconf i:nth-child(3n+1){background:#FF8FB8}
+.wn .wnconf i:nth-child(1){left:6%;animation-delay:-.4s}.wn .wnconf i:nth-child(2){left:14%;animation-delay:-2.1s}
+.wn .wnconf i:nth-child(3){left:22%;animation-delay:-3.3s}.wn .wnconf i:nth-child(4){left:30%;animation-delay:-1.2s}
+.wn .wnconf i:nth-child(5){left:38%;animation-delay:-4.1s}.wn .wnconf i:nth-child(6){left:46%;animation-delay:-2.7s}
+.wn .wnconf i:nth-child(7){left:54%;animation-delay:-.9s}.wn .wnconf i:nth-child(8){left:62%;animation-delay:-3.8s}
+.wn .wnconf i:nth-child(9){left:70%;animation-delay:-1.7s}.wn .wnconf i:nth-child(10){left:78%;animation-delay:-4.6s}
+.wn .wnconf i:nth-child(11){left:86%;animation-delay:-2.4s}.wn .wnconf i:nth-child(12){left:94%;animation-delay:-.2s}
+.wn .wnconf i:nth-child(13){left:10%;animation-delay:-3s}.wn .wnconf i:nth-child(14){left:90%;animation-delay:-1s}
+@keyframes wnFall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(420px) rotate(540deg)}}
+.wn .wnbody{padding:18px 22px 6px;max-height:min(52vh,560px);overflow:auto}
+.wn .wncount{text-align:center;font-weight:800;color:var(--gold-hi);margin-bottom:8px}
+.wn .wnsec{margin:14px 0 18px}
+.wn .wnsec h3{font-size:1.1rem;color:var(--text-hi);margin-bottom:8px}
+.wn .wnsec h3 span{font-size:.72rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-left:6px}
+.wn .wngrid{display:grid;gap:10px}
+.wn .wngrid.looks{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.wn .wngrid.pets{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.wn .wngrid.parts{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+.wn .wnlook,.wn .wnpet{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;
+  padding:12px 10px;border-radius:14px;background:var(--surface);border:1px solid var(--edge-soft)}
+.wn .wnlook.top{border-color:var(--gold);background:linear-gradient(var(--gold-faint),var(--surface));box-shadow:0 0 22px -10px var(--gold)}
+.wn .wnlook .pip{width:84px;height:84px}
+.wn .wnpet .pip{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,#5B3690 0%,#2A1B4F 100%)}
+.wn .wnflag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:.58rem;font-weight:800;letter-spacing:.14em;
+  padding:2px 9px;border-radius:99px;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi));color:var(--on-gold)}
+.wn .wnmeta{font-size:.72rem;color:var(--text-3)}
+.wn .wnpow{font-size:.7rem;color:var(--gold-hi)}
+.wn .wnpow.fest{color:var(--pass)}
+.wn .wnseason{font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.wn .wnchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.wn .wnchip{font-size:.72rem;padding:2px 9px;border-radius:99px;background:var(--sunk);border:1px solid var(--edge-soft);color:var(--text-2)}
+.wn .wnpart{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;font-size:.7rem;color:var(--text-2);
+  padding:6px;border-radius:12px;background:var(--sunk)}
+.wn .wnpart .pip{width:56px;height:56px}
+.wn .wnpart .ic{--ib:22px;width:44px;height:44px;border-radius:12px}
+.wn .wnpart small{font-size:.62rem;color:var(--text-3)}
+.wn .wnpart.more{justify-content:center;font-size:1.2rem;font-weight:800;color:var(--gold-hi)}
+.wn .wnlist{display:grid;gap:6px}
+.wn .wnrow{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;background:var(--sunk)}
+.wn .wnrow .ic{--ib:18px;width:32px;height:32px;border-radius:9px}
+.wn .wnrow .wnmeta{margin-left:auto}
+.wn .wnfeats{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.wn .wnfeat{display:flex;gap:10px;padding:10px;border-radius:12px;background:var(--surface);border:1px solid var(--edge-soft)}
+.wn .wnfi{font-size:1.5rem;line-height:1}
+.wn .wnfeat p{margin:2px 0 0;font-size:.8rem;color:var(--text-2)}
+.wn .wnfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:12px 22px 18px;border-top:1px solid var(--edge-soft)}
+@media(max-width:520px){.wn .wnside{display:none}.wn .wnmain .pip{width:140px;height:140px}}
+.sheet.wide{width:min(760px,100%)}
+.bulkgrid{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));max-height:44vh;overflow:auto}
+.bulkone{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;background:var(--sunk);text-align:center}
+.bulkone .pip{width:44px;height:44px}
+.bulkone b{font-size:.76rem;word-break:break-all}
+.bulkone span{font-size:.64rem;color:var(--text-3)}
+.bulkone.more{justify-content:center;font-weight:700;color:var(--gold-hi)}
+.newbadge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;padding:1px 6px;border-radius:99px;background:#2FBF71;color:#fff;vertical-align:middle}
+.ecochart{display:flex;gap:6px;align-items:flex-end;height:150px;padding:8px 4px 0;overflow-x:auto}
+.ecobar{flex:1;min-width:38px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px}
+.ecofill{width:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(var(--gold-hi),var(--gold-lo))}
+.ecov{font-size:.68rem;font-weight:700;color:var(--text-hi)}
+.ecom{font-size:.64rem;color:var(--text-2)}
+.ecod{font-size:.58rem;color:var(--text-3);white-space:nowrap}
 /* collapsible settings panels */
 .panel.fold>.phead{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
 .panel.fold>.phead>.pgrow{flex:1;min-width:0}
@@ -2478,6 +2558,7 @@ function load(){
     });
     S.settings.booksMigrated=true;
   }
+  whatsNewInit();
   if(S.active&&!profile(S.active))S.active=null;
 }
 function migrate(){
@@ -2634,7 +2715,7 @@ function openModal(html,onMount,opts){
   opts=opts||{};
   var scrim=document.createElement('div');
   scrim.className='scrim';
-  scrim.innerHTML='<div class="sheet'+(opts.anim===false?' noanim':'')+
+  scrim.innerHTML='<div class="sheet'+(opts.anim===false?' noanim':'')+(opts.cls?' '+opts.cls:'')+
     '" role="dialog" aria-modal="true">'+html+'</div>';
   document.body.appendChild(scrim);
   scrim.dismissable=(opts.dismissable!==false);
@@ -2661,7 +2742,8 @@ function redrawModal(html,onMount){
   var top=0,cur=S.modals[S.modals.length-1];
   if(cur)top=cur.scrollTop;
   closeModal();
-  return openModal(html,onMount,{dismissable:false,focus:false,anim:false,scroll:top});
+  var cls=(cur&&cur.firstChild&&/\bwide\b/.test(cur.firstChild.className))?'wide':'';
+  return openModal(html,onMount,{dismissable:false,focus:false,anim:false,scroll:top,cls:cls});
 }
 function closeModal(){
   var m=S.modals.pop();
@@ -4098,6 +4180,7 @@ function viewSettings(){
     '<label class="check stack"><input type="checkbox" id="ev-on"'+(eventsOn()?' checked':'')+
     '><span>Show the Events tab to readers</span></label>'+
     '<button class="btn btn-primary" data-act="save-events">Save</button></div>';
+  h+=whatsNewSettingsHTML();
   h+=townSettingsHTML();
   h+=viewPipShop();
   h+=viewIncentives();
@@ -4558,6 +4641,9 @@ function render(){
   $('#view').innerHTML=inQuiz?viewCatalog():((VIEWS[S.view]||viewCatalog)());
   if(S.view==='settings')foldPanels($('#view'));
   if(S.view!=='gate'&&!inQuiz&&S.view!=='settings')$('#view').insertAdjacentHTML('afterbegin',siteBannersHTML());
+  TOWN_SIG=townSig();
+  if(S.view==='catalog'&&!inQuiz&&me())setTimeout(function(){if(S.view==='catalog')showWhatsNew(false);},450);
+  focusEventCard();
   mountQuizLayer(inQuiz);
 
   var onGate=(S.view==='gate');
@@ -4765,6 +4851,10 @@ document.addEventListener('click',function(e){
   else if(act==='town-parcel'){claimParcel(id);}
   else if(act==='town-filter'){TOWN_FILTER=id;render();}
   else if(act==='ev-join'){joinEvent(id);}
+  else if(act==='banner-open'){FOCUS_EV=id;if(S.view==='events'){render();}else go('events');}
+  else if(act==='wn-preview'){showWhatsNew(true);}
+  else if(act==='wn-reset'){requireAdmin('Instructor key needed.',function(){var w=wnCfg();w.seen='';save();toast('It will show again on the catalogue.','good');});}
+  else if(act==='wn-save'){requireAdmin('Instructor key needed.',function(){var w=wnCfg();w.off=!$('#wn-on').checked;save();toast('Saved.','good');render();});}
   else if(act==='book-own'){requireAdmin('Instructor key needed.',function(){setOwnsBook(b.dataset.pid,id,b.dataset.on==='1');});}
   else if(act==='books-all'||act==='books-none'){requireAdmin('Instructor key needed.',function(){
     var rp=profile(id);if(!rp)return;rp.books={};
@@ -4775,6 +4865,11 @@ document.addEventListener('click',function(e){
   else if(act==='town-save'){requireAdmin('Instructor key needed.',saveTownSettings);}
   else if(act==='town-folk-toggle'){requireAdmin('Instructor key needed.',function(){townFolkToggle(id);});}
   else if(act==='town-folk-add'){requireAdmin('Instructor key needed.',townFolkAdd);}
+  else if(act==='town-bulk'){requireAdmin('Instructor key needed.',bulkFolkModal);}
+  else if(act==='town-bulk-clear'){requireAdmin('Instructor key needed.',removeGeneratedFolk);}
+  else if(act==='town-folk-more'){TOWN_SHOW_ALL=!TOWN_SHOW_ALL;render();}
+  else if(act==='eco-save'){requireAdmin('Instructor key needed.',saveEco);}
+  else if(act==='eco-reseed'){requireAdmin('Instructor key needed.',reseedEco);}
   else if(act==='town-folk-del'){requireAdmin('Instructor key needed.',function(){townFolkDel(id);});}
   else if(act==='remind-hide'){hideReminder(id);}
   else if(act==='remind-more'){S.remindAll=!S.remindAll;render();}
@@ -9146,7 +9241,7 @@ function eventCardHTML(ev,p){
   entriesOf(p).forEach(function(e){if(e.eventId===ev.id&&e.status==='rated')roundsDone[entryRound(ev,e)]=1;});
   var nRounds=Object.keys(roundsDone).length;
 
-  var h='<div class="evcard'+(st.can?' open':' shut')+(st.claim?' claimable':'')+(st.locked?' locked':'')+(theme?' themed':'')+(ev.hours&&ev.hours.on?' timed':'')+'"'+
+  var h='<div data-evid="'+esc(ev.id)+'" class="evcard'+(st.can?' open':' shut')+(st.claim?' claimable':'')+(st.locked?' locked':'')+(theme?' themed':'')+(ev.hours&&ev.hours.on?' timed':'')+'"'+
     (theme?' style="--tha:'+theme.a+';--thb:'+theme.b+'"':'')+'>';
   if(theme)h+=eventBannerHTML(ev,cdText,last).replace('<span class="evcd','<span'+cdAttr+' class="evcd');
   else if(showCd)h+='<span class="badges" aria-hidden="true"><span class="btime'+(last?' last':(ms<5*864e5?' soon':''))+
@@ -9159,9 +9254,10 @@ function eventCardHTML(ev,p){
     h+='<div class="goalbar"><div class="wbar"><span style="width:'+gp.pct+'%"></span></div>'+
       '<div class="tiny">'+pts(gp.total)+' of '+pts(gp.target)+' '+esc(goalUnit(ev))+
       (gp.townOn?' &nbsp;·&nbsp; you '+pts(gp.real)+' + '+esc(townCfg().label)+' '+pts(gp.town)+
-        ' &nbsp;·&nbsp; '+(gp.joined!=null?gp.joined+' of you joined, ':'')+gp.realHelpers+' of you and '+gp.townHelpers+' neighbours helping'
+        ' &nbsp;·&nbsp; '+gp.townHelpers+' neighbours helping'+(gp.joined!=null?' &nbsp;·&nbsp; '+gp.joined+' of you joined':' &nbsp;·&nbsp; '+gp.realHelpers+' of you helping')
         :' &nbsp;·&nbsp; '+gp.helpers+' helping')+
-      (gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':(gp.ended?' &nbsp;·&nbsp; <b>ended short</b>':''))+'</div></div>';
+      (gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':(gp.ended?' &nbsp;·&nbsp; <b>ended short</b>':''))+'</div>'+
+      (gp.townOn?townPaceLine(ev):'')+'</div>';
   }
   if(isStepKind(ev.kind)&&st.progress)h+='<div class="tiny" style="margin-top:6px;color:var(--gold-hi)">'+esc(st.progress)+'</div>';
   h+='<div class="evmeta">'+
@@ -9346,6 +9442,10 @@ function goalTownEditorHTML(d){
     h+='<p class="tiny" style="color:var(--gold-hi)">Now: the town has added '+pts(tg.total)+' of '+pts(goalCfg(d).target)+
       ' · by '+fmtDM(new Date(tg.span.end.getTime()-1))+': '+pts(tg.final)+
       (rd.end?' (each round)':'')+(tg.final>=goalCfg(d).target?' — reaches the goal without readers':' — readers need '+pts(Math.round((goalCfg(d).target-tg.final)*10)/10)+' more')+'</p>';
+    var steps=Math.max(1,Math.round((tg.span.end-tg.span.start)/({hour:3600000,day:864e5,week:7*864e5,month:30*864e5}[tg.cfg.step])));
+    var per=tg.final/steps;
+    h+='<p class="tiny muted">That is about +'+(per>=10?Math.round(per):Math.round(per*10)/10)+' '+esc(d.unit||goalUnit(d)||'')+' '+TOWN_STEPS[tg.cfg.step].toLowerCase()+
+      ' on average (the climb shape moves it faster or slower)'+(per<1&&goalCfg(d).target>=20?' — with whole numbers, the total only ticks up every few steps. Raise the target’s % or shorten the run for visible hourly movement.':'.')+'</p>';
   }
   return h+'</div>';
 }
@@ -11268,8 +11368,13 @@ function townCfg(){
 }
 function townOn(){return townCfg().on;}
 function townFolk(){
-  var c=townCfg();
-  return TOWN_FOLK.filter(function(f){return !c.removed[f.id];}).concat(c.custom.filter(function(f){return f&&f.id&&f.name;}));
+  var c=townCfg(),now=new Date();
+  var list=TOWN_FOLK.filter(function(f){return !c.removed[f.id];})
+    .concat(c.custom.filter(function(f){return f&&f.id&&f.name;}));
+  if(ecoCfg().on){
+    list=list.concat(ecoArrivals(now)).filter(function(f){return !ecoGone(f,now);});
+  }
+  return list;
 }
 function folkById(id){
   var l=townFolk();
@@ -11307,6 +11412,8 @@ function townModules(){return (S.modules||[]).filter(function(m){return m&&m.id;
 /* What a neighbour is doing right now. */
 function folkStatus(f,now){
   now=now||new Date();
+  if(ecoDormant(f,now))return{kind:'away',dot:'off',label:'Away',detail:'taking a break'};
+  if(ecoQuiet(f,now))return{kind:'offline',dot:'off',label:'Offline',detail:'asleep'};
   var slot=townSlot(now);
   var a=Math.min(.95,townBusy(now,f));
   var u=hashUnit(f.id+':s:'+slot);
@@ -11337,7 +11444,8 @@ function townReaders(m,now){
   mods.forEach(function(x){w[x.id]=.4+hashUnit('tw:'+x.id)*1.2;tot+=w[x.id];});
   var share=tot?(w[m.id]||0)/tot:0;
   var slot=Math.floor(now.getTime()/(10*60000));
-  var active=c.size*Math.min(.95,townBusy(now));
+  var ec=ecoCfg();
+  var active=c.size*Math.min(.95,townBusy(now))*(ec.on?(1-ec.dormant/100):1);
   var reading=Math.round(active*.5*share*(.75+hashUnit(m.id+':n:'+slot)*.5));
   var quiz=Math.round(reading*.35*(.5+hashUnit(m.id+':q:'+slot)));
   var named=townFolk().filter(function(f){var st=folkStatus(f,now);return st.moduleId===m.id;});
@@ -11362,6 +11470,400 @@ function townReadersPanel(m){
     }).join('')+'</span>':'')+'</div>';
 }
 
+/* =========================================================
+   Pip Town population: bulk neighbours and a living ecosystem.
+
+   Bulk neighbours are stored (S.settings.town.custom, gen:true).
+   The ecosystem is not stored: arrivals, departures and dormant
+   spells are worked out month by month from the ecosystem's own
+   seed, so every device agrees and nothing runs in the background.
+   ========================================================= */
+var NAME_FIRST=['Aarav','Abby','Adeola','Aiko','Alma','Amir','Ana','Arjun','Ava','Bea','Ben','Caleb','Camila','Chen','Chloe','Dani',
+  'Darius','Eli','Elif','Emeka','Emma','Ezra','Farah','Finn','Gia','Hana','Hugo','Ibrahim','Imani','Isla','Ivan','Jada','Jae',
+  'Javier','Jonah','Juno','Kai','Kalani','Kenji','Kiara','Lars','Layla','Leo','Lila','Luca','Lucia','Malik','Mateo','Mei','Mila',
+  'Nadia','Naveen','Nia','Nico','Noah','Omari','Oscar','Pia','Priya','Quinn','Rafael','Rania','Reza','Rosa','Ruby','Sami','Sana',
+  'Santi','Sienna','Sora','Tariq','Tess','Theo','Uma','Valentina','Wren','Xavier','Yara','Yusuf','Zara','Zeke','Zoe'];
+var NAME_ADJ=['Pixel','Moon','Star','Brave','Quiet','Lucky','Swift','Cosmic','Sunny','Misty','Clever','Tiny','Mighty','Jolly',
+  'Silver','Golden','Rocket','Storm','Maple','Velvet','Neon','Frosty','Happy','Sleepy','Wild','Echo','Lunar','Turbo','Cozy','Ember'];
+var NAME_NOUN=['Fox','Panda','Otter','Owl','Rider','Reader','Dragon','Comet','Bean','Sprout','Wolf','Koala','Turtle','Falcon',
+  'Muffin','Pebble','Scout','Knight','Pirate','Ninja','Bear','Whale','Bunny','Wizard','Maker','Sparrow','Tiger','Cloud','Page','Quill'];
+var NAME_VERB=['reads','draws','writes','plays','builds','dreams','codes','sings','runs','bakes','paints','explores'];
+var NAME_STYLES={
+  mix:'A mix of everything',
+  first:'First names (Priya)',
+  digits:'Name + numbers (Leo27)',
+  handle:'Handles (maya.reads, sam_draws)',
+  tag:'Gamer tags (PixelFox#3812)',
+  mash:'Mash-ups (QuietOtter)'
+};
+function rnd(seed,k){return hashUnit(seed+'#'+k);}
+function pickFrom(list,seed,k){return list[Math.floor(rnd(seed,k)*list.length)%list.length];}
+function genName(seed,style){
+  if(style==='mix'||!NAME_STYLES[style]){
+    var st=['first','digits','handle','tag','mash','digits','handle','tag'];
+    style=st[Math.floor(rnd(seed,'style')*st.length)%st.length];
+  }
+  var f=pickFrom(NAME_FIRST,seed,'f');
+  var n2=String(Math.floor(rnd(seed,'d')*99)+1);
+  if(style==='first')return f;
+  if(style==='digits')return f+n2;
+  if(style==='handle'){
+    var sep=rnd(seed,'sep')<.5?'.':'_';
+    var low=rnd(seed,'low')<.7;
+    return (low?f.toLowerCase():f)+sep+pickFrom(NAME_VERB,seed,'v');
+  }
+  if(style==='tag')return pickFrom(NAME_ADJ,seed,'a')+pickFrom(NAME_NOUN,seed,'n')+'#'+String(1000+Math.floor(rnd(seed,'t')*9000));
+  var m=pickFrom(NAME_ADJ,seed,'a')+pickFrom(NAME_NOUN,seed,'n');
+  return rnd(seed,'lc')<.3?m.toLowerCase():m;
+}
+var PERSONA_KEYS=['bookworm','collector','crafter','sporty','nightowl','casual'];
+function genPersona(seed,mix){
+  if(mix&&mix!=='mix'&&TOWN_PERSONA[mix])return mix;
+  return pickFrom(PERSONA_KEYS,seed,'p');
+}
+/* A Pip look from everyday (non top-tier, non-seasonal) parts. */
+function genLook(seed,fancy){
+  var pool=function(slot){return PIP_PARTS.filter(function(pt){
+    return pt.slot===slot&&(fancy?partTier(pt)!=='top':(!pt.season&&partTier(pt)!=='top'));});};
+  var look={};
+  var bodies=pool('body');look.body=bodies.length?pickFrom(bodies,seed,'body').v:'sun';
+  var eyes=pool('eyes');look.eyes=(eyes.length&&rnd(seed,'ey')<.7)?pickFrom(eyes,seed,'eyes').v:'dot';
+  [['hat',.6],['pattern',.35],['held',.4],['back',.2],['aura',.15]].forEach(function(x){
+    var l=pool(x[0]);
+    if(l.length&&rnd(seed,x[0]+'?')<x[1])look[x[0]]=pickFrom(l,seed,x[0]).v;
+  });
+  return look;
+}
+function allFolkNames(){
+  var names={};
+  TOWN_FOLK.concat(townCfg().custom).forEach(function(f){names[f.name.toLowerCase()]=1;});
+  ecoArrivals(new Date()).forEach(function(f){names[f.name.toLowerCase()]=1;});
+  return names;
+}
+function uniqueName(seed,style,taken){
+  for(var i=0;i<40;i++){
+    var n=genName(seed+':'+i,style);
+    if(!taken[n.toLowerCase()]){taken[n.toLowerCase()]=1;return n;}
+  }
+  var x=genName(seed,style)+'_'+Math.floor(rnd(seed,'u')*999);
+  taken[x.toLowerCase()]=1;
+  return x;
+}
+function makeFolk(seed,opts,taken){
+  return{id:'tf-'+seed.replace(/[^a-z0-9]/gi,'').slice(-14),name:uniqueName(seed,opts.style,taken),
+    persona:genPersona(seed,opts.persona),look:genLook(seed,opts.fancy),custom:true,gen:true};
+}
+
+/* ---------- bulk creation (instructor) ---------- */
+function bulkFolkModal(){
+  var d={count:20,style:'mix',persona:'mix',fancy:false,batch:uid()};
+  var preview=[];
+  function build(){
+    var taken=allFolkNames();
+    preview=[];
+    for(var i=0;i<d.count;i++)preview.push(makeFolk(d.batch+'-'+i,d,taken));
+  }
+  function body(){
+    build();
+    return '<h3>Add neighbours in bulk</h3>'+
+      '<p class="lede">Generated names, personalities and Pip looks. Nothing is added until you press Add.</p>'+
+      '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="width:120px"><span>How many</span><input class="inp" id="bk-n" type="number" min="1" max="300" value="'+d.count+'"></label>'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Name style</span><select class="inp" id="bk-style">'+Object.keys(NAME_STYLES).map(function(k){
+        return '<option value="'+k+'"'+(d.style===k?' selected':'')+'>'+esc(NAME_STYLES[k])+'</option>';}).join('')+'</select></label>'+
+      '<label class="field" style="flex:1;min-width:160px"><span>Personality</span><select class="inp" id="bk-per"><option value="mix">A mix</option>'+
+        PERSONA_KEYS.map(function(k){return '<option value="'+k+'"'+(d.persona===k?' selected':'')+'>'+esc(TOWN_PERSONA[k].name)+'</option>';}).join('')+'</select></label>'+
+      '</div>'+
+      '<label class="check"><input type="checkbox" id="bk-fancy"'+(d.fancy?' checked':'')+'><span>Let some wear seasonal items</span></label>'+
+      '<div class="bulkgrid stack">'+preview.slice(0,60).map(function(f){
+        return '<div class="bulkone">'+pipSVG(f.look,'idle',44,{still:true,shadow:false})+'<b>'+esc(f.name)+'</b><span>'+esc(TOWN_PERSONA[f.persona].name)+'</span></div>';
+      }).join('')+(preview.length>60?'<div class="bulkone more">+'+(preview.length-60)+' more</div>':'')+'</div>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button><button class="btn btn-ghost" id="bk-again">🎲 New names</button>'+
+      '<button class="btn btn-primary" id="bk-add">Add '+preview.length+' neighbour'+(preview.length===1?'':'s')+'</button></div>';
+  }
+  function grab(sc){
+    d.count=clampN(Math.round(num(sc.querySelector('#bk-n').value,20)),1,300);
+    d.style=sc.querySelector('#bk-style').value;
+    d.persona=sc.querySelector('#bk-per').value;
+    d.fancy=sc.querySelector('#bk-fancy').checked;
+  }
+  function mount(sc){
+    sc.addEventListener('change',function(e){
+      if(S.modals[S.modals.length-1]!==sc||!sc.parentNode)return;
+      if(e.target.matches('#bk-n,#bk-style,#bk-per,#bk-fancy')){grab(sc);redrawModal(body(),mount);}
+    });
+    sc.querySelector('#bk-again').addEventListener('click',function(){grab(sc);d.batch=uid();redrawModal(body(),mount);});
+    sc.querySelector('#bk-add').addEventListener('click',function(){
+      var before=d.count;grab(sc);if(d.count!==before)build();
+      var t=townStore();
+      if(!Array.isArray(t.custom))t.custom=[];
+      var at=nowISO();
+      preview.forEach(function(f){f.added=at;t.custom.push(f);});
+      save();closeModal();toast(preview.length+' neighbours moved in.','good');render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false,cls:'wide'});
+}
+function removeGeneratedFolk(){
+  var n=townCfg().custom.filter(function(f){return f.gen;}).length;
+  if(!n){toast('No generated neighbours to remove.');return;}
+  confirmModal('Remove '+n+' generated neighbours?','Neighbours you added by name stay. Gifts already given stay in readers’ history.','Remove',function(){
+    var t=townStore();
+    t.custom=(t.custom||[]).filter(function(f){return !f.gen;});
+    save();render();
+  },true);
+}
+
+/* ---------- the ecosystem ---------- */
+function ecoCfg(){
+  var e=(S.settings.town&&S.settings.town.eco)||{};
+  return{on:e.on===true,
+    start:e.start||'',
+    seed:e.seed||'eco',
+    seeds:Array.isArray(e.seeds)&&e.seeds.length?e.seeds:[{from:'0000-00',seed:e.seed||'eco'}],
+    dormant:clampN(num(e.dormant,15),0,90),
+    dormantLen:clampN(Math.round(num(e.dormantLen,3)),1,26),
+    quietOn:e.quietOn!==false,quietFrom:e.quietFrom||'21:30',quietTo:e.quietTo||'06:30',
+    quietPct:clampN(num(e.quietPct,85),0,100),
+    arrive:clampN(num(e.arrive,4),0,200),
+    leave:clampN(num(e.leave,2),0,200),
+    protectShipped:e.protectShipped!==false,
+    protectFriends:e.protectFriends!==false,
+    minPop:clampN(Math.round(num(e.minPop,8)),0,5000),
+    maxPop:clampN(Math.round(num(e.maxPop,250)),1,5000),
+    style:NAME_STYLES[e.style]?e.style:'mix',
+    announce:e.announce!==false};
+}
+function monthKey(y,m){return y+'-'+pad2(m+1);}
+function ecoStart(c){
+  var d=dnum(c.start);
+  return d?new Date(d.getFullYear(),d.getMonth(),1):null;
+}
+/* Poisson-ish whole number around an average, fixed per month. */
+function ecoCount(avg,seed){
+  if(!(avg>0))return 0;
+  var base=Math.floor(avg),frac=avg-base;
+  var n=base+(rnd(seed,'frac')<frac?1:0);
+  var wob=Math.round((rnd(seed,'wob')-.5)*Math.max(1,avg*.5));
+  return Math.max(0,n+wob);
+}
+var ECO_CACHE={key:'',val:null};
+function seedFor(c,mk){
+  var s=c.seeds[0].seed;
+  c.seeds.forEach(function(x){if(x.from<=mk)s=x.seed;});
+  return s;
+}
+/* Month by month from the start: who arrived, who left. */
+function ecoHistory(now){
+  now=now||new Date();
+  var c=ecoCfg();
+  var st=ecoStart(c);
+  if(!c.on||!st)return{arrivals:[],departures:{},months:[]};
+  var key=JSON.stringify(c)+'|'+JSON.stringify((S.settings.town||{}).removed||{})+'|'+((S.settings.town||{}).custom||[]).length+'|'+
+    Math.floor(now.getTime()/60000)+'|'+S.profiles.length;
+  if(ECO_CACHE.key===key)return ECO_CACHE.val;
+  var tc=townCfg();
+  var base=TOWN_FOLK.filter(function(f){return !tc.removed[f.id];}).concat(tc.custom.filter(function(f){return f&&f.id&&f.name;}));
+  var taken={};base.forEach(function(f){taken[f.name.toLowerCase()]=1;});
+  var arrivals=[],departures={},months=[];
+  var friends={};
+  S.profiles.forEach(function(p){townSentOf(p).forEach(function(s){friends[s.to]=1;});});
+  var y=st.getFullYear(),m=st.getMonth(),guard=0;
+  while(guard++<120){
+    var ms=new Date(y,m,1),me2=new Date(y,m+1,1);
+    if(ms>now)break;
+    var mk=monthKey(y,m),seed=seedFor(c,mk)+':'+mk;
+    var present=base.concat(arrivals).filter(function(f){return !departures[f.id]&&(!f.joined||f.joined<ms);});
+    var inN=ecoCount(c.arrive,seed+':in');
+    var outN=ecoCount(c.leave,seed+':out');
+    inN=Math.min(inN,Math.max(0,c.maxPop-present.length));
+    var came=[],went=[];
+    for(var i=0;i<inN;i++){
+      var fs=seed+':a'+i;
+      var f=makeFolk(fs,{style:c.style,persona:'mix',fancy:rnd(fs,'fancy')<.3},taken);
+      f.id='tf-eco-'+mk.replace('-','')+'-'+i;
+      f.custom=false;f.gen=false;f.eco=true;
+      f.joined=new Date(ms.getTime()+rnd(fs,'day')*(me2-ms-3600000));
+      arrivals.push(f);came.push(f);
+    }
+    var canGo=present.filter(function(f){
+      if(c.protectShipped&&!f.eco&&!f.gen)return false;
+      if(c.protectFriends&&friends[f.id])return false;
+      return true;
+    });
+    outN=Math.min(outN,canGo.length,Math.max(0,present.length-c.minPop));
+    var order=canGo.slice().sort(function(a,b){return rnd(seed,'o'+a.id)-rnd(seed,'o'+b.id);});
+    for(var j=0;j<outN;j++){
+      var g=order[j];
+      var when=new Date(ms.getTime()+rnd(seed,'l'+g.id)*(me2-ms-3600000));
+      if(g.joined&&when<=g.joined)when=new Date(Math.min(me2-1,g.joined.getTime()+864e5));
+      departures[g.id]=when;went.push(g);
+    }
+    months.push({key:mk,start:ms,came:came,went:went,pop:present.length+came.length-went.length});
+    m++;if(m>11){m=0;y++;}
+  }
+  var val={arrivals:arrivals,departures:departures,months:months};
+  ECO_CACHE={key:key,val:val};
+  return val;
+}
+function ecoArrivals(now){
+  now=now||new Date();
+  return ecoHistory(now).arrivals.filter(function(f){return f.joined<=now;});
+}
+function ecoGone(f,now){
+  var d=ecoHistory(now).departures[f.id];
+  return !!(d&&d<=(now||new Date()));
+}
+/* Dormant spells: each neighbour has a chance, per stretch of weeks,
+   of taking a break. Over a year that averages out to the % set. */
+function ecoDormant(f,now){
+  var c=ecoCfg();
+  if(!c.on||!c.dormant)return false;
+  now=now||new Date();
+  var len=c.dormantLen*7*864e5;
+  var off=rnd(c.seed+f.id,'phase')*len;
+  var block=Math.floor((now.getTime()+off)/len);
+  return rnd(c.seed+':d:'+f.id,block)*100<c.dormant;
+}
+function ecoQuiet(f,now){
+  var c=ecoCfg();
+  if(!c.on||!c.quietOn||!c.quietPct)return false;
+  var a=hm(c.quietFrom),b=hm(c.quietTo);
+  if(!a||!b)return false;
+  var t=now.getHours()*60+now.getMinutes(),s=a[0]*60+a[1],e=b[0]*60+b[1];
+  var inside=s<=e?(t>=s&&t<e):(t>=s||t<e);
+  if(!inside)return false;
+  return rnd(c.seed+':q:'+f.id,todayKey())*100<c.quietPct;
+}
+/* ---------- the numbers for the settings panel ---------- */
+function ecoSummary(){
+  var c=ecoCfg(),now=new Date();
+  var h=ecoHistory(now);
+  var folk=townFolk();
+  var dormant=folk.filter(function(f){return ecoDormant(f,now);}).length;
+  var mk=monthKey(now.getFullYear(),now.getMonth());
+  var cur=h.months.filter(function(m){return m.key===mk;})[0];
+  return{pop:folk.length,dormant:dormant,
+    cameThisMonth:cur?cur.came.filter(function(f){return f.joined<=now;}).length:0,
+    wentThisMonth:cur?cur.went.filter(function(f){return h.departures[f.id]<=now;}).length:0,
+    months:h.months,arrivals:h.arrivals,departures:h.departures};
+}
+function ecoForecast(){
+  var c=ecoCfg();
+  if(!c.on||!ecoStart(c))return [];
+  var now=new Date();
+  var later=new Date(now.getFullYear(),now.getMonth()+12,15);
+  var saved=ECO_CACHE;
+  ECO_CACHE={key:'',val:null};
+  var h=ecoHistory(later);
+  ECO_CACHE=saved;
+  var mk=monthKey(now.getFullYear(),now.getMonth());
+  var from=-1;
+  h.months.forEach(function(m,i){if(m.key===mk)from=i;});
+  return from<0?[]:h.months.slice(from,from+12);
+}
+function ecoMovesFeed(now,sinceMs){
+  var c=ecoCfg();
+  if(!c.on||!c.announce)return [];
+  now=now||new Date();
+  var h=ecoHistory(now),out=[];
+  h.arrivals.forEach(function(f){
+    if(f.joined<=now&&now-f.joined<sinceMs)out.push({folk:f,text:'moved into '+townCfg().label,icon:'📦',at:f.joined.getTime()});
+  });
+  Object.keys(h.departures).forEach(function(id){
+    var d=h.departures[id];
+    if(d<=now&&now-d<sinceMs){
+      var f=TOWN_FOLK.concat(townCfg().custom,h.arrivals).filter(function(x){return x.id===id;})[0];
+      if(f)out.push({folk:f,text:'moved away — bye for now',icon:'👋',at:d.getTime()});
+    }
+  });
+  return out;
+}
+function ecoSettingsHTML(){
+  var c=ecoCfg();
+  var cb=function(id,on,label){return '<label class="check"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'><span>'+label+'</span></label>';};
+  var num2=function(id,label,v,min,max,step,w){return '<label class="field" style="flex:1;min-width:'+(w||170)+'px"><span>'+label+'</span><input class="inp" id="'+id+'" type="number" min="'+min+'" max="'+max+'" step="'+(step||1)+'" value="'+v+'"></label>';};
+  var h='<div class="panel"><h3>Town ecosystem</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">Let the town live on its own: neighbours take breaks, sleep at night, move in and move away. '+
+    'Every move is worked out from the month and the ecosystem’s seed, so all devices agree and nothing runs in the background.</p>'+
+    '<div class="stack">'+cb('eco-on',c.on,'Run the ecosystem')+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:170px"><span>Counting from</span><input class="inp" id="eco-start" type="date" value="'+esc(c.start||dkey(new Date()))+'"></label>'+
+      num2('eco-min','Never fewer than',c.minPop,0,5000)+num2('eco-max','Never more than',c.maxPop,1,5000)+
+    '</div>'+
+    sh4('Breaks')+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      num2('eco-dorm','Dormant at any time, on average (%)',c.dormant,0,90)+
+      num2('eco-dlen','A break lasts about (weeks)',c.dormantLen,1,26)+
+    '</div>'+
+    '<p class="tiny muted">Dormant neighbours show as “Away”, don’t read, shop, visit or help goals until they’re back.</p>'+
+    sh4('Quiet hours')+cb('eco-qon',c.quietOn,'Most neighbours are offline at night')+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:130px"><span>From</span><input class="inp" id="eco-qf" type="time" value="'+esc(c.quietFrom)+'"></label>'+
+      '<label class="field" style="flex:1;min-width:130px"><span>Until</span><input class="inp" id="eco-qt" type="time" value="'+esc(c.quietTo)+'"></label>'+
+      num2('eco-qp','Offline during those hours (%)',c.quietPct,0,100)+
+    '</div>'+
+    sh4('Moving in and out')+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      num2('eco-in','New neighbours a month, on average',c.arrive,0,200,0.5)+
+      num2('eco-out','Neighbours leaving a month, on average',c.leave,0,200,0.5)+
+      '<label class="field" style="flex:1;min-width:170px"><span>Newcomers’ names</span><select class="inp" id="eco-style">'+Object.keys(NAME_STYLES).map(function(k){
+        return '<option value="'+k+'"'+(c.style===k?' selected':'')+'>'+esc(NAME_STYLES[k])+'</option>';}).join('')+'</select></label>'+
+    '</div>'+
+    cb('eco-pship',c.protectShipped,'Never move away the neighbours that came with PipHub or that you added by name (bulk-generated ones can move)')+
+    cb('eco-pfr',c.protectFriends,'Never move away a neighbour a reader has given a gift to')+
+    cb('eco-ann',c.announce,'Show move-ins and move-outs in the town feed')+
+    '<div class="row stack"><button class="btn btn-primary" data-act="eco-save">Save ecosystem</button>'+
+    '<button class="btn btn-ghost" data-act="eco-reseed">🎲 Reshuffle the future</button></div></div>';
+  if(c.on&&ecoStart(c)){
+    var sm=ecoSummary();
+    h+='<div class="divider"></div><div class="stats">'+
+      '<div class="stat"><div class="k">Neighbours now</div><div class="v">'+sm.pop+'</div></div>'+
+      '<div class="stat"><div class="k">Away on a break</div><div class="v">'+sm.dormant+'</div></div>'+
+      '<div class="stat"><div class="k">Moved in this month</div><div class="v">'+sm.cameThisMonth+'</div></div>'+
+      '<div class="stat"><div class="k">Moved away this month</div><div class="v">'+sm.wentThisMonth+'</div></div></div>';
+    var fc=ecoForecast();
+    if(fc.length){
+      var mx=Math.max.apply(null,fc.map(function(m){return m.pop;}).concat([1]));
+      h+=sh4('The next 12 months')+'<div class="ecochart">'+fc.map(function(m){
+        return '<div class="ecobar" title="'+esc(m.key+': '+m.pop+' neighbours, +'+m.came.length+' / −'+m.went.length)+'">'+
+          '<span class="ecov">'+m.pop+'</span><span class="ecofill" style="height:'+Math.max(4,Math.round(m.pop/mx*100))+'%"></span>'+
+          '<span class="ecom">'+MONTHS[+m.key.slice(5)-1]+'</span><span class="ecod">+'+m.came.length+' −'+m.went.length+'</span></div>';
+      }).join('')+'</div>';
+    }
+    var recent=ecoMovesFeed(new Date(),60*864e5).sort(function(a,b){return b.at-a.at;}).slice(0,8);
+    if(recent.length)h+=sh4('Recent moves')+recent.map(function(r){
+      return '<div class="tiny" style="padding:3px 0">'+r.icon+' <b>'+esc(r.folk.name)+'</b> '+esc(r.text)+' · '+esc(fmtDM(new Date(r.at)))+'</div>';}).join('');
+  }
+  return h+'</div>';
+}
+function saveEco(){
+  var t=townStore();
+  var e=t.eco||{};
+  var v=function(id){var el=$('#'+id);return el?el.value:null;};
+  var ck=function(id){var el=$('#'+id);return el?el.checked:null;};
+  e.on=ck('eco-on');e.start=v('eco-start')||dkey(new Date());
+  e.minPop=num(v('eco-min'),8);e.maxPop=num(v('eco-max'),250);
+  e.dormant=num(v('eco-dorm'),15);e.dormantLen=num(v('eco-dlen'),3);
+  e.quietOn=ck('eco-qon');e.quietFrom=v('eco-qf')||'21:30';e.quietTo=v('eco-qt')||'06:30';e.quietPct=num(v('eco-qp'),85);
+  e.arrive=num(v('eco-in'),4);e.leave=num(v('eco-out'),2);e.style=v('eco-style');
+  e.protectShipped=ck('eco-pship');e.protectFriends=ck('eco-pfr');e.announce=ck('eco-ann');
+  if(!e.seed)e.seed='eco-'+uid();
+  if(e.maxPop<e.minPop)e.maxPop=e.minPop;
+  t.eco=e;
+  ECO_CACHE={key:'',val:null};
+  save();toast('Ecosystem saved.','good');render();
+}
+function reseedEco(){
+  confirmModal('Reshuffle the future?','Who moves in and out from next month on will change. Everyone who has already moved in or away stays as they are.','Reshuffle',function(){
+    var t=townStore();t.eco=t.eco||{};
+    var c=ecoCfg(),now=new Date();
+    var next=monthKey(now.getMonth()===11?now.getFullYear()+1:now.getFullYear(),(now.getMonth()+1)%12);
+    t.eco.seeds=c.seeds.filter(function(x){return x.from<next;}).concat([{from:next,seed:'eco-'+uid()}]);
+    ECO_CACHE={key:'',val:null};save();render();
+  });
+}
+
 /* ---------- the town feed ---------- */
 function townFeed(n,now,opts){
   now=now||new Date();opts=opts||{};
@@ -11378,6 +11880,7 @@ function townFeed(n,now,opts){
     folk.forEach(function(f){
       var key=f.id+'|f|'+sl;
       if(hashUnit(key)>=Math.min(.6,townBusy(at,f)*.14))return;
+      if(ecoDormant(f,at)||ecoQuiet(f,at)||(f.joined&&f.joined>at))return;
       var time=t0+hashUnit(key+'t')*10*60000;
       if(time>now.getTime())return;
       var r=hashUnit(key+'k'),txt='',icon='✨';
@@ -11391,6 +11894,7 @@ function townFeed(n,now,opts){
       out.push({folk:f,text:txt,icon:icon,at:time});
     });
   }
+  out=out.concat(ecoMovesFeed(now,6*3600000));
   out.sort(function(a,b){return b.at-a.at;});
   return out.slice(0,n);
 }
@@ -11492,7 +11996,7 @@ function townVisitor(p,now){
   p=p||me();now=now||new Date();
   var c=townCfg();
   if(!p||!c.on||!c.visitors)return null;
-  var folk=townFolk();
+  var folk=townFolk().filter(function(f){return !ecoDormant(f,now)&&!ecoQuiet(f,now);});
   if(!folk.length)return null;
   var slot=Math.floor(now.getTime()/(30*60000));
   var seed=p.id+':v:'+slot;
@@ -11608,6 +12112,10 @@ function friendHearts(p,fid){var n=friendLevel(p,fid);return n?'Friendship '+'�
 
 /* ---------- the Town page ---------- */
 var TOWN_FILTER='all';
+function isNewFolk(f){
+  var t=f.joined||(f.added?new Date(f.added):null);
+  return !!t&&(Date.now()-t)<14*864e5;
+}
 function viewTown(){
   var p=me(),c=townCfg();
   if(!c.on)return '<div class="empty"><h3>'+esc(c.label)+' is closed</h3><div class="stack"><button class="btn" data-go="catalog">Back to the catalogue</button></div></div>';
@@ -11621,8 +12129,11 @@ function viewTown(){
     '<div class="row"><div class="stat" style="min-width:120px"><div class="k">Around town now</div>'+
     '<div class="v">'+Math.max(active,online)+'</div></div></div></div>';
   var order={on:0,recent:1,off:2};
+  if(rows.length>60&&TOWN_FILTER==='all'){
+    rows=rows.filter(function(r){return r.st.dot!=='off';}).concat(rows.filter(function(r){return r.st.dot==='off';}).slice(0,Math.max(0,60-rows.filter(function(r){return r.st.dot!=='off';}).length)));
+  }
   rows.sort(function(a,b){return (order[a.st.dot]-order[b.st.dot])||a.f.name.localeCompare(b.f.name);});
-  var filters=[['all','Everyone'],['on','Online'],['reading','Reading'],['store','In Store'],['friends','Friends']];
+  var filters=[['all','Everyone'],['on','Online'],['reading','Reading'],['store','In Store'],['friends','Friends'],['new','New here'],['away','Away']];
   h+='<div class="seg stack">'+filters.map(function(x){
     return '<button type="button" data-act="town-filter" data-id="'+x[0]+'" aria-pressed="'+(TOWN_FILTER===x[0])+'">'+x[1]+'</button>';
   }).join('')+'</div>';
@@ -11631,6 +12142,8 @@ function viewTown(){
     if(TOWN_FILTER==='reading')return r.st.kind==='reading'||r.st.kind==='quiz';
     if(TOWN_FILTER==='store')return r.st.kind==='store';
     if(TOWN_FILTER==='friends')return friendLevel(p,r.f.id)>0;
+    if(TOWN_FILTER==='new')return isNewFolk(r.f);
+    if(TOWN_FILTER==='away')return r.st.kind==='away';
     return true;
   });
   h+='<div class="towngrid stack">';
@@ -11641,7 +12154,7 @@ function viewTown(){
     var fl=friendLevel(p,f.id);
     h+='<div class="folkcard'+(st.dot==='off'?' away':'')+'">'+
       '<div class="fav">'+pipSVG(folkLook(f),pose,64,{still:true})+'</div>'+
-      '<div class="fmain"><div class="fname">'+esc(f.name)+'</div>'+folkBadge()+
+      '<div class="fmain"><div class="fname">'+esc(f.name)+'</div>'+folkBadge()+(isNewFolk(f)?' <span class="newbadge">NEW</span>':'')+
       (c.statuses?'<div class="fstat">'+statusDot(st)+esc(st.label)+(st.detail?'<span class="muted"> · '+esc(st.detail)+'</span>':'')+'</div>':'')+
       '<div class="tiny muted">'+esc(per.name)+(fl?' · <span class="hearts">'+'♥'.repeat(fl)+'</span>':'')+'</div></div>'+
       (canGiveAt('town')?'<button class="btn btn-sm" data-act="town-give" data-id="'+esc(f.id)+'" data-place="town">🎁 Gift</button>':'')+
@@ -11707,6 +12220,8 @@ function townGoalSpan(ev,now){
   var start=roundStartOf(ev,rd);
   if(!(start instanceof Date)||isNaN(start))start=dayStart(new Date(ev.created||Date.now()));
   var end=rd.end||addDays(start,g.days);
+  /* line the start up with the step, so the first update is a whole step */
+  start=quantizeTime(start,g.step);
   return{start:start,end:end,key:rd.key,repeats:!!rd.resets};
 }
 function townGoalAt(ev,t,span){
@@ -11715,7 +12230,7 @@ function townGoalAt(ev,t,span){
   if(q<span.start)q=span.start;
   var f=(q-span.start)/Math.max(1,(span.end-span.start));
   var v=target*g.finish/100*townPaceCurve(g.pace,f,ev.id+span.key);
-  return target>=20?Math.floor(v):Math.floor(v*10)/10;
+  return target>=20?Math.round(v):Math.round(v*10)/10;
 }
 function townGoal(ev,now){
   now=now||new Date();
@@ -11725,7 +12240,7 @@ function townGoal(ev,now){
   var total=townGoalAt(ev,now<span.end?now:new Date(span.end.getTime()-1),span);
   var target=goalCfg(ev).target;
   var crowd=Math.max(3,Math.round(townCfg().size*.3*Math.min(1,g.finish/100)));
-  var helpers=total>0?Math.max(1,Math.round(crowd*Math.min(1,total/Math.max(1,target*g.finish/100)))):0;
+  var helpers=total>0?Math.max(2,Math.round(crowd*Math.sqrt(Math.min(1,total/Math.max(1,target*g.finish/100))))):0;
   return{on:true,total:total,helpers:helpers,span:span,ended:!span.repeats&&now>=span.end,
     final:townGoalAt(ev,new Date(span.end.getTime()-1),span),cfg:g};
 }
@@ -11931,11 +12446,11 @@ function siteBannersHTML(){
       line='<span class="sbsub">'+(n?n+' in '+esc(townCfg().label)+' have joined':'Everyone’s invited')+'</span>';
     }
     var joined=hasJoined(ev,p);
-    h+='<div class="sitebanner" style="--tha:'+th.a+';--thb:'+th.b+';--thi:'+(th.ink||'#fff')+'">'+
+    h+='<div class="sitebanner" role="link" tabindex="0" title="Open this event" data-act="banner-open" data-id="'+esc(ev.id)+'" style="--tha:'+th.a+';--thb:'+th.b+';--thi:'+(th.ink||'#fff')+'">'+
       '<span class="sbtitle">'+esc((th.motif&&th.motif[0])||'🎉')+' '+esc(ev.title)+'</span>'+line+
       (needsJoin(ev)&&!joined
         ?'<button class="btn btn-sm" data-act="ev-join" data-id="'+esc(ev.id)+'">Join</button>'
-        :'<span class="sbjoined">'+(needsJoin(ev)?'✓ Joined':'')+'</span><button class="btn btn-sm" data-go="events">View</button>')+
+        :'<span class="sbjoined">'+(needsJoin(ev)?'✓ Joined':'')+'</span><button class="btn btn-sm" data-act="banner-open" data-id="'+esc(ev.id)+'">View</button>')+
       '</div>';
   });
   return h;
@@ -11980,7 +12495,9 @@ function townSettingsHTML(){
     '<button class="btn btn-primary" data-act="town-save">Save community settings</button></div>'+
     '<div class="divider"></div>'+sh4('Neighbours')+
     '<div class="scroll stack"><table><thead><tr><th>Neighbour</th><th>Type</th><th>Right now</th><th></th></tr></thead><tbody>';
-  TOWN_FOLK.concat(c.custom).forEach(function(f){
+  var allRows=TOWN_FOLK.concat(c.custom);
+  var cutRows=TOWN_SHOW_ALL?allRows:allRows.slice(0,25);
+  cutRows.forEach(function(f){
     var gone=!!c.removed[f.id];
     var st=folkStatus(f);
     h+='<tr'+(gone?' style="opacity:.5"':'')+'><td><div class="row" style="gap:8px">'+pipSVG(folkLook(f),'idle',28,{still:true,shadow:false})+esc(f.name)+'</div></td>'+
@@ -11995,9 +12512,15 @@ function townSettingsHTML(){
     '<label class="field" style="flex:1;min-width:160px"><span>New neighbour’s name</span><input class="inp" id="tw-nname" maxlength="24" placeholder="Priya_K"></label>'+
     '<label class="field" style="min-width:140px"><span>Type</span><select class="inp" id="tw-nper">'+Object.keys(TOWN_PERSONA).map(function(k){
       return '<option value="'+k+'">'+TOWN_PERSONA[k].name+'</option>';}).join('')+'</select></label>'+
-    '<button class="btn" data-act="town-folk-add">'+ico('plus')+'Add</button></div></div>';
+    '<button class="btn" data-act="town-folk-add">'+ico('plus')+'Add</button></div>'+
+    (allRows.length>25?'<button class="btn btn-sm btn-ghost stack" data-act="town-folk-more">'+(TOWN_SHOW_ALL?'Show fewer':'Show all '+allRows.length)+'</button>':'')+
+    '<div class="row stack" style="gap:8px;flex-wrap:wrap"><button class="btn btn-primary" data-act="town-bulk">'+ico('plus')+'Add neighbours in bulk</button>'+
+    '<button class="btn btn-ghost" data-act="town-bulk-clear">Remove generated neighbours ('+c.custom.filter(function(f){return f.gen;}).length+')</button></div>'+
+    '<p class="tiny muted">'+allRows.length+' neighbours listed here'+(ecoCfg().on?', plus '+ecoArrivals(new Date()).length+' who moved in with the ecosystem ('+townFolk().length+' living in town now)':'')+'.</p></div>';
+  h+=ecoSettingsHTML();
   return h;
 }
+var TOWN_SHOW_ALL=false;
 function townStore(){
   var t=S.settings.town;
   if(!t||typeof t!=='object'){t={};S.settings.town=t;}
@@ -12038,6 +12561,244 @@ function townFolkDel(id){
   var t=townStore();
   t.custom=(t.custom||[]).filter(function(f){return f.id!==id;});
   save();render();
+}
+
+/* =========================================================
+   What's new — shown once per app version, over the catalogue.
+
+   Two sources, merged:
+   1. APP_RELEASES: the written notes for each version (title,
+      headline, feature list). Add one entry per release.
+   2. A live diff: what is in the catalogue now that was not
+      there the last time this device saw the popup — Pip looks,
+      companions, cosmetics, foods, store items, titles, events.
+      The first time (no snapshot yet) the release's `spotlight`
+      decides which items to feature.
+   ========================================================= */
+var APP_VERSION='pip-2026-10-10-1';
+var APP_RELEASES=[
+  {version:'pip-2026-10-10-1',date:'2026-09-16',
+   kicker:'Town news',
+   title:'Pip Town is growing!',
+   headline:'New neighbours are moving in, some take a break now and then, and the town goes quiet at night — just like a real neighbourhood.',
+   spotlight:{seasons:['harvestfair']},
+   features:[
+     {icon:'📦',title:'New neighbours',text:'Look for the NEW badge on the Town page, and the “New here” filter.'},
+     {icon:'😴',title:'Away and asleep',text:'Neighbours on a break show as Away, and most are offline late at night.'},
+     {icon:'👋',title:'Moving day',text:'The town feed tells you when someone moves in or moves away.'},
+     {icon:'🛠️',title:'For instructors',text:'Add neighbours in bulk with generated names, and run the Town ecosystem: breaks, quiet hours, monthly move-ins and move-outs, with a 12-month forecast.',admin:true}
+   ]},
+  {version:'pip-2026-10-09-1',date:'2026-09-16',
+   kicker:'Fresh update',
+   title:'The Harvest Fair is in town!',
+   headline:'New Pips, a carousel companion, Pip Town neighbours and community events you can join.',
+   spotlight:{seasons:['harvestfair']},
+   features:[
+     {icon:'🎠',title:'Carousel Maestro',text:'A top-tier Pip whose colours shift like carousel lights, with a turning Ferris wheel and a pony that rides its pole.'},
+     {icon:'🏘️',title:'Pip Town',text:'Meet your neighbours in the new Town tab: see who is reading, shopping or online, and swap gifts.'},
+     {icon:'🤝',title:'Community events',text:'Join a community event and everything you do helps the whole town reach the goal — tap the banner to jump straight to it.'},
+     {icon:'🎁',title:'Win whole Pips',text:'Events and activities can now give away complete looks, even top-tier ones.'},
+     {icon:'📕',title:'Your books',text:'Quizzes unlock for the books you have. Ask your instructor if one is missing.'},
+     {icon:'⏱️',title:'Live town progress',text:'Community goals now update on their own while you watch.',admin:false},
+     {icon:'🛠️',title:'For instructors',text:'Book ownership grid, pinned events, a tidy Ended events section, and this What’s new popup (Settings → What’s new).',admin:true}
+   ]}
+];
+function currentRelease(){
+  for(var i=0;i<APP_RELEASES.length;i++)if(APP_RELEASES[i].version===APP_VERSION)return APP_RELEASES[i];
+  return APP_RELEASES[0];
+}
+function wnCfg(){
+  var w=S.settings.whatsNew;
+  if(!w||typeof w!=='object'){w={};S.settings.whatsNew=w;}
+  return w;
+}
+function catalogSnapshot(){
+  return{looks:PIP_LOOKS.map(function(l){return l.id;}),
+    parts:PIP_PARTS.map(function(p){return p.id;}),
+    foods:foodList().map(function(f){return f.id;}),
+    store:(S.store||[]).map(function(x){return x.id;}),
+    modules:(S.modules||[]).map(function(m){return m.id;}),
+    events:eventList().map(function(e){return e.id;})};
+}
+/* Everything new since the device last saw the popup. */
+function whatsNewItems(){
+  var w=wnCfg(),snap=w.snap,rel=currentRelease(),out;
+  var p=me();
+  function fresh(list,key){return snap&&Array.isArray(snap[key])?list.filter(function(x){return snap[key].indexOf(x.id)<0;}):null;}
+  var looks=fresh(PIP_LOOKS,'looks'),parts=fresh(PIP_PARTS,'parts');
+  if(!looks){
+    var seas=(rel.spotlight&&rel.spotlight.seasons)||[];
+    looks=PIP_LOOKS.filter(function(l){return seas.indexOf(l.season)>=0;});
+    parts=PIP_PARTS.filter(function(x){return seas.indexOf(x.season)>=0;});
+  }
+  parts=parts.filter(function(x){return x.price>0;});
+  out={
+    top:looks.filter(function(l){return l.tier==='top';}),
+    looks:looks.filter(function(l){return l.tier!=='top';}),
+    pets:parts.filter(function(x){return x.slot==='pet';}),
+    parts:parts.filter(function(x){return x.slot!=='pet';}),
+    foods:(fresh(foodList(),'foods')||[]).filter(function(f){return !f.hidden;}),
+    store:(fresh(S.store||[],'store')||[]).filter(function(x){return !x.hidden;}),
+    modules:fresh(S.modules||[],'modules')||[],
+    events:(fresh(eventList(),'events')||[]).filter(function(ev){return !ev.hidden&&(!p||assignedTo(ev,p));})
+  };
+  out.count=out.top.length+out.looks.length+out.pets.length+out.parts.length+out.foods.length+out.store.length+out.modules.length+out.events.length;
+  return out;
+}
+function seasonTag(thing){
+  if(!thing.season||!PIP_SEASONS[thing.season])return '';
+  var w=pipSeasonWindow(thing.season);
+  return '<span class="wnseason">'+esc(PIP_SEASONS[thing.season].name)+(w&&w.open?' · until '+fmtDM(w.to):(w?' · from '+fmtDM(w.from):''))+'</span>';
+}
+function whatsNewHTML(){
+  var rel=currentRelease(),it=whatsNewItems(),p=me();
+  var heroLook=it.top[0]||it.looks[0]||null;
+  var sideLooks=it.top.slice(1).concat(it.looks).slice(0,2);
+  var h='<div class="wn">'+
+    '<div class="wnhero">'+
+      '<div class="wnconf" aria-hidden="true">'+'<i></i>'.repeat(14)+'</div>'+
+      '<div class="wnkick">'+esc(rel.kicker||'What’s new')+' <span class="wnver">'+esc(rel.date?fmtDM(new Date(rel.date+'T12:00:00')):'')+'</span></div>'+
+      '<h2 class="wntitle">'+esc(rel.title)+'</h2>'+
+      '<p class="wnlede">'+esc(rel.headline)+'</p>'+
+      (heroLook?'<div class="wnstage">'+
+        (sideLooks[0]?'<div class="wnside">'+pipSVG(lookPreview(sideLooks[0]),'cheer',96)+'</div>':'')+
+        '<div class="wnmain">'+pipSVG(lookPreview(heroLook),'cheer',170)+'</div>'+
+        (sideLooks[1]?'<div class="wnside">'+pipSVG(lookPreview(sideLooks[1]),'idle',96)+'</div>':'')+
+      '</div>':'')+
+    '</div><div class="wnbody">';
+  if(it.count)h+='<div class="wncount">'+it.count+' new thing'+(it.count===1?'':'s')+' to discover</div>';
+  function sec(title,sub,inner){return '<div class="wnsec"><h3>'+title+(sub?' <span>'+sub+'</span>':'')+'</h3>'+inner+'</div>';}
+  function lookCard(l){
+    var powers=lookPowers(l).map(function(a){return PIP_POWER_SHORT[a.kind]?PIP_POWER_SHORT[a.kind](a.value):'';}).filter(Boolean).join(' · ');
+    return '<div class="wnlook'+(l.tier==='top'?' top':'')+'">'+(l.tier==='top'?'<span class="wnflag">TOP TIER</span>':'')+
+      pipSVG(lookPreview(l),'cheer',84,{still:true})+'<b>'+esc(l.name)+'</b>'+
+      '<span class="wnmeta">'+l.grants.length+' pieces · '+pts(pipCost(l))+' pts</span>'+
+      (powers?'<span class="wnpow">'+esc(powers)+'</span>':'')+
+      (festivalText(l)?'<span class="wnpow fest">'+esc(festivalText(l))+'</span>':'')+
+      seasonTag(l)+'</div>';
+  }
+  if(it.top.length)h+=sec('New top-tier Pips','the rarest looks',
+    '<div class="wngrid looks">'+it.top.map(lookCard).join('')+'</div>');
+  if(it.looks.length)h+=sec('New Pips','complete looks','<div class="wngrid looks">'+it.looks.map(lookCard).join('')+'</div>');
+  if(it.pets.length)h+=sec('New companions','they follow Pip everywhere','<div class="wngrid pets">'+it.pets.map(function(pt){
+    var tr=petTrait(pt.v);
+    return '<div class="wnpet">'+petSVG(pt.v,'cheer',72)+'<b>'+esc(pt.name)+'</b><span class="wnmeta">'+esc(tr.name)+' · '+pts(pipCost(pt))+' pts</span>'+seasonTag(pt)+'</div>';
+  }).join('')+'</div>');
+  if(it.parts.length){
+    var bySlot={};
+    it.parts.forEach(function(pt){(bySlot[pt.slot]=bySlot[pt.slot]||[]).push(pt);});
+    var chips=Object.keys(bySlot).map(function(sl){return '<span class="wnchip">'+bySlot[sl].length+' '+esc((PIP_SLOT_NAMES[sl]||sl).toLowerCase())+'</span>';}).join('');
+    var shown=it.parts.slice(0,12);
+    h+=sec('New cosmetics',it.parts.length+' pieces','<div class="wnchips">'+chips+'</div><div class="wngrid parts">'+shown.map(function(pt){
+      var pv={body:(p&&pipLook(p).body)||'sun'};pv[pt.slot]=pt.v;
+      if(pt.slot==='body'){pv={body:pt.v};}
+      return '<div class="wnpart">'+pipSVG(pv,'idle',56,{still:true,shadow:false})+'<span>'+esc(pt.name)+'</span></div>';
+    }).join('')+(it.parts.length>12?'<div class="wnpart more">+'+(it.parts.length-12)+'<span>more in the store</span></div>':'')+'</div>');
+  }
+  if(it.foods.length)h+=sec('New in Pip’s pantry','','<div class="wngrid parts">'+it.foods.map(function(f){
+    return '<div class="wnpart">'+foodIconHTML(f)+'<span>'+esc(f.name)+'</span><small>'+esc(foodBenefitText(f))+'</small></div>';}).join('')+'</div>');
+  if(it.store.length)h+=sec('New in the store','','<div class="wnlist">'+it.store.slice(0,6).map(function(x){
+    return '<div class="wnrow">'+renderIcon(x.icon)+'<b>'+esc(x.name||x.title||'Item')+'</b><span class="wnmeta">'+pts(num(x.cost,0))+' pts</span></div>';}).join('')+'</div>');
+  if(it.modules.length)h+=sec('New books','','<div class="wnlist">'+it.modules.slice(0,6).map(function(m){
+    return '<div class="wnrow"><span class="wnbook">📚</span><b>'+esc(m.title)+'</b><span class="wnmeta">'+esc(m.author||'')+(ownsBook(m)?'':' · not yet owned')+'</span></div>';}).join('')+'</div>');
+  if(it.events.length)h+=sec('New events','','<div class="wnlist">'+it.events.slice(0,6).map(function(ev){
+    return '<div class="wnrow">'+renderIcon(ev.icon)+'<b>'+esc(ev.title)+'</b>'+(isCommunityEvent(ev)?'<span class="townbadge">Community</span>':'')+'</div>';}).join('')+'</div>');
+  var feats=(rel.features||[]).filter(function(f){return !f.admin||S.admin;});
+  if(feats.length)h+=sec('Also new','','<div class="wnfeats">'+feats.map(function(f){
+    return '<div class="wnfeat"><span class="wnfi">'+f.icon+'</span><div><b>'+esc(f.title)+'</b><p>'+esc(f.text)+'</p></div></div>';}).join('')+'</div>');
+  h+='</div><div class="wnfoot">'+
+    ((it.top.length||it.looks.length||it.parts.length)?'<button class="btn" id="wn-store">See them in the store</button>':'')+
+    (it.events.length||feats.some(function(f){return /event/i.test(f.title);})?'<button class="btn" id="wn-events">Events</button>':'')+
+    '<button class="btn btn-primary" id="wn-ok">Let’s go!</button></div></div>';
+  return h;
+}
+function markWhatsNewSeen(){
+  var w=wnCfg();
+  w.seen=APP_VERSION;
+  w.snap=catalogSnapshot();
+  save();
+}
+function showWhatsNew(force){
+  if(!me())return;
+  var w=wnCfg();
+  if(!force&&(w.off||w.seen===APP_VERSION))return;
+  if(!force&&(S.modals.length||momentLive||S.run))return;
+  var html=whatsNewHTML();
+  markWhatsNewSeen();
+  openModal(html,function(scrim){
+    function done(v){closeModal();if(v)go(v);}
+    scrim.querySelector('#wn-ok').addEventListener('click',function(){done(null);});
+    var st=scrim.querySelector('#wn-store');if(st)st.addEventListener('click',function(){done('store');});
+    var evb=scrim.querySelector('#wn-events');if(evb)evb.addEventListener('click',function(){done('events');});
+  },{cls:'wnsheet'});
+}
+/* A fresh install has nothing to announce: remember the catalogue as it is. */
+function whatsNewInit(){
+  var w=wnCfg();
+  if(!w.seen&&!S.profiles.length){w.seen=APP_VERSION;w.snap=catalogSnapshot();}
+}
+function whatsNewSettingsHTML(){
+  var w=wnCfg();
+  return '<div class="panel"><h3>What’s new</h3>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">After an update, readers see a one-time popup over the catalogue with the release notes and '+
+    'everything added since this device last saw it: Pips, companions, cosmetics, foods, store items, books and events. '+
+    'This device last saw version '+esc(w.seen||'—')+'; the app is '+esc(APP_VERSION)+'.</p>'+
+    '<label class="check stack"><input type="checkbox" id="wn-on"'+(w.off?'':' checked')+'><span>Show the popup after an update</span></label>'+
+    '<div class="row stack"><button class="btn btn-primary" data-act="wn-save">Save</button>'+
+    '<button class="btn" data-act="wn-preview">Preview it now</button>'+
+    '<button class="btn btn-ghost" data-act="wn-reset">Show it again on next visit</button></div></div>';
+}
+
+/* ---------- jump from a banner to its event ---------- */
+var FOCUS_EV=null;
+function focusEventCard(){
+  if(!FOCUS_EV||S.view!=='events')return;
+  var id=FOCUS_EV;FOCUS_EV=null;
+  var el=document.querySelector('.evcard[data-evid="'+id+'"]');
+  if(!el)return;
+  var d=el.closest('details');if(d)d.open=true;
+  setTimeout(function(){
+    el.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'center'});
+    el.classList.add('evflash');
+    setTimeout(function(){el.classList.remove('evflash');},2600);
+  },60);
+}
+
+/* ---------- community goals update live ---------- */
+function townSig(){
+  if(!townOn())return '';
+  return eventList().filter(function(ev){return ev.kind==='goal'&&goalTownCfg(ev).on;})
+    .map(function(ev){var t=townGoal(ev);return ev.id+':'+t.total;}).join('|');
+}
+var TOWN_SIG='';
+setInterval(function(){
+  if(!me()||S.view==='gate'||S.view==='quiz'||S.run)return;
+  var sig=townSig();
+  if(sig===TOWN_SIG)return;
+  var busy=document.querySelector('.scrim')||
+    (document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+  if(busy)return;
+  render();
+},30000);
+function nextTownStep(t,step){
+  var q=quantizeTime(t,step);
+  if(step==='hour')return new Date(q.getTime()+3600000);
+  if(step==='week')return addDays(q,7);
+  if(step==='month')return new Date(q.getFullYear(),q.getMonth()+1,1);
+  return addDays(q,1);
+}
+function townPaceLine(ev){
+  var tg=townGoal(ev);
+  if(!tg.on||tg.ended)return '';
+  var now=new Date(),g=tg.cfg;
+  var prev=new Date(quantizeTime(now,g.step).getTime()-1);
+  var lastGain=Math.round((tg.total-townGoalAt(ev,prev<tg.span.start?tg.span.start:prev,tg.span))*10)/10;
+  var nx=nextTownStep(now,g.step);
+  if(nx>tg.span.end)nx=tg.span.end;
+  var mins=Math.max(1,Math.round((nx-now)/60000));
+  var unit={hour:'hour',day:'day',week:'week',month:'month'}[g.step];
+  return '<div class="tiny townpace">🏘️ '+esc(townCfg().label)+' '+(lastGain>0?'added +'+String(lastGain)+' in the last '+unit:'is warming up')+
+    ' · next update in '+(mins<60?mins+' min':durWords(mins))+'</div>';
 }
 
 /* ---------- Pip in every zone ---------- */

@@ -678,3 +678,42 @@ An event is a **community event** when the town helps with its group goal, or wh
 - **Buying a Pip item, look or food** that can be earned in an open event (as a guaranteed gift, a bonus, or as part of a look that can be won).
 
 It shows a message naming the events and why each is connected, with **Join** buttons and **Join and continue**, **Continue without joining** (or **Buy it anyway**) and **Open Events**. Each alert shows once a day for the same thing. The same connections appear as a small "🤝 Counts toward … — join to get credit" line on title pages and activity rows, and as "Can be earned in an event" on Pip shelf looks.
+
+## What's new popup
+
+After an update, the first time a reader reaches the catalogue they see a one-time popup:
+
+- **The header** is a bold hero with the release title and headline, confetti, and the newest Pips on stage (the top-tier look in the middle).
+- **The showcase** lists everything added since this device last saw the popup, worked out by comparing the catalogue: new top-tier Pips (with powers and seasonal bonus), new complete looks, new companions (with their personality), new cosmetics (counted by slot), new foods, store items, books and events.
+- **"Also new"** lists the release's feature notes. Instructor-only notes are shown only in instructor mode.
+- **Buttons** jump to the store or Events, or close the popup.
+
+It shows once per version per device. A brand-new install doesn't show it. **Settings → What's new** can switch it off, preview it, or show it again on the next visit.
+
+For each release, the app carries `APP_VERSION` (kept equal to the `VERSION` in `sw.js`) and an entry in `APP_RELEASES` with its title, headline, features and the seasons to spotlight.
+
+## Banner → event
+
+Clicking the town-wide banner (or its View button) opens the Events page, scrolls to that event and makes it glow. If the event is in Ended events, that section opens. The Join button on the banner still joins directly.
+
+## Community goals update live
+
+While PipHub is open, community goals refresh by themselves the moment the town's total moves (checked every 30 seconds; never while a popup, quiz or text field is in use). Each community goal card shows "Pip Town added +N in the last hour · next update in M min". The town's schedule is lined up with its step, so an hourly goal moves at the top of every hour. Totals round to the nearest whole number, so each step always shows its share. The editor states the average gain per step. A goal of 500 over 14 days at 90% moves about +1.3 an hour, so small targets or long runs move slowly by design.
+
+## Growing Pip Town
+
+**Add neighbours in bulk** (Settings → Community → Neighbours). Choose how many (up to 300 at a time), a name style (a mix, first names like *Priya*, name + numbers like *Leo27*, handles like *maya.reads*, gamer tags like *PixelFox#3812*, or mash-ups like *QuietOtter*), a personality or a mix, and whether some may wear seasonal items. Each neighbour gets a unique name and a Pip look made from everyday parts. You see them all before anything is added, and 🎲 New names draws another batch. "Remove generated neighbours" takes them all out again and keeps the ones you added by name. The neighbours table shows 25 at a time, with "Show all".
+
+**Town ecosystem** (Settings → Town ecosystem) lets the town live on its own. Set:
+
+- **Counting from:** the date the ecosystem starts; everything is worked out month by month from then.
+- **Never fewer than / never more than:** population limits.
+- **Breaks:** the average % of neighbours dormant at any time over the year, and how many weeks a break lasts. Dormant neighbours show as **Away** and don't read, shop, visit or appear in the feed.
+- **Quiet hours:** a time window (for example 21:30–06:30) and the % of neighbours offline during it.
+- **Moving in and out:** average new neighbours a month, average leaving a month, and the newcomers' name style. The exact number wobbles around the average from month to month.
+- **Protection:** keep the shipped neighbours and the ones you added by name, and keep anyone a reader has given a gift to.
+- **Announcements:** move-ins (📦) and move-outs (👋) in the town feed. New arrivals carry a NEW badge for two weeks, and the Town page has "New here" and "Away" filters.
+
+The panel shows neighbours now, away now, moved in and moved away this month, a 12-month population forecast and the latest moves. **Reshuffle the future** changes who moves from next month on without touching anyone who has already moved.
+
+Nothing here is stored or runs in the background: moves and breaks are worked out from the month and the ecosystem's seed, so every device shows the same town.
