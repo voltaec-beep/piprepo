@@ -605,3 +605,14 @@ The list shows whether each ability is on now, waiting or ended, and which looks
 - **Narrow screens:** on medium-width screens the menu shows icons only, except the open section. On phones the menu becomes its own scrolling row with labels.
 - **Pip's room button:** a house button next to the palette switch opens Pip's room, and it lights up while you're there.
 - **Logo:** the PipHub logo in the top bar is larger (36px, or 32px on phones).
+
+## Seasons (instructor)
+
+Settings → Pip → **Seasons** lists every season with its yearly dates, whether it is open right now, its weather, and what uses it (Pip items, seasonal abilities, foods).
+
+- **Edit** any season: rename it, change its yearly dates (an end before the start runs over the new year), and pick its weather.
+- **Open or closed:** *Follow the dates* (normal), *Open now* (open from today until its next end date, whatever the dates say, which is handy for a surprise or for testing), or *Closed* (its items leave the shelf, and its abilities, foods and weather stop).
+- **Back to the shipped dates** undoes changes to a season that came with PipHub.
+- **New season** creates your own season. You can then use it in seasonal abilities ("Follow a Pip season"), foods and weather. Your own seasons can be deleted; anything using one stops until it is given other dates.
+- Readers always keep items they already own. Changes are stored in `S.settings.pipSeasons` and travel with backups.
+- When several seasons with weather are open, your own seasons show first, then Moon Festival, Halloween, Harvest Fair, Winter, Autumn, Spring and Summer.

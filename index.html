@@ -2387,6 +2387,7 @@ function load(){
   });
   seedFoods();
   migratePowers();
+  applySeasons();
   if(S.active&&!profile(S.active))S.active=null;
 }
 function migrate(){
@@ -3927,7 +3928,129 @@ function viewPipShop(){
   });
   h+='</tbody></table></div>'+
     '<button class="btn btn-primary stack" data-act="save-pipshop">Save Pip prices</button></div>';
-  return h+powerPanelsHTML();
+  return h+seasonsPanelHTML()+powerPanelsHTML();
+}
+
+/* ---------- Seasons (instructor) ---------- */
+var SEASON_MODES=[['auto','Follow the dates'],['open','Open now'],['closed','Closed']];
+function seasonStatus(k){
+  var s=PIP_SEASONS[k],w=pipSeasonWindow(k);
+  if(s.mode==='closed')return{cls:'cold',txt:'closed'};
+  if(!w)return{cls:'cold',txt:'no dates'};
+  if(w.open)return{cls:'warm',txt:(w.forced?'opened by hand':'on now')+', until '+fmtDM(w.to)};
+  return{cls:'cold',txt:'starts '+fmtDM(w.from)};
+}
+function seasonsPanelHTML(){
+  var c=seasonCfg();
+  var h='<div class="panel"><div class="row" style="justify-content:space-between"><h3>Seasons</h3>'+
+    '<button class="btn btn-sm btn-primary" data-act="season-new">'+ico('plus')+'New season</button></div>'+
+    '<p class="tiny muted" style="margin-top:4px;max-width:72ch">A season decides when seasonal Pip items are on the shelf, when seasonal '+
+    'abilities and foods work, and which weather shows. Change the dates, open a season now, or close it. '+
+    'Readers keep anything they already own.</p>'+
+    '<div class="scroll stack"><table><thead><tr><th>Season</th><th>Every year</th><th>Right now</th><th>Weather</th><th>Used by</th><th></th></tr></thead><tbody>';
+  Object.keys(PIP_SEASONS).forEach(function(k){
+    var s=PIP_SEASONS[k],st=seasonStatus(k),use=seasonUsage(k),wk=SEASON_WEATHER[k];
+    h+='<tr><td><b>'+esc(s.name)+'</b>'+(s.custom?' <span class="pill">yours</span>':'')+(s.edited?' <span class="tiny muted">edited</span>':'')+'</td>'+
+      '<td class="tiny">'+s.from[1]+' '+MONTHS[s.from[0]-1]+' – '+s.to[1]+' '+MONTHS[s.to[0]-1]+'</td>'+
+      '<td><span class="pill '+st.cls+'">'+esc(st.txt)+'</span></td>'+
+      '<td class="tiny">'+(wk&&WEATHER[wk]?WEATHER[wk].glyph+' '+esc(WEATHER[wk].name):'<span class="muted">none</span>')+'</td>'+
+      '<td class="tiny muted">'+esc(use.join(', ')||'nothing yet')+'</td>'+
+      '<td style="text-align:right;white-space:nowrap"><button class="btn btn-sm btn-ghost" data-act="season-edit" data-id="'+esc(k)+'">Edit</button>'+
+      (s.custom?' <button class="btn btn-sm btn-danger" data-act="season-del" data-id="'+esc(k)+'">Delete</button>':'')+'</td></tr>';
+  });
+  return h+'</tbody></table></div>'+
+    '<p class="tiny muted stack">When two seasons with weather are open at once, your own seasons show first, then Moon Festival, Halloween, Harvest Fair, Winter, Autumn, Spring and Summer.</p></div>';
+}
+function seasonEditor(key){
+  var c=seasonCfg();
+  var isNew=!key;
+  var builtin=key&&PIP_SEASONS_BUILTIN[key];
+  var cur=key?PIP_SEASONS[key]:null;
+  if(key&&!cur)return;
+  var d=cur?{name:cur.name,from:cur.from.slice(),to:cur.to.slice(),mode:cur.mode||'auto',weather:SEASON_WEATHER[key]||''}
+           :{name:'',from:[12,20],to:[1,5],mode:'auto',weather:''};
+  function body(){
+    var probe={name:d.name||'Season',from:cleanMD(d.from,[1,1]),to:cleanMD(d.to,[1,1]),mode:d.mode};
+    var tmp='__preview__';PIP_SEASONS[tmp]=probe;
+    var w=pipSeasonWindow(tmp);delete PIP_SEASONS[tmp];
+    var now=d.mode==='closed'?'closed':!w?'no dates':w.open?'open, until '+fmtDM(w.to):'opens '+fmtDM(w.from)+', closes '+fmtDM(w.to);
+    return '<h3>'+(isNew?'New season':'Edit '+esc(cur.name))+'</h3>'+
+      '<p class="lede">'+(builtin?'A season that came with PipHub. Your changes can be undone with "Back to the shipped dates".':
+        'Your own season. Use it for seasonal abilities, foods, or weather.')+'</p>'+
+      '<label class="field"><span>Name</span><input class="inp" id="se-name" data-focus maxlength="30" value="'+esc(d.name)+'" placeholder="Winter break"></label>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi);margin-top:14px">Every year</h4>'+
+      '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field"><span>From</span><span class="row" style="gap:6px">'+mdSelect('se-f',d.from)+'</span></label>'+
+      '<label class="field"><span>Until</span><span class="row" style="gap:6px">'+mdSelect('se-t',d.to)+'</span></label></div>'+
+      '<p class="tiny muted">An end date before the start date runs over the new year (for example 1 Dec – 28 Feb).</p>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi);margin-top:14px">Open or closed</h4>'+
+      '<div class="seg">'+SEASON_MODES.map(function(o){
+        return '<button type="button" data-semode="'+o[0]+'" aria-pressed="'+(d.mode===o[0])+'">'+o[1]+'</button>';}).join('')+'</div>'+
+      '<p class="tiny muted">'+({auto:'Opens and closes on its dates.',open:'Open from today, whatever the dates say, until its next end date. Good for a surprise or for testing.',
+        closed:'Stays closed: its items leave the shelf and its abilities, foods and weather stop.'})[d.mode]+'</p>'+
+      '<p class="tiny" style="color:var(--gold-hi)">Right now: '+esc(now)+'</p>'+
+      '<label class="field" style="margin-top:10px"><span>Weather while it is open</span><select class="inp" id="se-weather">'+
+        '<option value="">None</option>'+Object.keys(WEATHER).map(function(k){
+          return '<option value="'+k+'"'+(d.weather===k?' selected':'')+'>'+WEATHER[k].glyph+' '+esc(WEATHER[k].name)+'</option>';}).join('')+
+      '</select></label>'+
+      (key?'<p class="tiny muted stack">Used by: '+esc(seasonUsage(key).join(', ')||'nothing yet')+'</p>':'')+
+      '<div class="err" id="se-err"></div>'+
+      '<div class="foot">'+(builtin&&c.edits[key]?'<button class="btn btn-ghost" id="se-reset">Back to the shipped dates</button>':'')+
+      '<button class="btn" data-close>Cancel</button><button class="btn btn-primary" id="se-save">'+(isNew?'Create':'Save')+'</button></div>';
+  }
+  function grab(scrim){
+    var g=function(q){var el=scrim.querySelector(q);return el?el.value:null;};
+    if(g('#se-name')!==null)d.name=g('#se-name').trim();
+    if(g('#se-f-m')!==null){
+      d.from=cleanMD([+g('#se-f-m'),num(g('#se-f-d'),1)],[1,1]);
+      d.to=cleanMD([+g('#se-t-m'),num(g('#se-t-d'),1)],[1,1]);
+    }
+    if(g('#se-weather')!==null)d.weather=g('#se-weather');
+  }
+  function redraw(){redrawModal(body(),mount);}
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var t=e.target.closest('[data-semode]');
+      if(!t)return;
+      grab(scrim);d.mode=t.getAttribute('data-semode');redraw();
+    });
+    scrim.addEventListener('change',function(e){
+      if(e.target.matches('select[id^="se-"],input[id$="-d"]')){grab(scrim);redraw();}
+    });
+    var rs=scrim.querySelector('#se-reset');
+    if(rs)rs.addEventListener('click',function(){
+      delete c.edits[key];save();closeModal();applySeasons();
+      toast(PIP_SEASONS[key].name+' is back to its shipped dates.','good');render();
+    });
+    scrim.querySelector('#se-save').addEventListener('click',function(){
+      grab(scrim);
+      var err=scrim.querySelector('#se-err');
+      if(!d.name){err.textContent='Give the season a name.';return;}
+      var clash=Object.keys(PIP_SEASONS).some(function(k){return k!==key&&PIP_SEASONS[k].name.toLowerCase()===d.name.toLowerCase();});
+      if(clash){err.textContent='Another season already has that name.';return;}
+      if(builtin){
+        c.edits[key]={name:d.name,from:d.from,to:d.to,mode:d.mode,weather:d.weather};
+      }else if(key){
+        c.custom.forEach(function(x){if(x.key===key){x.name=d.name;x.from=d.from;x.to=d.to;x.mode=d.mode;x.weather=d.weather;}});
+      }else{
+        c.custom.push({key:'cs-'+uid(),name:d.name,from:d.from,to:d.to,mode:d.mode,weather:d.weather});
+      }
+      save();closeModal();applySeasons();toast('"'+d.name+'" saved.','good');render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+function deleteSeason(key){
+  var s=PIP_SEASONS[key];
+  if(!s||!s.custom)return;
+  var use=seasonUsage(key);
+  confirmModal('Delete "'+s.name+'"?',
+    (use.length?'It is used by '+use.join(', ')+'. Those stop working until you give them other dates. ':'')+
+    'This cannot be undone.','Delete',function(){
+      var c=seasonCfg();
+      c.custom=c.custom.filter(function(x){return x.key!==key;});
+      save();applySeasons();toast('"'+s.name+'" deleted.');render();
+    },true);
 }
 
 /* ---------- wishes and streaks (instructor) ---------- */
@@ -4218,6 +4341,7 @@ function go(v,arg){
   window.scrollTo({top:0,behavior:'auto'});
 }
 function render(){
+  applySeasons();
   if(!me()&&S.view!=='gate')S.view='gate';
   if(S.view==='quiz'&&!S.run)S.view='catalog';
   if(['titles','settings','redemptions','approvals','reviews'].indexOf(S.view)>=0&&!S.admin)S.view='catalog';
@@ -4421,6 +4545,9 @@ document.addEventListener('click',function(e){
   else if(act==='room-wear'){wearLook(id);}
   else if(act==='pp-edit'){requireAdmin('Editing powers needs the instructor key.',function(){lookPowerEditor(id);});}
   else if(act==='pk-save'){requireAdmin('Instructor key needed.',savePowerKinds);}
+  else if(act==='season-new'){requireAdmin('Instructor key needed.',function(){seasonEditor(null);});}
+  else if(act==='season-edit'){requireAdmin('Instructor key needed.',function(){seasonEditor(id);});}
+  else if(act==='season-del'){requireAdmin('Instructor key needed.',function(){deleteSeason(id);});}
   else if(act==='sab-new'){requireAdmin('Instructor key needed.',function(){seasonalEditor(null);});}
   else if(act==='sab-edit'){requireAdmin('Instructor key needed.',function(){seasonalEditor(id);});}
   else if(act==='sab-del'){requireAdmin('Instructor key needed.',function(){deleteSeasonal(id);});}
@@ -7561,10 +7688,74 @@ var PIP_SEASONS={
   spring:{name:'Spring',from:[3,1],to:[5,31]},
   summer:{name:'Summer',from:[6,1],to:[8,31]}
 };
+/* ---------- Seasons are instructor-configurable ----------
+   The shipped seasons are kept in PIP_SEASONS_BUILTIN. S.settings.pipSeasons
+   holds changes: edits (name, dates, mode, weather) to shipped seasons, and
+   whole custom seasons. applySeasons() rebuilds PIP_SEASONS, SEASON_WEATHER and
+   WEATHER_ORDER in place, so every reader of those objects sees the change. */
+var PIP_SEASONS_BUILTIN=JSON.parse(JSON.stringify(PIP_SEASONS));
+function seasonCfg(){
+  var c=S.settings.pipSeasons;
+  if(!c||typeof c!=='object'){c={};S.settings.pipSeasons=c;}
+  if(!c.edits||typeof c.edits!=='object')c.edits={};
+  if(!Array.isArray(c.custom))c.custom=[];
+  return c;
+}
+function cleanMD(md,fb){
+  if(!Array.isArray(md))return fb.slice();
+  var m=Math.max(1,Math.min(12,Math.round(+md[0]||fb[0])));
+  var dim=[31,29,31,30,31,30,31,31,30,31,30,31][m-1];
+  return [m,Math.max(1,Math.min(dim,Math.round(+md[1]||fb[1])))];
+}
+function applySeasons(){
+  if(typeof S==='undefined'||!S||!S.settings)return;
+  var c=seasonCfg();
+  Object.keys(PIP_SEASONS).forEach(function(k){delete PIP_SEASONS[k];});
+  Object.keys(SEASON_WEATHER).forEach(function(k){delete SEASON_WEATHER[k];});
+  var order=[];
+  c.custom.forEach(function(x){
+    if(!x||!x.key)return;
+    PIP_SEASONS[x.key]={name:x.name||'Season',from:cleanMD(x.from,[1,1]),to:cleanMD(x.to,[1,31]),
+      mode:x.mode||'auto',custom:true};
+    if(x.weather)SEASON_WEATHER[x.key]=x.weather;
+    order.push(x.key);
+  });
+  Object.keys(PIP_SEASONS_BUILTIN).forEach(function(k){
+    var b=PIP_SEASONS_BUILTIN[k],e=c.edits[k]||{};
+    PIP_SEASONS[k]={name:e.name||b.name,from:cleanMD(e.from||b.from,b.from),to:cleanMD(e.to||b.to,b.to),
+      mode:e.mode||'auto',edited:!!c.edits[k]};
+    var w=('weather' in e)?e.weather:SEASON_WEATHER_BUILTIN[k];
+    if(w)SEASON_WEATHER[k]=w;
+  });
+  WEATHER_ORDER.length=0;
+  order.concat(WEATHER_ORDER_BUILTIN).forEach(function(k){if(PIP_SEASONS[k])WEATHER_ORDER.push(k);});
+}
+function seasonUsage(key){
+  var out=[];
+  var n=PIP_PARTS.filter(function(p){return p.season===key;}).length+PIP_LOOKS.filter(function(l){return l.season===key;}).length;
+  if(n)out.push(n+' Pip item'+(n===1?'':'s'));
+  var lib=(typeof powerLibrary==='function')?powerLibrary():[];
+  var a=lib.filter(function(x){return x.dates&&x.dates.mode==='season'&&x.dates.key===key;}).length;
+  if(a)out.push(a+' seasonal abilit'+(a===1?'y':'ies'));
+  var f=(S.foods||[]).filter(function(x){return x.season===key||(x.benefit&&x.benefit.season===key);}).length;
+  if(f)out.push(f+' food'+(f===1?'':'s'));
+  return out;
+}
 function pipSeasonWindow(key,now){
   var s=PIP_SEASONS[key];
   if(!s)return null;
   now=now||new Date();
+  /* Instructor overrides: closed = never open; open = open now, until the
+     season's own next end date. */
+  if(s.mode==='closed')return null;
+  if(s.mode==='open'){
+    var nat=pipSeasonWindowNatural(s,now);
+    var st=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    return{name:s.name,from:(nat&&nat.open)?nat.from:st,to:nat?nat.to:new Date(st.getTime()+30*864e5),open:true,forced:true};
+  }
+  return pipSeasonWindowNatural(s,now);
+}
+function pipSeasonWindowNatural(s,now){
   var y=now.getFullYear();
   var mk=function(yr,md,end){return end?new Date(yr,md[0]-1,md[1],23,59,59):new Date(yr,md[0]-1,md[1]);};
   var wraps=(s.to[0]*100+s.to[1])<(s.from[0]*100+s.from[1]);
@@ -10414,6 +10605,8 @@ var WEATHER={
 };
 var SEASON_WEATHER={moonfest:'lanterns',halloween:'bats',harvestfair:'confetti',winter:'snow',autumn:'leaves',spring:'petals',summer:'sun'};
 var WEATHER_ORDER=['moonfest','halloween','harvestfair','winter','autumn','spring','summer'];
+var SEASON_WEATHER_BUILTIN=JSON.parse(JSON.stringify(SEASON_WEATHER));
+var WEATHER_ORDER_BUILTIN=WEATHER_ORDER.slice();
 function currentWeather(now){
   var c=aliveCfg();
   if(c.force==='off')return '';
