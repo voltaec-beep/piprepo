@@ -1793,6 +1793,38 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 .themepick{margin-bottom:12px}
 .foodcard .pill{white-space:normal;text-align:center;max-width:100%;line-height:1.3}
 
+/* ============ event engine: checklists, calendars, goals ============ */
+.steplist{display:grid;gap:8px}
+.steprow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--edge-soft);background:var(--surface)}
+.steprow.done{border-color:var(--pass);background:var(--pass-faint)}
+.steprow .sn{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-size:.8rem;font-weight:700;background:var(--brand-faint);color:var(--brand-hi)}
+.steprow.done .sn{background:var(--pass);color:#fff}
+.steprow .sl{flex:1;min-width:0;color:var(--text-hi);font-size:.9rem}
+.steprow .sp{font-family:var(--serif);color:var(--gold-hi);font-size:.9rem}
+.calgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.caldoor{
+  position:relative;aspect-ratio:1;border-radius:12px;display:grid;place-items:center;align-content:center;gap:2px;
+  border:1px solid var(--edge);background:linear-gradient(var(--surface),var(--sunk));color:var(--text-2);
+  font:inherit;cursor:default;padding:4px;
+}
+.caldoor b{font-family:var(--serif);font-size:1.35rem;line-height:1;color:var(--text-hi)}
+.caldoor span{font-size:.58rem;line-height:1.15;text-align:center}
+.caldoor.open{cursor:pointer;border-color:var(--gold-soft);
+  background:linear-gradient(135deg,#C9302C,#1E7A3E);color:#fff}
+.caldoor.open b{color:#fff}
+.caldoor.today{box-shadow:0 0 0 2px var(--gold-hi);animation:doorGlow 1.8s ease-in-out infinite}
+@keyframes doorGlow{0%,100%{box-shadow:0 0 0 2px var(--gold-hi)}50%{box-shadow:0 0 0 5px var(--gold-soft)}}
+.caldoor.done{border-color:var(--pass);background:var(--pass-faint);color:var(--pass)}
+.caldoor.wait{border-color:var(--gold-soft);color:var(--gold-hi)}
+.caldoor.missed,.caldoor.shut{opacity:.5}
+@media (hover:hover) and (pointer:fine){.caldoor.open:hover{transform:translateY(-2px)}}
+.goalbar{margin-top:8px;display:grid;gap:4px;max-width:420px}
+.goalbar .wbar{height:9px;border-radius:999px;background:var(--sunk);overflow:hidden;border:1px solid var(--edge-soft)}
+.goalbar .wbar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--pass))}
+.evcard.timed .evmain h4::before{content:"\23F1\FE0F  "}
+
 /* ============ bonus cosmetics ============ */
 .bonusstrip{
   display:flex;align-items:center;gap:11px;margin-top:11px;
@@ -4101,6 +4133,9 @@ document.addEventListener('click',function(e){
     if(rp){rp.room=rp.room||{};rp.room.wall=b.dataset.w;save();render();}
   }
   else if(act==='ev-do'){var ev=eventById(id);if(ev)entryModal(ev);}
+  else if(act==='ev-steps'){var evs=eventById(id);if(evs)stepsModal(evs);}
+  else if(act==='ev-dup'){requireAdmin('Duplicating an event needs the instructor key.',function(){duplicateEvent(id);});}
+  else if(act==='ev-approve'){requireAdmin('Approving needs the instructor key.',function(){approveEntry(id);});}
   else if(act==='ev-new'){requireAdmin('Adding an event needs the instructor key.',function(){eventEditor(null);});}
   else if(act==='ev-edit'){requireAdmin('Editing an event needs the instructor key.',function(){
     var e2=eventById(id);if(e2)eventEditor(e2);});}
@@ -5048,7 +5083,7 @@ function availability(item,now){
       }
       if(now<oe){
         var l=dayDiff(oe,now);
-        return{open:true,label:l<=1?'Last day':l+' days left',tone:l<=7?'warm':'cold',endsExcl:oe};
+        return{open:true,label:l<=1?'Last day':l+' days left',tone:l<=7?'warm':'cold',endsExcl:oe,cycle:k};
       }
     }
     return{open:false,label:'Finished',tone:'cold'};
@@ -7589,7 +7624,13 @@ var EVENT_KINDS={
   count:{name:'Tally',verb:'Report the number',
     blurb:'Report a number — minutes, pages, laps.',glyph:'clock'},
   checkin:{name:'Challenge',verb:'Mark it done',
-    blurb:'Say you did it, with a note if you like.',glyph:'star'}
+    blurb:'Say you did it, with a note if you like.',glyph:'star'},
+  steps:{name:'Checklist',verb:'Open checklist',
+    blurb:'A few small steps, such as read, draw, write a caption. Each step can pay.',glyph:'sparkle'},
+  goal:{name:'Group goal',verb:'Add to the goal',
+    blurb:'Everyone adds to one shared total. Reaching it rewards the whole group.',glyph:'trophy'},
+  calendar:{name:'Holiday calendar',verb:'Open calendar',
+    blurb:'A new small task unlocks each day, like a December countdown.',glyph:'gift'}
 };
 var DEFAULT_RUBRIC=[
   {id:'r1',label:'Gave it a go',points:2},
@@ -7645,22 +7686,735 @@ function getPhoto(id){return idbGet('photos',id).then(function(r){return r?r.dat
 function dropPhoto(id){return idbDel('photos',id);}
 
 /* ---------- may this reader enter ---------- */
-function eventState(ev,p){
-  p=p||me();
-  var mine=entriesOf(p).filter(function(e){return e.eventId===ev.id;});
-  var pending=mine.filter(function(e){return e.status==='pending';}).length;
-  var av=availability(ev);
-  if(!assignedTo(ev,p))return{can:false,label:'Not for you',tone:'cold',mine:mine,pending:pending};
-  if(!av.open)return{can:false,label:av.label||'Not open',tone:'cold',mine:mine,pending:pending,window:av};
-  var cap=(ev.entries&&ev.entries.mode==='once')?1:Math.max(1,num(ev.entries&&ev.entries.limit,3));
-  if(mine.length>=cap)
-    return{can:false,label:cap===1?'Sent in':'All '+cap+' sent in',tone:'good',mine:mine,pending:pending,window:av};
-  if(pending)
-    return{can:false,label:pending+' waiting to be looked at',tone:'warm',mine:mine,pending:pending,window:av};
-  return{can:true,label:av.label||'',tone:av.tone||'cold',mine:mine,pending:pending,window:av,left:cap-mine.length};
-}
 function totalPending(p){
   return entriesOf(p).filter(function(e){return e.status==='pending';}).length;
+}
+
+/* =========================================================
+   The event engine, second edition.
+
+   Every event now runs in rounds. A round is worked out from
+   the date (today, this week, this month, every few days, this
+   year's festival window...), and an entry belongs to the round
+   it was sent in. Limits count per round, so an event a reader
+   finished last week is theirs to do again this week.
+
+   On top of that: checklists that pay per step, group goals the
+   whole class fills together, challenges open only for a few
+   hours, day-by-day holiday calendars, and links to Pip's shop
+   and pantry.
+   ========================================================= */
+var EVENT_REPEATS=[['none','Does not repeat'],['daily','Every day'],['weekly','Every week'],
+  ['monthly','Every month'],['every','Every few days'],['yearly','Every year']];
+var WEEKDAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function pad2(n){return (n<10?'0':'')+n;}
+function dkey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function dayStart(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function isClassicKind(k){return ['photo','text','count','checkin'].indexOf(k)>=0;}
+function isStepKind(k){return k==='steps'||k==='calendar';}
+
+/* A yearly window (month/day to month/day) that may wrap the new year. */
+function yearWindow(from,to,now){
+  var y=now.getFullYear();
+  var wraps=(to[0]*100+to[1])<(from[0]*100+from[1]);
+  var tries=wraps?[[y-1,y],[y,y+1]]:[[y,y],[y+1,y+1]];
+  for(var i=0;i<tries.length;i++){
+    var a=new Date(tries[i][0],from[0]-1,from[1]);
+    var b=new Date(tries[i][1],to[0]-1,to[1]+1);        /* exclusive end */
+    if(now<b)return{from:a,endExcl:b,open:now>=a};
+  }
+  return null;
+}
+function calendarWindow(ev,now){
+  now=now||new Date();
+  var c=ev.cal||{};
+  var m=Math.max(1,Math.min(12,num(c.month,12))),d=Math.max(1,Math.min(31,num(c.day,1)));
+  var n=Math.max(1,(ev.steps||[]).length);
+  var y=now.getFullYear();
+  for(var yy=y-1;yy<=y+1;yy++){
+    var s=new Date(yy,m-1,d),e=addDays(s,n);
+    if(now<e){
+      var open=now>=s;
+      return{start:s,endExcl:e,open:open,
+        label:open?'':'Starts '+(dayDiff(s,now)>45?fmtDay(s):inDays(dayDiff(s,now)))};
+    }
+  }
+  return{start:new Date(y+1,m-1,d),endExcl:addDays(new Date(y+1,m-1,d),n),open:false,label:'Next year'};
+}
+function nextWeekday(days,now){
+  for(var i=1;i<=7;i++){
+    var d=addDays(dayStart(now),i);
+    if(days.indexOf(d.getDay())>=0)return d;
+  }
+  return null;
+}
+/* Which round is running now (or at a given moment). */
+function eventRound(ev,now){
+  now=now||new Date();
+  if(ev.kind==='calendar'){
+    var c=calendarWindow(ev,now);
+    return{key:'y'+c.start.getFullYear(),start:c.start,end:c.endExcl,open:c.open,label:c.label};
+  }
+  var r=ev.repeat||{mode:'none'};
+  var t=dayStart(now);
+  if(r.mode==='daily')return{key:dkey(t),start:t,end:addDays(t,1),open:true,resets:true};
+  if(r.mode==='weekly'){
+    var ws=startOfWeek(now);
+    var days=(r.days&&r.days.length)?r.days:null;
+    var open=!days||days.indexOf(now.getDay())>=0;
+    var nx=(!open&&days)?nextWeekday(days,now):null;
+    return{key:'w'+dkey(ws),start:ws,end:addDays(ws,7),open:open,resets:true,
+      label:open?'':(nx?'Opens '+(dayDiff(nx,t)===1?'tomorrow':WEEKDAYS[nx.getDay()]):'Closed today')};
+  }
+  if(r.mode==='monthly'){
+    var ms=new Date(now.getFullYear(),now.getMonth(),1);
+    return{key:'m'+now.getFullYear()+'-'+pad2(now.getMonth()+1),start:ms,
+      end:new Date(now.getFullYear(),now.getMonth()+1,1),open:true,resets:true};
+  }
+  if(r.mode==='every'){
+    var n=Math.max(1,num(r.n,3));
+    var anchor=dayStart(dnum(r.anchor)||dnum(String(ev.created||'').slice(0,10))||new Date(2026,0,1));
+    var idx=Math.floor(Math.round((t.getTime()-anchor.getTime())/864e5)/n);
+    var st=addDays(anchor,idx*n);
+    return{key:'e'+idx,start:st,end:addDays(st,n),open:true,resets:true};
+  }
+  if(r.mode==='yearly'){
+    var yw=yearWindow(r.from||[10,1],r.to||[10,31],now);
+    if(!yw)return{key:'none',open:false,label:'Not scheduled'};
+    return{key:'y'+yw.from.getFullYear(),start:yw.from,end:yw.endExcl,open:yw.open,
+      label:yw.open?'':'Returns '+(dayDiff(yw.from,now)>45?fmtDay(yw.from):inDays(dayDiff(yw.from,now)))};
+  }
+  /* no repeat: an event that returns on a cycle still gets a fresh round each time */
+  if(ev.avail&&ev.avail.mode==='season'){
+    var av=availability(ev,now);
+    if(av.cycle!=null)return{key:'c'+av.cycle,open:true,end:av.endsExcl||null};
+  }
+  return{key:'all',open:true,start:null,end:null};
+}
+function entryRound(ev,e){
+  if(e.round)return e.round;
+  return eventRound(ev,new Date(e.at)).key;
+}
+/* Timed challenges: open only between two clock times on an open day. */
+function hm(s){var m=/^(\d{1,2}):(\d{2})$/.exec(String(s||''));return m?[+m[1],+m[2]]:null;}
+function hoursState(ev,now){
+  now=now||new Date();
+  var h=ev.hours;
+  if(!h||!h.on)return{on:false,open:true};
+  var a=hm(h.from),b=hm(h.to);
+  if(!a||!b)return{on:false,open:true};
+  var s=new Date(now.getFullYear(),now.getMonth(),now.getDate(),a[0],a[1]);
+  var e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),b[0],b[1]);
+  if(e<=s)e=addDays(e,1);
+  if(now>=s&&now<e)return{on:true,open:true,until:e};
+  if(now<s)return{on:true,open:false,label:'Opens at '+h.from,opensAt:s};
+  return{on:true,open:false,label:'Done for today — back at '+h.from};
+}
+function clockLeft(ms){
+  var m=Math.max(0,Math.ceil(ms/60000));
+  if(m<60)return m+'m';
+  var h=Math.floor(m/60);
+  if(h<48)return h+'h '+pad2(m%60)+'m';
+  return Math.floor(h/24)+'d '+(h%24)+'h';
+}
+/* Everything that decides whether the event is running right now. */
+function eventOpen(ev,now){
+  now=now||new Date();
+  var av=(ev.kind==='calendar')?{open:true,label:''}:availability(ev,now);
+  var rd=eventRound(ev,now);
+  var hs=hoursState(ev,now);
+  if(!av.open)return{open:false,label:av.label||'Not open',av:av,round:rd,hours:hs};
+  if(!rd.open)return{open:false,label:rd.label||'Not open',av:av,round:rd,hours:hs};
+  if(!hs.open)return{open:false,label:hs.label,av:av,round:rd,hours:hs};
+  var until=null;
+  if(hs.on)until=hs.until;
+  else if(rd.end&&(rd.resets||ev.kind==='calendar'))until=rd.end;
+  if(av.endsExcl&&(!until||av.endsExcl<until))until=av.endsExcl;
+  return{open:true,label:av.label||'',av:av,round:rd,hours:hs,until:until};
+}
+
+/* ---------- link-ups with Pip's shop and pantry ---------- */
+function eventLink(ev){return ev.link||{};}
+function linkBlock(ev,p,roundKey,mine){
+  var L=eventLink(ev);
+  if(L.look){
+    var lk=pipLookById(L.look);
+    if(lk&&!wearingLook(lk,p))return 'Wear '+lk.name+' to take part';
+  }
+  if(L.food){
+    var f=foodById(L.food);
+    var paid=(mine||[]).some(function(e){return e.ticket;});
+    if(f&&!paid&&!(pantryOf(p)[f.id]>0))return 'Needs 1 '+f.name+' from the pantry';
+  }
+  return '';
+}
+/* Spend the food ticket once per round, on the first entry. */
+function takeTicket(ev,p,mine){
+  var L=eventLink(ev);
+  if(!L.food||!foodById(L.food))return false;
+  if((mine||[]).some(function(e){return e.ticket;}))return false;
+  var pan=pantryOf(p);
+  if(!(pan[L.food]>0))return false;
+  pan[L.food]--;
+  if(!pan[L.food])delete pan[L.food];
+  return true;
+}
+function eventGiftText(ev){
+  var L=eventLink(ev),out=[];
+  if(L.giftPart&&pipPart(L.giftPart))out.push(pipPart(L.giftPart).name);
+  if(L.giftFood&&foodById(L.giftFood))out.push(foodById(L.giftFood).name);
+  return out.join(' + ');
+}
+function grantGift(ev,p){
+  var L=eventLink(ev),got=[];
+  var pt=L.giftPart&&pipPart(L.giftPart);
+  if(pt&&!ownsPip(pt.id,p)){
+    if(!Array.isArray(p.pipOwned))p.pipOwned=[];
+    p.pipOwned.push(pt.id);
+    got.push(pt.name);
+  }
+  var f=L.giftFood&&foodById(L.giftFood);
+  if(f){giveFood(p,f.id,1);got.push(f.name);}
+  if(got.length){
+    save();
+    toast(p.name+' got a gift: '+got.join(' and ')+'.','good',7000);
+  }
+  return got;
+}
+
+/* ---------- where a reader stands this round ---------- */
+function roundEntries(ev,p,key){
+  return entriesOf(p).filter(function(e){
+    return e.eventId===ev.id&&!e.goalReward&&entryRound(ev,e)===key;
+  });
+}
+function stepEntry(ev,p,stepId,key){
+  var hit=null;
+  roundEntries(ev,p,key).forEach(function(e){
+    if(e.stepId===stepId&&e.status!=='declined')hit=e;
+  });
+  return hit;
+}
+function calendarDayIndex(ev,now){
+  var c=calendarWindow(ev,now);
+  if(!c.open)return -1;
+  return Math.round((dayStart(now||new Date()).getTime()-dayStart(c.start).getTime())/864e5);
+}
+function stepUnlock(ev,p,i,key,now){
+  now=now||new Date();
+  var steps=ev.steps||[];
+  if(ev.kind==='calendar'){
+    var di=calendarDayIndex(ev,now);
+    var c=calendarWindow(ev,now);
+    if(i>di)return{ok:false,label:fmtDay(addDays(c.start,i))};
+    if(i<di&&!(ev.cal&&ev.cal.catchUp))return{ok:false,label:'Missed',missed:true};
+    return{ok:true};
+  }
+  if(ev.stepsCfg&&ev.stepsCfg.inOrder&&i>0){
+    var prev=stepEntry(ev,p,steps[i-1].id,key);
+    if(!prev)return{ok:false,label:'After step '+i};
+  }
+  return{ok:true};
+}
+function eventState(ev,p){
+  p=p||me();
+  var op=eventOpen(ev);
+  var key=op.round.key;
+  var mine=roundEntries(ev,p,key);
+  var pending=mine.filter(function(e){return e.status==='pending';}).length;
+  var base={mine:mine,pending:pending,window:op,round:op.round,until:op.until||null};
+  function out(o){for(var k in base)if(!(k in o))o[k]=base[k];return o;}
+  if(!assignedTo(ev,p))return out({can:false,label:'Not for you',tone:'cold'});
+  if(!op.open)return out({can:false,label:op.label,tone:'cold'});
+  var block=linkBlock(ev,p,key,mine);
+  if(isStepKind(ev.kind)){
+    var steps=ev.steps||[];
+    var done=steps.filter(function(s){return stepEntry(ev,p,s.id,key);}).length;
+    var ready=steps.some(function(s,i){return !stepEntry(ev,p,s.id,key)&&stepUnlock(ev,p,i,key).ok;});
+    var prog=done+'/'+steps.length+(ev.kind==='calendar'?' doors':' done');
+    if(done>=steps.length&&steps.length)return out({can:false,label:'All done',tone:'good',progress:prog,done:done});
+    if(block)return out({can:false,label:block,tone:'warm',progress:prog,done:done,blocked:true});
+    return out({can:true,open:true,label:ready?prog:(prog+' · next one soon'),tone:ready?'warm':'cold',
+      progress:prog,done:done,ready:ready,view:true});
+  }
+  var cap=(ev.entries&&ev.entries.mode==='once')?1:Math.max(1,num(ev.entries&&ev.entries.limit,3));
+  if(mine.length>=cap){
+    var again=op.round.resets&&op.round.end?' · again '+inDays(dayDiff(op.round.end,new Date())):'';
+    return out({can:false,label:(cap===1?'Sent in':'All '+cap+' sent in')+again,tone:'good'});
+  }
+  if(pending&&ev.kind!=='goal')return out({can:false,label:pending+' waiting to be looked at',tone:'warm'});
+  if(block)return out({can:false,label:block,tone:'warm',blocked:true});
+  return out({can:true,label:op.label||'',tone:(op.av&&op.av.tone)||'cold',left:cap-mine.length});
+}
+
+/* ---------- checklists and calendars ---------- */
+function stepsModal(ev){
+  function body(){
+    var p=me();
+    var st=eventState(ev,p);
+    var key=st.round.key;
+    var steps=ev.steps||[];
+    var cal=ev.kind==='calendar';
+    var h='<h3>'+esc(ev.title)+'</h3>'+(ev.brief?'<p class="lede">'+esc(ev.brief)+'</p>':'')+
+      '<p class="tiny muted">'+esc(st.progress||'')+
+      (ev.stepsCfg&&num(ev.stepsCfg.bonus,0)?' &nbsp;·&nbsp; finish them all for +'+pts(num(ev.stepsCfg.bonus,0))+' more':'')+
+      (eventGiftText(ev)?' &nbsp;·&nbsp; gift for finishing: '+esc(eventGiftText(ev)):'')+'</p>';
+    if(!st.can&&st.label!=='All done')h+='<p class="tiny" style="color:var(--fail)">'+esc(st.label)+'</p>';
+    if(cal){
+      var di=calendarDayIndex(ev);
+      h+='<div class="calgrid stack">';
+      steps.forEach(function(s,i){
+        var e=stepEntry(ev,p,s.id,key);
+        var un=stepUnlock(ev,p,i,key);
+        var cls=e?(e.status==='pending'?'wait':'done'):(un.ok?'open':(un.missed?'missed':'shut'));
+        h+='<button type="button" class="caldoor '+cls+(i===di?' today':'')+'" '+
+          (cls==='open'&&st.can?'data-evstep="'+esc(s.id)+'"':'disabled')+' title="'+
+          esc((e||un.ok)?s.label:(un.label||''))+'">'+
+          '<b>'+(i+1)+'</b>'+
+          (e?'<span>'+(e.status==='pending'?'waiting':'✓ +'+pts(num(e.points,0)))+'</span>':
+            (un.ok?'<span>+'+pts(num(s.points,0))+'</span>':'<span>'+esc(un.missed?'missed':un.label)+'</span>'))+
+          '</button>';
+      });
+      h+='</div>';
+    }else{
+      h+='<div class="steplist stack">';
+      steps.forEach(function(s,i){
+        var e=stepEntry(ev,p,s.id,key);
+        var un=stepUnlock(ev,p,i,key);
+        h+='<div class="steprow'+(e?' done':'')+'"><span class="sn">'+(e&&e.status==='rated'?'✓':(i+1))+'</span>'+
+          '<span class="sl">'+esc(s.label)+'</span><span class="sp">+'+pts(num(s.points,0))+'</span>'+
+          (e?'<span class="pill '+(e.status==='pending'?'warm':'good')+'">'+(e.status==='pending'?'waiting':'done')+'</span>':
+            (un.ok&&st.can?'<button class="btn btn-sm btn-primary" data-evstep="'+esc(s.id)+'">Done</button>':
+              '<span class="pill cold">'+esc(un.label||'locked')+'</span>'))+
+          '</div>';
+      });
+      h+='</div>';
+    }
+    if(ev.stepsCfg&&ev.stepsCfg.approval)h+='<p class="tiny muted stack">Your instructor checks each one before the points land.</p>';
+    return h+'<div class="foot"><button class="btn btn-primary" data-close>Close</button></div>';
+  }
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var b=e.target.closest('[data-evstep]');
+      if(!b)return;
+      var s=(ev.steps||[]).filter(function(x){return x.id===b.dataset.evstep;})[0];
+      if(!s)return;
+      var title=ev.kind==='calendar'?'Day '+((ev.steps||[]).indexOf(s)+1)+': '+s.label:s.label;
+      confirmModal(title,'Did you do it? '+(num(s.points,0)?'It is worth '+pts(num(s.points,0))+' points.':''),
+        'Yes, done',function(){
+          if(doStep(ev.id,s.id))redrawModal(body(),mount);
+        });
+    });
+  }
+  openModal(body(),mount,{dismissable:true});
+}
+function doStep(evId,stepId){
+  var p=me(),ev=eventById(evId);
+  if(!p||!ev)return false;
+  var st=eventState(ev,p);
+  if(!st.can){toast(st.label,'bad');return false;}
+  var key=st.round.key;
+  var i=-1;
+  (ev.steps||[]).forEach(function(s,k){if(s.id===stepId)i=k;});
+  if(i<0)return false;
+  var step=ev.steps[i];
+  if(stepEntry(ev,p,stepId,key)){toast('Already done.','bad');return false;}
+  var un=stepUnlock(ev,p,i,key);
+  if(!un.ok){toast(un.label||'Not yet.','bad');return false;}
+  var approval=!!(ev.stepsCfg&&ev.stepsCfg.approval);
+  if(approval&&totalPending(p)>=PENDING_CAP){
+    toast('You have '+PENDING_CAP+' things waiting to be looked at already.','bad',6000);return false;
+  }
+  var ticket=takeTicket(ev,p,st.mine);
+  var boosted=withBoost(num(step.points,0),p);
+  var e={id:uid(),eventId:ev.id,eventTitle:ev.title,kind:ev.kind,stepId:step.id,
+    stepLabel:(ev.kind==='calendar'?'Day '+(i+1)+': ':'')+step.label,
+    at:nowISO(),round:key,note:'',text:'',count:null,thumb:'',
+    status:approval?'pending':'rated',
+    points:approval?0:boosted.points,boost:approval?0:boosted.boost,
+    ratingLabel:approval?'':'Done',ratedAt:approval?'':nowISO()};
+  if(ticket)e.ticket=true;
+  p.entries=entriesOf(p).concat([e]);
+  save();
+  if(!approval){
+    toast(e.stepLabel+' — +'+pts(e.points)+' points.','good');
+    finishSteps(ev,p,key);
+  }else toast('Sent in. Your instructor will check it.','good');
+  render();
+  return true;
+}
+/* Every step done in a round: pay the finishing bonus, once. */
+function finishSteps(ev,p,key){
+  var steps=ev.steps||[];
+  if(!steps.length)return;
+  var all=steps.every(function(s){var e=stepEntry(ev,p,s.id,key);return e&&e.status==='rated';});
+  if(!all)return;
+  if(roundEntries(ev,p,key).some(function(e){return e.stepId==='__all';}))return;
+  var bonus=num(ev.stepsCfg&&ev.stepsCfg.bonus,0);
+  var boosted=withBoost(bonus,p);
+  p.entries=entriesOf(p).concat([{id:uid(),eventId:ev.id,eventTitle:ev.title,kind:ev.kind,
+    stepId:'__all',stepLabel:ev.kind==='calendar'?'Every door opened':'Every step done',
+    at:nowISO(),round:key,status:'rated',points:boosted.points,boost:boosted.boost,
+    ratingLabel:'Finished',ratedAt:nowISO(),note:'',text:'',count:null,thumb:''}]);
+  save();
+  grantGift(ev,p);
+  grantBonus(ev,p,'event');
+  if(p===me())celebrate({kicker:ev.kind==='calendar'?'Calendar complete':'Checklist complete',
+    title:ev.title,line:'Every one of them, done',pose:'cheer',
+    prize:bonus?'+'+pts(boosted.points)+' points':''});
+}
+function approveEntry(id){
+  var f=findEntry(id);if(!f)return;
+  var ev=eventById(f.e.eventId);
+  var pts0=0;
+  if(f.e.stepId&&ev){
+    (ev.steps||[]).forEach(function(s){if(s.id===f.e.stepId)pts0=num(s.points,0);});
+  }else if(ev&&ev.kind==='goal')pts0=num(ev.goal&&ev.goal.perEntry,0);
+  var boosted=withBoost(pts0,f.p);
+  f.e.status='rated';f.e.points=boosted.points;f.e.boost=boosted.boost;
+  f.e.ratingLabel=f.e.stepId?'Done':'Counted';f.e.ratedAt=nowISO();
+  save();
+  if(ev&&f.e.stepId)finishSteps(ev,f.p,entryRound(ev,f.e));
+  if(ev&&ev.kind==='goal')settleGoals();
+  toast('Approved for '+f.p.name+'.','good');
+  render();
+}
+
+/* ---------- group goals ---------- */
+function goalCfg(ev){
+  var g=ev.goal||{};
+  return{target:Math.max(1,num(g.target,100)),reward:Math.max(0,num(g.reward,5)),
+    who:g.who==='helped'?'helped':'all',approval:g.approval===true,perEntry:Math.max(0,num(g.perEntry,0))};
+}
+function goalProgress(ev,key){
+  var total=0,helpers=0;
+  key=key||eventRound(ev).key;
+  S.profiles.forEach(function(p){
+    var got=0;
+    roundEntries(ev,p,key).forEach(function(e){
+      if(e.status==='rated')got+=Math.max(0,num(e.count,0));
+    });
+    if(got>0)helpers++;
+    total+=got;
+  });
+  var g=goalCfg(ev);
+  total=Math.round(total*10)/10;
+  return{total:total,target:g.target,pct:Math.min(100,Math.round(total/g.target*100)),
+    helpers:helpers,reached:total>=g.target,key:key};
+}
+function goalRewarded(ev,p,key){
+  return entriesOf(p).some(function(e){return e.eventId===ev.id&&e.goalReward&&e.round===key;});
+}
+function settleGoals(){
+  eventList().forEach(function(ev){
+    if(ev.kind!=='goal')return;
+    var pr=goalProgress(ev);
+    if(!pr.reached)return;
+    var g=goalCfg(ev);
+    S.profiles.forEach(function(p){
+      if(!assignedTo(ev,p))return;
+      if(goalRewarded(ev,p,pr.key))return;
+      if(g.who==='helped'&&!roundEntries(ev,p,pr.key).some(function(e){return e.status==='rated'&&num(e.count,0)>0;}))return;
+      var boosted=withBoost(g.reward,p);
+      p.entries=entriesOf(p).concat([{id:uid(),eventId:ev.id,eventTitle:ev.title,kind:'goal',
+        goalReward:true,stepLabel:'Group goal reached',at:nowISO(),round:pr.key,status:'rated',
+        points:boosted.points,boost:boosted.boost,ratingLabel:'Group goal reached',ratedAt:nowISO(),
+        note:'',text:'',count:null,thumb:''}]);
+      grantGift(ev,p);
+      if(p===me())celebrate({kicker:'Group goal',title:ev.title,
+        line:pts(pr.total)+' '+(ev.unit||'')+' — together',pose:'cheer',
+        prize:g.reward?'+'+pts(boosted.points)+' points for everyone':''});
+    });
+    save();
+  });
+}
+
+/* ---------- duplicate ---------- */
+function duplicateEvent(id){
+  var ev=eventById(id);
+  if(!ev)return;
+  var c=JSON.parse(JSON.stringify(ev));
+  c.id=uid();
+  c.title=(ev.title+' (copy)').slice(0,48);
+  c.hidden=true;
+  c.created=nowISO();
+  eventEditor(c,{dup:true});
+}
+
+/* ---------- the card ---------- */
+function eventCardHTML(ev,p){
+  var st=eventState(ev,p);
+  var kind=EVENT_KINDS[ev.kind]||EVENT_KINDS.checkin;
+  var theme=eventTheme(ev);
+  var until=st.until;
+  var ms=until?until.getTime()-Date.now():0;
+  var showCd=st.can&&st.window.open&&until&&(ms<7*864e5||(ev.hours&&ev.hours.on));
+  var last=showCd&&ms<864e5;
+  var cdText=showCd?(clockLeft(ms)+' left'):'';
+  var cdAttr=showCd?' data-evuntil="'+esc(until.toISOString())+'"':'';
+  var best;
+  if(isStepKind(ev.kind))best=(ev.steps||[]).reduce(function(m,s){return m+num(s.points,0);},0)+num(ev.stepsCfg&&ev.stepsCfg.bonus,0);
+  else if(ev.kind==='goal')best=goalCfg(ev).reward;
+  else best=(ev.rubric||DEFAULT_RUBRIC).reduce(function(m,r){return Math.max(m,num(r.points,0));},0);
+  var L=eventLink(ev);
+  var rep=(ev.repeat&&ev.repeat.mode&&ev.repeat.mode!=='none')?
+    EVENT_REPEATS.filter(function(x){return x[0]===ev.repeat.mode;})[0][1]:'';
+  if(ev.repeat&&ev.repeat.mode==='weekly'&&ev.repeat.days&&ev.repeat.days.length)
+    rep='Every '+ev.repeat.days.map(function(d){return WEEKDAYS[d];}).join(', ');
+  if(ev.repeat&&ev.repeat.mode==='every')rep='Every '+num(ev.repeat.n,3)+' days';
+  var times=entriesOf(p).filter(function(e){return e.eventId===ev.id&&e.status==='rated'&&!e.stepId&&!e.goalReward;});
+  var roundsDone={};
+  entriesOf(p).forEach(function(e){if(e.eventId===ev.id&&e.status==='rated')roundsDone[entryRound(ev,e)]=1;});
+  var nRounds=Object.keys(roundsDone).length;
+
+  var h='<div class="evcard'+(st.can?' open':' shut')+(theme?' themed':'')+(ev.hours&&ev.hours.on?' timed':'')+'"'+
+    (theme?' style="--tha:'+theme.a+';--thb:'+theme.b+'"':'')+'>';
+  if(theme)h+=eventBannerHTML(ev,cdText,last).replace('<span class="evcd','<span'+cdAttr+' class="evcd');
+  else if(showCd)h+='<span class="badges" aria-hidden="true"><span class="btime'+(last?' last':(ms<5*864e5?' soon':''))+
+    '"><span class="dot"></span><span'+cdAttr+'>'+esc(cdText.toUpperCase())+'</span></span></span>';
+  h+=renderIcon(ev.icon)+
+    '<div class="evmain"><h4>'+esc(ev.title)+'</h4>'+
+    (ev.brief?'<p>'+esc(ev.brief)+'</p>':'');
+  if(ev.kind==='goal'){
+    var gp=goalProgress(ev);
+    h+='<div class="goalbar"><div class="wbar"><span style="width:'+gp.pct+'%"></span></div>'+
+      '<div class="tiny">'+pts(gp.total)+' of '+pts(gp.target)+' '+esc(ev.unit||'')+
+      ' &nbsp;·&nbsp; '+gp.helpers+' helping'+(gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':'')+'</div></div>';
+  }
+  if(isStepKind(ev.kind)&&st.progress)h+='<div class="tiny" style="margin-top:6px;color:var(--gold-hi)">'+esc(st.progress)+'</div>';
+  h+='<div class="evmeta">'+
+      '<span class="pill cold">'+esc(kind.name)+'</span>'+
+      (rep?'<span class="pill cold">↻ '+esc(rep)+'</span>':'')+
+      (ev.hours&&ev.hours.on?'<span class="pill cold">⏱ '+esc(ev.hours.from+'–'+ev.hours.to)+'</span>':'')+
+      (L.look&&pipLookById(L.look)?'<span class="pill warm">Wear '+esc(pipLookById(L.look).name)+'</span>':'')+
+      (L.food&&foodById(L.food)?'<span class="pill warm">Costs 1 '+esc(foodById(L.food).name)+'</span>':'')+
+      (eventGiftText(ev)?'<span class="pill good">Gift: '+esc(eventGiftText(ev))+'</span>':'')+
+      '<span class="pill '+st.tone+'">'+esc(st.label||'Open')+'</span>'+
+      (nRounds>1||(nRounds===1&&rep)?'<span class="pill cold">Done '+nRounds+'&times;</span>':'')+
+      (ev.hidden?'<span class="pill cold">hidden</span>':'')+
+    '</div></div>'+
+    '<div class="evside">'+
+      '<span class="upto">'+(ev.kind==='goal'?'':'up to ')+pts(best)+(ev.kind==='goal'?' each':'')+'</span>';
+  if(isStepKind(ev.kind)){
+    if(st.view||st.done)h+='<button class="btn btn-sm '+(st.can&&st.ready?'btn-primary':'')+'" data-act="ev-steps" data-id="'+esc(ev.id)+'">'+
+      (ev.kind==='calendar'?'Open calendar':'Open checklist')+'</button>';
+  }else if(st.can){
+    h+='<button class="btn btn-sm btn-primary" data-act="ev-do" data-id="'+esc(ev.id)+'">'+
+      esc(ev.kind==='goal'?'Add to the goal':kind.verb)+'</button>';
+  }
+  if(S.admin)h+='<span class="row" style="gap:5px;justify-content:flex-end;flex-wrap:wrap">'+
+      '<button class="btn btn-sm btn-ghost" data-act="ev-edit" data-id="'+esc(ev.id)+'">Edit</button>'+
+      '<button class="btn btn-sm btn-ghost" data-act="ev-dup" data-id="'+esc(ev.id)+'">Duplicate</button>'+
+      '<button class="btn btn-sm btn-danger" data-act="ev-del" data-id="'+esc(ev.id)+'">Remove</button>'+
+    '</span>';
+  h+='</div>'+bonusStrip(ev,p)+'</div>';
+  return h;
+}
+/* live countdowns on event cards */
+setInterval(function(){
+  var now=Date.now(),flip=false;
+  $$('[data-evuntil]').forEach(function(el){
+    var ms=new Date(el.dataset.evuntil).getTime()-now;
+    if(ms<=0){flip=true;return;}
+    var t=clockLeft(ms)+' left';
+    el.textContent=el.closest('.btime')?t.toUpperCase():t;
+  });
+  if(flip&&S.view==='events'&&!document.querySelector('.scrim'))render();
+},20000);
+
+/* ---------- editor pieces ---------- */
+function eventKindDefaults(d){
+  if(isStepKind(d.kind)&&!(d.steps&&d.steps.length)){
+    d.steps=d.kind==='calendar'
+      ?[1,2,3,4,5].map(function(n){return{id:'s'+uid(),label:'Day '+n+' task',points:1};})
+      :[{id:'s'+uid(),label:'Read it',points:2},{id:'s'+uid(),label:'Draw it',points:2},{id:'s'+uid(),label:'Write a caption',points:2}];
+  }
+  if(!d.stepsCfg)d.stepsCfg={approval:false,bonus:2,inOrder:false};
+  if(d.kind==='calendar'&&!d.cal)d.cal={month:12,day:1,catchUp:true};
+  if(d.kind==='goal'){
+    if(!d.goal)d.goal={target:500,reward:5,who:'all',approval:false,perEntry:0};
+    if(!d.unit||d.unit==='How many')d.unit='minutes';
+    if(!d.entries||d.entries.mode==='once')d.entries={mode:'limit',limit:5};
+  }
+  if(!d.repeat)d.repeat={mode:'none',days:[],n:3,from:[10,1],to:[10,31]};
+  if(!d.hours)d.hours={on:false,from:'15:00',to:'17:00'};
+  if(!d.link)d.link={look:'',food:'',giftPart:'',giftFood:''};
+}
+function h4(t){return '<h4 style="font-size:.95rem;color:var(--text-hi)">'+t+'</h4>';}
+function mdSelect(id,md){
+  return '<select class="inp" id="'+id+'-m">'+MONTHS.map(function(m,i){
+      return '<option value="'+(i+1)+'"'+(md[0]===i+1?' selected':'')+'>'+m+'</option>';}).join('')+'</select>'+
+    '<input class="inp" id="'+id+'-d" type="number" min="1" max="31" value="'+md[1]+'" style="max-width:80px">';
+}
+function eventKindExtraHTML(d){
+  var h='';
+  if(isStepKind(d.kind)){
+    var cal=d.kind==='calendar';
+    h+='<div class="divider"></div>'+h4(cal?'The calendar':'The checklist')+
+      '<p class="tiny muted" style="margin-top:4px">'+(cal
+        ?'One door opens each day from the start date. Each door can pay. It comes back every year.'
+        :'Each step pays when it is done. Finishing them all can pay a bonus.')+'</p>';
+    if(cal){
+      h+='<div class="row" style="gap:10px;align-items:flex-end">'+
+        '<label class="field" style="flex:1"><span>First door opens</span><span class="row" style="gap:6px">'+
+        mdSelect('ev-cal',[num(d.cal.month,12),num(d.cal.day,1)])+'</span></label></div>'+
+        '<label class="check"><input type="checkbox" id="ev-catch"'+(d.cal.catchUp?' checked':'')+
+        '><span>Missed doors can still be opened later in the calendar</span></label>';
+    }else{
+      h+='<label class="check"><input type="checkbox" id="ev-inorder"'+(d.stepsCfg.inOrder?' checked':'')+
+        '><span>Steps must be done in order</span></label>';
+    }
+    h+='<div class="rubric stack">'+d.steps.map(function(s,i){
+      return '<div class="rubrow"><span class="tiny muted" style="min-width:44px">'+(cal?'Day ':'')+(i+1)+'</span>'+
+        '<input class="inp" data-evsl="'+i+'" maxlength="60" value="'+esc(s.label)+'">'+
+        '<input class="inp" data-evsp="'+i+'" type="number" min="0" step="0.5" value="'+esc(s.points)+'">'+
+        (d.steps.length>1?'<button class="btn btn-sm btn-danger" type="button" data-evsdel="'+i+'">&times;</button>':'')+
+        '</div>';
+    }).join('')+'</div>'+
+    '<div class="row" style="gap:8px">'+
+      (d.steps.length<31?'<button class="btn btn-sm" type="button" data-evsadd="1">'+ico('plus')+(cal?'Add a day':'Add a step')+'</button>':'')+
+      (cal?'<span class="row" style="gap:6px"><input class="inp" id="ev-filln" type="number" min="1" max="31" value="'+
+        (d.steps.length<24?24:d.steps.length)+'" style="max-width:80px">'+
+        '<button class="btn btn-sm" type="button" data-evfill="1">Set number of days</button></span>':'')+
+    '</div>'+
+    '<div class="row" style="gap:10px">'+
+      '<label class="field" style="flex:1"><span>Bonus for finishing them all</span>'+
+      '<input class="inp" id="ev-sbonus" type="number" min="0" step="0.5" value="'+esc(d.stepsCfg.bonus)+'"></label></div>'+
+    '<label class="check"><input type="checkbox" id="ev-sappr"'+(d.stepsCfg.approval?' checked':'')+
+      '><span>Hold the points until an instructor approves each one</span></label>';
+  }
+  if(d.kind==='goal'){
+    var g=d.goal;
+    h+='<div class="divider"></div>'+h4('The group goal')+
+      '<p class="tiny muted" style="margin-top:4px">Readers add their numbers to one shared total. Reaching it rewards everyone.</p>'+
+      '<div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>Target</span><input class="inp" id="ev-gt" type="number" min="1" value="'+esc(g.target)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Reward for each reader</span><input class="inp" id="ev-gr" type="number" min="0" step="0.5" value="'+esc(g.reward)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Points per entry too</span><input class="inp" id="ev-gpe" type="number" min="0" step="0.5" value="'+esc(g.perEntry||0)+'"></label>'+
+      '</div>'+
+      '<div class="stack">'+['all','helped'].map(function(w){
+        return '<button type="button" class="btn btn-sm'+(g.who===w?' btn-primary':'')+'" data-evgwho="'+w+'">'+
+          (w==='all'?'Reward every reader it is for':'Reward only readers who helped')+'</button>';}).join(' ')+'</div>'+
+      '<label class="check"><input type="checkbox" id="ev-gappr"'+(g.approval?' checked':'')+
+      '><span>Numbers only count once an instructor approves them</span></label>';
+  }
+  return h;
+}
+function eventRepeatEditorHTML(d){
+  var r=d.repeat,h='';
+  if(d.kind!=='calendar'){
+    h+='<div class="divider"></div>'+h4('Repeats')+
+      '<p class="tiny muted" style="margin-top:4px">Each repeat is a fresh round: what a reader did last round does not stop them this round.</p>'+
+      '<div class="seg stack">'+EVENT_REPEATS.map(function(o){
+        return '<button type="button" data-evrep="'+o[0]+'" aria-pressed="'+(r.mode===o[0])+'">'+esc(o[1])+'</button>';
+      }).join('')+'</div>';
+    if(r.mode==='weekly')h+='<div class="subfields"><div class="tiny muted" style="margin-bottom:6px">Open on — none picked means every day of the week</div>'+
+      '<div class="seg">'+WEEKDAYS.map(function(w,i){
+        return '<button type="button" data-evday="'+i+'" aria-pressed="'+((r.days||[]).indexOf(i)>=0)+'">'+w+'</button>';
+      }).join('')+'</div></div>';
+    if(r.mode==='every')h+='<div class="subfields"><label class="field"><span>Every this many days</span>'+
+      '<input class="inp" id="ev-rn" type="number" min="1" max="365" value="'+esc(r.n||3)+'"></label></div>';
+    if(r.mode==='yearly')h+='<div class="subfields"><div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field"><span>From</span><span class="row" style="gap:6px">'+mdSelect('ev-yf',r.from||[10,1])+'</span></label>'+
+      '<label class="field"><span>Until</span><span class="row" style="gap:6px">'+mdSelect('ev-yt',r.to||[10,31])+'</span></label>'+
+      '</div></div>';
+    if(r.mode!=='none'){
+      var nx=eventRound(d);
+      h+='<p class="tiny" style="color:var(--gold-hi)">'+(nx.open?'This round is open'+(nx.end?' until '+fmtDay(addDays(nx.end,-1)):''):esc(nx.label||'Not open now'))+'</p>';
+    }
+  }
+  h+='<div class="divider"></div>'+h4('Timed challenge')+
+    '<label class="check"><input type="checkbox" id="ev-hon"'+(d.hours.on?' checked':'')+
+    '><span>Only open between two times of day</span></label>';
+  if(d.hours.on)h+='<div class="subfields"><div class="row" style="gap:10px">'+
+    '<label class="field" style="flex:1"><span>Opens at</span><input class="inp" id="ev-hf" type="time" value="'+esc(d.hours.from)+'"></label>'+
+    '<label class="field" style="flex:1"><span>Closes at</span><input class="inp" id="ev-ht" type="time" value="'+esc(d.hours.to)+'"></label>'+
+    '</div><p class="tiny muted">Pair it with "Between two dates" for a one-day challenge, or with a repeat for a daily one. The card counts down while it is open.</p></div>';
+  return h;
+}
+function eventLinkEditorHTML(d){
+  var L=d.link;
+  function sel(id,cur,opts,none){
+    return '<select class="inp" id="'+id+'"><option value="">'+none+'</option>'+opts.map(function(o){
+      return '<option value="'+esc(o[0])+'"'+(cur===o[0]?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';
+  }
+  var looks=PIP_LOOKS.map(function(l){return [l.id,l.name+(l.season&&PIP_SEASONS[l.season]?' ('+PIP_SEASONS[l.season].name+')':'')];});
+  var foods=foodList().map(function(f){return [f.id,f.name];});
+  var parts=PIP_PARTS.filter(function(pt){return pt.price>0;}).map(function(pt){
+    return [pt.id,pt.name+(pt.season&&PIP_SEASONS[pt.season]?' ('+PIP_SEASONS[pt.season].name+')':'')];});
+  return '<div class="divider"></div>'+h4('Pip link-ups')+
+    '<p class="tiny muted" style="margin-top:4px">Ask for a Pip look or a food to take part, and hand out a guaranteed gift. '+
+    'The gift lands when an entry is rated, when a checklist or calendar is finished, or when a group goal is reached.</p>'+
+    '<div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Must be wearing</span>'+sel('ev-llook',L.look,looks,'No look needed')+'</label>'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Costs one food from the pantry (once a round)</span>'+sel('ev-lfood',L.food,foods,'No food needed')+'</label>'+
+    '</div><div class="row" style="gap:10px;flex-wrap:wrap">'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Gift a Pip part</span>'+sel('ev-gpart',L.giftPart,parts,'No part')+'</label>'+
+      '<label class="field" style="flex:1;min-width:180px"><span>Gift a food</span>'+sel('ev-gfood',L.giftFood,foods,'No food')+'</label>'+
+    '</div>';
+}
+function eventExtraGrab(scrim,d){
+  var g=function(s){var el=scrim.querySelector(s);return el?el.value:null;};
+  var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:null;};
+  $$('[data-evsl]',scrim).forEach(function(el){var i=+el.dataset.evsl;if(d.steps[i])d.steps[i].label=el.value.trim();});
+  $$('[data-evsp]',scrim).forEach(function(el){var i=+el.dataset.evsp;if(d.steps[i])d.steps[i].points=Math.max(0,num(el.value,0));});
+  if(g('#ev-sbonus')!==null)d.stepsCfg.bonus=Math.max(0,num(g('#ev-sbonus'),0));
+  if(cb('#ev-sappr')!==null)d.stepsCfg.approval=cb('#ev-sappr');
+  if(cb('#ev-inorder')!==null)d.stepsCfg.inOrder=cb('#ev-inorder');
+  if(g('#ev-cal-m')!==null){d.cal.month=+g('#ev-cal-m');d.cal.day=Math.max(1,Math.min(31,num(g('#ev-cal-d'),1)));}
+  if(cb('#ev-catch')!==null)d.cal.catchUp=cb('#ev-catch');
+  if(g('#ev-gt')!==null)d.goal.target=Math.max(1,num(g('#ev-gt'),100));
+  if(g('#ev-gr')!==null)d.goal.reward=Math.max(0,num(g('#ev-gr'),0));
+  if(g('#ev-gpe')!==null)d.goal.perEntry=Math.max(0,num(g('#ev-gpe'),0));
+  if(cb('#ev-gappr')!==null)d.goal.approval=cb('#ev-gappr');
+  if(g('#ev-rn')!==null)d.repeat.n=Math.max(1,num(g('#ev-rn'),3));
+  if(g('#ev-yf-m')!==null)d.repeat.from=[+g('#ev-yf-m'),Math.max(1,Math.min(31,num(g('#ev-yf-d'),1)))];
+  if(g('#ev-yt-m')!==null)d.repeat.to=[+g('#ev-yt-m'),Math.max(1,Math.min(31,num(g('#ev-yt-d'),1)))];
+  if(cb('#ev-hon')!==null)d.hours.on=cb('#ev-hon');
+  if(g('#ev-hf')!==null)d.hours.from=g('#ev-hf')||'15:00';
+  if(g('#ev-ht')!==null)d.hours.to=g('#ev-ht')||'17:00';
+  if(g('#ev-llook')!==null)d.link.look=g('#ev-llook');
+  if(g('#ev-lfood')!==null)d.link.food=g('#ev-lfood');
+  if(g('#ev-gpart')!==null)d.link.giftPart=g('#ev-gpart');
+  if(g('#ev-gfood')!==null)d.link.giftFood=g('#ev-gfood');
+}
+function eventExtraClick(e,d,scrim){
+  var t;
+  if((t=e.target.closest('[data-evrep]'))){
+    d.repeat.mode=t.dataset.evrep;
+    if(d.repeat.mode==='every'&&!d.repeat.anchor)d.repeat.anchor=dkey(new Date());
+    return true;
+  }
+  if((t=e.target.closest('[data-evday]'))){
+    var days=d.repeat.days||[],i=+t.dataset.evday,at=days.indexOf(i);
+    if(at>=0)days.splice(at,1);else days.push(i);
+    d.repeat.days=days.sort();return true;
+  }
+  if((t=e.target.closest('[data-evsdel]'))){d.steps.splice(+t.dataset.evsdel,1);return true;}
+  if((t=e.target.closest('[data-evsadd]'))){
+    d.steps.push({id:'s'+uid(),label:d.kind==='calendar'?'Day '+(d.steps.length+1)+' task':'',points:1});return true;
+  }
+  if((t=e.target.closest('[data-evfill]'))){
+    var n=Math.max(1,Math.min(31,num(scrim.querySelector('#ev-filln').value,24)));
+    while(d.steps.length<n)d.steps.push({id:'s'+uid(),label:'Day '+(d.steps.length+1)+' task',points:1});
+    d.steps.length=n;return true;
+  }
+  if((t=e.target.closest('[data-evgwho]'))){d.goal.who=t.dataset.evgwho;return true;}
+  return false;
+}
+function eventExtraCheck(d){
+  if(isStepKind(d.kind)){
+    d.steps=d.steps.filter(function(s){return s.label;});
+    if(!d.steps.length)return 'Add at least one '+(d.kind==='calendar'?'day':'step')+', with a name.';
+  }
+  if(d.kind==='calendar')d.avail={mode:'always',start:'',end:'',days:7,everyMonths:12};
+  if(d.hours.on){
+    if(!hm(d.hours.from)||!hm(d.hours.to))return 'Set both times for the timed challenge.';
+    if(d.hours.from===d.hours.to)return 'The opening and closing times are the same.';
+  }
+  if(d.repeat.mode==='weekly'&&d.repeat.days&&d.repeat.days.length===7)d.repeat.days=[];
+  return '';
 }
 
 /* ---------- sending something in ---------- */
@@ -7670,17 +8424,29 @@ function submitEntry(ev,payload){
     toast('You have '+PENDING_CAP+' things waiting to be looked at already. Hold on until some come back.','bad',7000);
     return;
   }
+  var st=eventState(ev,p);
+  if(!st.can){toast(st.label,'bad');return;}
   var id=uid();
   var entry={id:id,eventId:ev.id,eventTitle:ev.title,kind:ev.kind,
     at:nowISO(),status:'pending',note:payload.note||'',
     text:payload.text||'',count:payload.count||null,thumb:payload.thumb||'',
-    hasPhoto:!!payload.photo};
+    hasPhoto:!!payload.photo,round:st.round.key};
+  var auto=(ev.kind==='goal'&&!goalCfg(ev).approval);
+  if(auto){
+    var bo=withBoost(goalCfg(ev).perEntry,p);
+    entry.status='rated';entry.points=bo.points;entry.boost=bo.boost;
+    entry.ratingLabel='Counted';entry.ratedAt=nowISO();
+  }
   function finish(){
+    if(takeTicket(ev,p,st.mine))entry.ticket=true;
     p.entries=entriesOf(p).concat([entry]);
     save();
     snapshot('after '+p.name+' sent in '+ev.title);
     closeModal();
-    toast('Sent in. Your instructor will take a look.','good',6000);
+    if(auto){
+      toast('Added '+pts(num(entry.count,0))+' to the group total.','good',6000);
+      settleGoals();
+    }else toast('Sent in. Your instructor will take a look.','good',6000);
     render();
   }
   if(payload.photo)putPhoto(id,payload.photo).then(finish,finish);
@@ -7705,14 +8471,16 @@ function entryModal(ev){
         ? '<label class="field stack"><span>Your writing</span>'+
           '<textarea id="e-text" data-focus placeholder="Type it here"></textarea></label>'
         :'')+
-      (ev.kind==='count'
+      (ev.kind==='count'||ev.kind==='goal'
         ? '<label class="field stack"><span>'+esc(ev.unit||'How many')+'</span>'+
           '<input class="inp" id="e-count" data-focus type="number" min="0" step="1"></label>'
         :'')+
       '<label class="field"><span>Anything to say about it — optional</span>'+
       '<input class="inp" id="e-note" maxlength="140"></label>'+
       '<div class="err" id="e-err"></div>'+
-      '<p class="tiny muted">Your instructor decides the points once they have looked at it.</p>'+
+      (ev.kind==='goal'
+        ? '<p class="tiny muted">'+(goalCfg(ev).approval?'It joins the group total once your instructor approves it.':'It joins the group total straight away.')+'</p>'
+        : '<p class="tiny muted">Your instructor decides the points once they have looked at it.</p>')+
       '<div class="foot"><button class="btn" data-close>Cancel</button>'+
       '<button class="btn btn-primary" id="e-send">Send it in</button></div>';
   }
@@ -7751,7 +8519,7 @@ function entryModal(ev){
         text=scrim.querySelector('#e-text').value.trim();
         if(text.length<4){err.textContent='Write a little more first.';return;}
       }
-      if(ev.kind==='count'){
+      if(ev.kind==='count'||ev.kind==='goal'){
         count=num(scrim.querySelector('#e-count').value,null);
         if(count===null||count<0){err.textContent='Put a number in.';return;}
       }
@@ -7764,11 +8532,12 @@ function entryModal(ev){
 /* ---------- reader view ---------- */
 function viewEvents(){
   var p=me();
+  settleGoals();
   var list=eventList().filter(function(ev){
     if(S.admin)return true;
     if(ev.hidden)return false;
     if(!assignedTo(ev,p))return false;
-    if(ev.hideWhenClosed&&!availability(ev).open)return false;
+    if(ev.hideWhenClosed&&!eventOpen(ev).open)return false;
     return true;
   });
   var h='<div class="pagehead"><div><h2>Events</h2>'+
@@ -7793,7 +8562,7 @@ function viewEvents(){
       h+='<div class="receipt">'+
         (e.thumb?'<img class="entrythumb" src="'+e.thumb+'" alt="">':
           '<span class="ic" style="background:var(--surf-2)">'+ico(EVENT_KINDS[e.kind]?'file':'file')+'</span>')+
-        '<div style="flex:1;min-width:0"><div class="tiny">'+esc(e.eventTitle)+'</div>'+
+        '<div style="flex:1;min-width:0"><div class="tiny">'+esc(e.eventTitle+(e.stepLabel?' — '+e.stepLabel:''))+'</div>'+
         '<div class="tiny muted">'+sinceWords(e.at)+
           (e.status==='rated'?' &nbsp;·&nbsp; '+esc(e.ratingLabel||'rated')+', '+pts(e.points)+' points':'')+
           (e.status==='declined'?' &nbsp;·&nbsp; sent back':'')+
@@ -7816,39 +8585,7 @@ function viewEvents(){
   }
 
   h+='<div class="evlist stack">';
-  list.forEach(function(ev){
-    var st=eventState(ev,p);
-    var av=st.window||availability(ev);
-    var kind=EVENT_KINDS[ev.kind]||EVENT_KINDS.checkin;
-    var top=(av.open&&av.label&&/day|Last/.test(av.label));
-    var best=(ev.rubric||DEFAULT_RUBRIC).reduce(function(m,r){return Math.max(m,num(r.points,0));},0);
-    var theme=eventTheme(ev);
-    var lastDay=top&&(/Last/.test(av.label)||parseInt(av.label,10)<=1);
-    h+='<div class="evcard'+(st.can?' open':' shut')+(theme?' themed':'')+'"'+
-      (theme?' style="--tha:'+theme.a+';--thb:'+theme.b+'"':'')+'>'+
-      (theme?eventBannerHTML(ev,top?(lastDay?'LAST DAY':av.label.toUpperCase()):'',lastDay):'')+
-      (top&&!theme?'<span class="badges" aria-hidden="true"><span class="btime '+
-        (/Last/.test(av.label)||parseInt(av.label,10)<=1?'last':(parseInt(av.label,10)<=5?'soon':''))+
-        '"><span class="dot"></span>'+esc(/Last/.test(av.label)?'LAST DAY':av.label.toUpperCase())+
-        '</span></span>':'')+
-      renderIcon(ev.icon)+
-      '<div class="evmain"><h4>'+esc(ev.title)+'</h4>'+
-      (ev.brief?'<p>'+esc(ev.brief)+'</p>':'')+
-      '<div class="evmeta">'+
-        '<span class="pill cold">'+esc(kind.name)+'</span>'+
-        '<span class="pill '+st.tone+'">'+esc(st.label||'Open')+'</span>'+
-        (ev.hidden?'<span class="pill cold">hidden</span>':'')+
-      '</div></div>'+
-      '<div class="evside">'+
-        '<span class="upto">up to '+pts(best)+'</span>'+
-        (st.can?'<button class="btn btn-sm btn-primary" data-act="ev-do" data-id="'+esc(ev.id)+'">'+
-          esc(kind.verb)+'</button>':'')+
-        (S.admin?'<span class="row" style="gap:5px;justify-content:flex-end">'+
-          '<button class="btn btn-sm btn-ghost" data-act="ev-edit" data-id="'+esc(ev.id)+'">Edit</button>'+
-          '<button class="btn btn-sm btn-danger" data-act="ev-del" data-id="'+esc(ev.id)+'">Remove</button>'+
-        '</span>':'')+
-      '</div>'+bonusStrip(ev,p)+'</div>';
-  });
+  list.forEach(function(ev){h+=eventCardHTML(ev,p);});
   return h+'</div>';
 }
 
@@ -7897,7 +8634,7 @@ function viewReviews(){
         (r.e.thumb?'<button class="revshot" data-act="ev-photo" data-id="'+esc(r.e.id)+'">'+
           '<img src="'+r.e.thumb+'" alt=""><span>see it full size</span></button>':'')+
         '<div style="flex:1;min-width:0">'+
-          '<div class="tiny muted">'+esc(r.p.name)+' &nbsp;·&nbsp; '+esc(r.e.eventTitle)+
+          '<div class="tiny muted">'+esc(r.p.name)+' &nbsp;·&nbsp; '+esc(r.e.eventTitle+(r.e.stepLabel?' — '+r.e.stepLabel:''))+
           ' &nbsp;·&nbsp; '+sinceWords(r.e.at)+'</div>'+
           (r.e.text?'<p class="revtext">'+esc(r.e.text)+'</p>':'')+
           (r.e.count!==null&&r.e.count!==undefined&&r.e.count!==''?
@@ -7905,7 +8642,10 @@ function viewReviews(){
           (r.e.note?'<p class="tiny muted">"'+esc(r.e.note)+'"</p>':'')+
         '</div>'+
       '</div>'+
-      (r.e.status==='pending'
+      (r.e.status==='pending'&&(r.e.stepId||r.e.kind==='goal')
+        ? '<div class="revrate"><button class="btn btn-sm btn-primary" data-act="ev-approve" data-id="'+esc(r.e.id)+'">Approve</button>'+
+          '<button class="btn btn-sm btn-ghost" data-act="ev-back" data-id="'+esc(r.e.id)+'">Send back</button></div>'
+        : r.e.status==='pending'
         ? '<div class="revrate">'+rubric.map(function(rb){
             return '<button class="btn btn-sm btn-primary" data-act="ev-rate" data-id="'+esc(r.e.id)+
               '" data-r="'+esc(rb.id)+'">'+esc(rb.label)+' &nbsp;+'+pts(num(rb.points,0))+'</button>';
@@ -7933,7 +8673,7 @@ function rateEntry(id,ratingId){
   f.e.status='rated';f.e.ratingId=rb.id;f.e.ratingLabel=rb.label;
   f.e.points=boosted.points;f.e.boost=boosted.boost;f.e.ratedAt=nowISO();
   save();
-  if(ev)grantBonus(ev,f.p,'event');
+  if(ev){grantBonus(ev,f.p,'event');grantGift(ev,f.p);}
   toast(f.p.name+' earned '+pts(f.e.points)+' for '+f.e.eventTitle+'.','good',6000);
   render();
 }
@@ -7956,7 +8696,8 @@ function showEntryPhoto(id){
 }
 
 /* ---------- the event editor ---------- */
-function eventEditor(existing){
+function eventEditor(existing,opts){
+  opts=opts||{};
   var d=existing?JSON.parse(JSON.stringify(existing)):{
     id:uid(),kind:'photo',title:'',brief:'',unit:'How many',
     icon:{glyph:'paint',fg:'#F4B53F',bg:'#1C2340',scale:100},
@@ -7969,6 +8710,7 @@ function eventEditor(existing){
     hidden:false,hideWhenClosed:false,created:nowISO()
   };
   if(!d.banner)d.banner={theme:'none',text:''};
+  eventKindDefaults(d);
   if(!d.rubric||!d.rubric.length)d.rubric=JSON.parse(JSON.stringify(DEFAULT_RUBRIC));
   if(!d.icon)d.icon={glyph:'paint',fg:'#F4B53F',bg:'#1C2340',scale:100};
   if(d.icon.scale==null)d.icon.scale=100;
@@ -7981,7 +8723,8 @@ function eventEditor(existing){
   }
   function body(){
     var k=EVENT_KINDS[d.kind];
-    return '<h3>'+(existing?'Edit event':'New event')+'</h3>'+
+    return '<h3>'+(opts.dup?'Duplicate event':(existing?'Edit event':'New event'))+'</h3>'+
+      (opts.dup?'<p class="tiny" style="color:var(--gold-hi)">A copy, hidden from readers until you untick "Hidden".</p>':'')+
       '<p class="lede">Ask for something, then decide what it was worth once you have seen it.</p>'+
 
       '<h4 style="font-size:.95rem;color:var(--text-hi);margin-top:18px">What kind</h4>'+
@@ -8003,11 +8746,14 @@ function eventEditor(existing){
       (d.kind==='count'?'<label class="field"><span>What is being counted</span>'+
         '<input class="inp" id="v-unit" maxlength="30" value="'+esc(d.unit||'')+'" '+
         'placeholder="Minutes read"></label>':'')+
+      (d.kind==='goal'?'<label class="field"><span>What is being counted</span>'+
+        '<input class="inp" id="v-unit" maxlength="30" value="'+esc(d.unit||'')+'" placeholder="minutes"></label>':'')+
+      eventKindExtraHTML(d)+
 
       eventBannerEditorHTML(d)+
       '<div class="divider"></div>'+iconEditorHTML(d.icon)+
 
-      '<div class="divider"></div>'+
+      (isClassicKind(d.kind)?'<div class="divider"></div>'+
       '<h4 style="font-size:.95rem;color:var(--text-hi)">What each rating is worth</h4>'+
       '<p class="tiny muted" style="margin-top:4px">You pick one of these when you look at what came in.</p>'+
       '<div class="rubric stack" id="rubric">'+d.rubric.map(function(r,i){
@@ -8019,18 +8765,18 @@ function eventEditor(existing){
         '</div>';
       }).join('')+'</div>'+
       (d.rubric.length<6?'<button class="btn btn-sm" type="button" id="v-addr">'+ico('plus')+
-        'Add a rating</button>':'')+
+        'Add a rating</button>':''):'')+
 
-      '<div class="divider"></div>'+
-      '<h4 style="font-size:.95rem;color:var(--text-hi)">How many times</h4>'+
+      (!isStepKind(d.kind)?'<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">How many times each round</h4>'+
       '<div class="stack">'+seg('ent',[['once','Once only'],['limit','A few times']],
         (d.entries&&d.entries.mode)||'limit')+'</div>'+
       ((d.entries&&d.entries.mode)!=='once'?'<div class="subfields">'+
         '<label class="field"><span>Most entries per reader</span>'+
         '<input class="inp" id="v-limit" type="number" min="1" max="20" value="'+
-        esc((d.entries&&d.entries.limit)||3)+'"></label></div>':'')+
+        esc((d.entries&&d.entries.limit)||3)+'"></label></div>':''):'')+
 
-      '<div class="divider"></div>'+
+      (d.kind!=='calendar'?'<div class="divider"></div>'+
       '<h4 style="font-size:.95rem;color:var(--text-hi)">When it runs</h4>'+
       '<div class="stack">'+seg('av',[['always','Always'],['window','Between two dates'],
         ['season','Returns on a cycle']],d.avail.mode)+'</div>'+
@@ -8050,7 +8796,8 @@ function eventEditor(existing){
         '<input class="inp" id="a-every" type="number" min="1" value="'+esc(d.avail.everyMonths)+'"></label>'+
         '</div><p class="tiny" id="a-preview" style="color:var(--gold-hi)"></p></div>':'')+
       (d.avail.mode!=='always'?'<label class="check"><input type="checkbox" id="v-hideclosed"'+
-        (d.hideWhenClosed?' checked':'')+'><span>Hide it completely when it is not running</span></label>':'')+
+        (d.hideWhenClosed?' checked':'')+'><span>Hide it completely when it is not running</span></label>':''):'')+
+      eventRepeatEditorHTML(d)+
 
       '<div class="divider"></div>'+
       '<h4 style="font-size:.95rem;color:var(--text-hi)">Who it is for</h4>'+
@@ -8063,10 +8810,11 @@ function eventEditor(existing){
         }).join('')+'</div></div>':'')+
       '<label class="check"><input type="checkbox" id="v-hidden"'+(d.hidden?' checked':'')+
       '><span>Hidden from readers</span></label>'+
+      eventLinkEditorHTML(d)+
       bonusEditorHTML(d)+
       '<div class="err" id="v-err"></div>'+
       '<div class="foot"><button class="btn" data-close>Cancel</button>'+
-      '<button class="btn btn-primary" id="v-save">'+(existing?'Save event':'Add event')+'</button></div>';
+      '<button class="btn btn-primary" id="v-save">'+(opts.dup?'Add the copy':(existing?'Save event':'Add event'))+'</button></div>';
   }
   function grab(scrim){
     var g=function(s){var el=scrim.querySelector(s);return el?el.value:null;};
@@ -8091,6 +8839,7 @@ function eventEditor(existing){
       var i=+el.dataset.rp; if(d.rubric[i])d.rubric[i].points=Math.max(0,num(el.value,0));
     });
     bonusEditorGrab(scrim,d);
+    eventExtraGrab(scrim,d);
     var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:false;};
     d.hidden=cb('#v-hidden');
     if(scrim.querySelector('#v-hideclosed'))d.hideWhenClosed=cb('#v-hideclosed');
@@ -8101,12 +8850,14 @@ function eventEditor(existing){
       grab(scrim);
       if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
+      if(eventExtraClick(e,d,scrim)){redraw();return;}
       var th=e.target.closest('[data-evtheme]');
       if(th){d.banner.theme=th.dataset.evtheme;redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
         if(s.dataset.seg==='kind'){
           d.kind=s.dataset.v;
+          eventKindDefaults(d);
           var gl=EVENT_KINDS[d.kind].glyph;
           if(!d.icon.image&&!d.icon.emoji)d.icon.glyph=gl;
         }
@@ -8126,6 +8877,12 @@ function eventEditor(existing){
       if(rd){d.rubric.splice(+rd.dataset.rdel,1);redraw();return;}
     });
     bonusEditorMount(scrim,d,redraw);
+    var hon=scrim.querySelector('#ev-hon');
+    if(hon)hon.addEventListener('change',function(){grab(scrim);redraw();});
+    ['#ev-yf-m','#ev-yf-d','#ev-yt-m','#ev-yt-d','#ev-rn'].forEach(function(sel){
+      var el=scrim.querySelector(sel);
+      if(el)el.addEventListener('change',function(){grab(scrim);redraw();});
+    });
     var addr=scrim.querySelector('#v-addr');
     if(addr)addr.addEventListener('click',function(){
       grab(scrim);
@@ -8169,6 +8926,8 @@ function eventEditor(existing){
       grab(scrim);
       var err=scrim.querySelector('#v-err');
       if(!d.title){err.textContent='Give it a title.';return;}
+      var xerr=eventExtraCheck(d);
+      if(xerr){err.textContent=xerr;redraw();return;}
       d.rubric=d.rubric.filter(function(r){return r.label;});
       if(!d.rubric.length){err.textContent='Keep at least one rating, with a name.';return;}
       if(d.avail.mode==='window'&&(!d.avail.start||!d.avail.end)){
@@ -8183,7 +8942,7 @@ function eventEditor(existing){
       for(var k=0;k<l.length;k++)if(l[k].id===d.id)i=k;
       if(i>=0)S.events[i]=d;else S.events.push(d);
       save();closeModal();
-      toast(existing?'Event saved.':'"'+d.title+'" added.','good');
+      toast(opts.dup?'"'+d.title+'" added, hidden for now.':(existing?'Event saved.':'"'+d.title+'" added.'),'good');
       go('events');
     });
   }
@@ -8287,6 +9046,7 @@ function trophyEntries(p){
   /* Anything rated at the top of its event's rubric earns a place. */
   return entriesOf(p).filter(function(e){
     if(e.status!=='rated')return false;
+    if(e.stepId||e.goalReward||e.kind==='goal')return false;
     var ev=eventById(e.eventId);
     var rubric=(ev&&ev.rubric)||DEFAULT_RUBRIC;
     var best=rubric.reduce(function(m,r){return Math.max(m,num(r.points,0));},0);

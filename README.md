@@ -499,3 +499,31 @@ Food is bought with points in Pip's room and fed to Pip for a short power: a poi
 - Food purchases are marked like cosmetics, so they never show up in Redemptions.
 - Five starter foods are added on first run: Honey toast, Berry smoothie, Lucky cookie, Lotus mooncake (Moon Festival) and Pumpkin pie (Halloween).
 - **As a bonus:** the bonus pool in the event, activity and store editors has a "Food for Pip's pantry" group. A won food goes into the pantry. Unlike cosmetics, food can be won again, but only once per event, activity or store item per day.
+
+## The event engine: rounds, repeats and new kinds
+
+**Rounds.** Every event runs in rounds, and each entry belongs to the round it was sent in. Entry limits ("once only", "up to N") now count **per round**, so an event a reader finished last round can be done again. Entries from before this update are placed in the right round by their date. An event that "returns on a cycle" gets a fresh round each time it comes back.
+
+**Repeats** (in the event editor):
+
+- **Every day**
+- **Every week:** optionally only on chosen weekdays, such as Fridays.
+- **Every month**
+- **Every few days:** set the number of days.
+- **Every year:** between two month/day dates; this can wrap the new year.
+
+The editor shows whether the current round is open. Cards show "↻ Every day" and "Done 3×", and a finished event says "Sent in · again tomorrow".
+
+**Timed challenges.** Any event can be limited to a time of day (for example 15:00–17:00). Pair it with "Between two dates" for a one-day challenge, or with a repeat for a daily one. While it is open, the card or its seasonal banner counts down live.
+
+**New event kinds**
+
+- **Checklist:** a few steps (read, draw, write a caption), each with its own points, plus an optional bonus for finishing them all. Steps can be required in order, and can need instructor approval. Readers work through them in "Open checklist".
+- **Group goal:** every reader adds a number to one shared total, such as 500 minutes this week. The card shows a progress bar and how many are helping. When the target is reached, every reader the event is for, or only those who helped, gets the reward. Entries can also pay a little each, and can need approval before they count.
+- **Holiday calendar:** one door opens each day from a month/day start date, and each door can pay. Missed doors can optionally be opened later. Opening every door pays a finishing bonus. The calendar comes back every year.
+
+**Pip link-ups.** An event can require a complete Pip look to be worn, or cost one food from the pantry. The food is taken once per round, on the first entry. It can also hand out a guaranteed gift of a Pip part and/or a food. The gift lands when an entry is rated, when a checklist or calendar is finished, or when a group goal is reached. This is on top of the random bonus pool.
+
+**Duplicate.** Each event card has a Duplicate button for instructors. It opens the editor on a copy with the same rubric, banner, steps, repeats, link-ups and bonus pool. The copy is hidden until you untick Hidden.
+
+**Review.** Checklist steps, calendar doors and group-goal entries that need approval show a single Approve button. Checklist steps and group-goal entries never count toward room trophies.
