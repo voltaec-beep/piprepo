@@ -744,3 +744,30 @@ Companions speed up when Pip cheers, and stay put when he is asleep or sad. Smal
 ## Events page layout
 
 Community events a reader hasn't joined yet are shown at full strength with their Join button; they're no longer faded. "What you have sent in" now sits at the bottom of the Events page, below the events and the Ended events section.
+
+## Close-up previews
+
+Tapping any Pip item a reader doesn't have yet opens a large, animated preview: a complete look, a single part or a companion. It works on the store's Pip shelf (a look's picture or any single part), on bonus strips on events, activities and store items, on an event's gift pill, and on the What's new popup. The preview has pose buttons (Cheer, Stand, Read, Wait, Sleep). For single parts there's "On my Pip" to see the item on the reader's own Pip. Looks list every piece, with owned ones ticked, plus their powers and seasonal bonus. The preview also shows the season, any event it can be earned in, and an **Unlock** button with the price, or "Not in the store right now" when the item is win-only or out of season.
+
+## Pip — Companions (Settings)
+
+A new panel next to the Pip panel sets:
+
+- **For all companions:** whether they move around Pip, whether they speed up when Pip cheers, their speed (slow to zippy), and whether they find things, with the daily chance.
+- **For each companion:** how it moves (its own style, circles, hops about, explores all around, strolls, or stays beside Pip) and its personality in Pip's room (Curious, Sleepy or Proud), each with a preview.
+
+These settings moved here from Living Pip. The events banner and cards no longer say "no readers yet".
+
+## What companions can find
+
+Settings → Pip — Companions → **What companions can find**. Each day a find happens (at the daily chance), it is one of:
+
+- **Food:** optionally only the foods you tick; otherwise any food on the menu.
+- **Points:** between a minimum and a maximum you set.
+- **Pip items:** from the companion's own season (falling back to everyday items), everyday items only, or only the items you pick from a grid. A reader never finds an item they already own.
+
+Each kind has an on/off switch and a weight that sets how likely it is compared with the others (default food 55, points 40, Pip items 5). Each companion also has a **Finds** setting: anything allowed, food only, points only, Pip items only, or nothing.
+
+## Room badge
+
+The Pip's room button in the top bar shows a pink count when something is waiting there that the reader hasn't seen yet: a companion's find or a parcel from a neighbour. Hovering it lists what's waiting. Opening the room clears the count; new finds and parcels bring it back. The count refreshes every minute, so a parcel arriving later in the day shows up without a reload.
