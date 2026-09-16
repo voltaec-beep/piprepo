@@ -474,3 +474,28 @@ Seasonal parts and looks carry a `season` key and only sit on the shelf inside t
 - **Little Mooncake** (40 pts, +1% points): mooncake body with a pressed pattern and an osmanthus sprig.
 - **Lantern Keeper** (240 pts, +1% wish payback): vermilion body with gold clouds, a lantern cap with a swinging tassel, a rabbit lantern and rising sky lanterns.
 - **Jade Moon Sage** (650 pts, 1% off all year; **+2% points, 2% off and +2% wish payback during the Moon Festival**): jade body with moon silk and pearls, moonlit eyes, a crescent diadem with pearl strands, flowing silk ribbons, a moon mirror with a moving glint, a full moon behind, a **Moon pond** under his feet (the new *Ground* slot), rising moon dust, and a **Jade rabbit** companion that hops when Pip cheers, dozes when he sleeps and droops an ear when he is sad.
+
+## Wish lock
+
+Once a reader picks a wish, it is **locked in** for a set number of days (7 by default). A confirmation screen reminds them that choosing a wish is a commitment. While it is locked, the store shows "Locked · N days" instead of Change, and no other item can become their wish. When the wish is granted, the lock ends, unless "Keep the lock running even after the wish is granted" is ticked. An instructor with the key can release a lock. If the wished-for item is removed from the store, its lock ends too. Settings → Wishlist sets the number of days (0 turns the lock off).
+
+## Seasonal event banners
+
+An event can wear a banner for Spring, Summer, Fall, Winter, Halloween, Christmas, New Year, Independence Day or Moon Festival. The banner is a coloured strip across the top of the card with gently moving emoji, your own text (or the season's name), and the countdown inside it. You pick it in the event editor, which shows a live preview.
+
+## Pips on display
+
+Complete looks a reader owns but isn't wearing stand around Pip's room as figurines (up to six; four on a phone). Tap one to put that whole look on. The panel under the room lists all of them.
+
+## Pip's pantry (food)
+
+Food is bought with points in Pip's room and fed to Pip for a short power: a point boost, a store discount or extra wish payback, lasting a set number of minutes or hours. A food's power can be tied to a season (for example, it only works during Halloween). A seasonal food is only sold in its season, and its power pauses if the season ends while it is working.
+
+- **Only one food works at a time.** A food's power adds to the power from Pip's outfit, but Pip won't eat another food until the current one wears off.
+- **Feeding rules** (instructor, in the room): minutes between meals, most meals a day, and the default number of each food a reader can keep.
+- **Per food** (Add food / Edit): price, power, duration, season, how often it can be bought (any time, once ever, up to a number, per day, per week, or with a wait in hours), most kept at once, hours before Pip eats that same food again, when it is on the menu (always, between two dates, or on a repeating cycle), hidden, win only, and hide when off the menu.
+- Feeding plays a short animation: the food drops in, Pip chews, crumbs and hearts fly, and the power is shown. Turning on reduced motion shows a still version instead.
+- While a food works, a bowl sits beside Pip, the room and dressing room show a green power pill with a live countdown, and the pantry shows how long is left.
+- Food purchases are marked like cosmetics, so they never show up in Redemptions.
+- Five starter foods are added on first run: Honey toast, Berry smoothie, Lucky cookie, Lotus mooncake (Moon Festival) and Pumpkin pie (Halloween).
+- **As a bonus:** the bonus pool in the event, activity and store editors has a "Food for Pip's pantry" group. A won food goes into the pantry. Unlike cosmetics, food can be won again, but only once per event, activity or store item per day.

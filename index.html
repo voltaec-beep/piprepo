@@ -1620,6 +1620,179 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
   .wallpick:hover{border-color:var(--brand-hi)}
 }
 
+/* ============ Pip's pantry ============ */
+.pantry .foodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.foodcard{
+  display:grid;justify-items:center;text-align:center;gap:5px;padding:12px 10px;border-radius:14px;
+  background:linear-gradient(var(--surface),var(--sunk));border:1px solid var(--edge-soft);
+}
+.foodcard .ic{--ib:34px;width:54px;height:54px}
+.foodcard .ic .emo{font-size:calc(34px*var(--is))}
+.foodcard.have{border-color:var(--gold-soft)}
+.foodcard.buyable{border-color:var(--brand-hi)}
+.foodcard.shut{opacity:.6}
+.foodcard .fn{font-family:var(--serif);font-size:1rem;color:var(--text-hi);line-height:1.2}
+.foodcard .cnt{font-family:var(--sans);font-size:.78rem;color:var(--gold-hi)}
+.foodcard .fd{font-size:.72rem;color:var(--text-3);line-height:1.35}
+.foodcard .fb{font-size:.74rem;color:var(--pass);line-height:1.3}
+.foodcard .fp{font-family:var(--serif);color:var(--gold-hi)}
+.foodcard .fp small{font-family:var(--sans);font-size:.66rem;color:var(--text-3)}
+.foodcard .fp s{color:var(--text-3);font-size:.8rem}
+.foodcard .adminrow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:4px}
+.fedbar{
+  display:flex;align-items:center;gap:10px;margin:10px 0 12px;padding:8px 12px;border-radius:12px;
+  border:1px solid var(--pass);background:var(--pass-faint);font-size:.84rem;color:var(--text-hi);flex-wrap:wrap;
+}
+.fedbar.asleep{border-color:var(--edge);background:none;color:var(--text-3)}
+.fedbar .ic{--ib:20px;width:32px;height:32px;border-radius:9px}
+.abil.food{border-color:var(--pass);background:var(--pass-faint);color:var(--pass)}
+.abil.food svg{display:none}
+
+/* the bowl beside Pip while a food works */
+.room .bowl{position:absolute;left:calc(50% + 62px);bottom:6%;width:46px;display:grid;justify-items:center;z-index:2}
+.room .bowl .bf .ic{--ib:20px;width:30px;height:30px;border-radius:50%;background:none !important;box-shadow:none;
+  animation:bowlBob 2.4s ease-in-out infinite}
+.room .bowl .bb{display:block;width:44px;height:14px;margin-top:-8px;border-radius:0 0 22px 22px;
+  background:linear-gradient(#E8452C,#8E1B14);box-shadow:0 4px 8px -3px #000}
+.room .bowl.asleep{opacity:.5}
+@keyframes bowlBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+/* Pips on display */
+.room .figure{
+  position:absolute;z-index:1;border:0;background:none;padding:0;cursor:pointer;
+  display:grid;justify-items:center;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4));
+  transition:transform .16s var(--ease);
+}
+.room .figure .pip{width:72px;height:72px}
+.room .figure .fl{
+  font-size:.56rem;letter-spacing:.06em;color:rgba(255,255,255,.75);margin-top:-6px;
+  padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.35);white-space:nowrap;
+  opacity:0;transition:opacity .16s var(--ease);
+}
+.room .figure.top .fl{color:#FFD583}
+.room .figure:hover .fl,.room .figure:focus-visible .fl{opacity:1}
+.room .figmore{position:absolute;right:2%;bottom:1%;font-size:.6rem;color:rgba(255,255,255,.6)}
+@media (hover:hover) and (pointer:fine){.room .figure:hover{transform:translateY(-4px) scale(1.06)}}
+@media(max-width:620px){
+  .room .figure .pip{width:54px;height:54px}
+  .room .figure:nth-of-type(n+5){display:none}
+  .room .bowl{left:calc(50% + 46px)}
+}
+.figlist{display:flex;flex-wrap:wrap;gap:8px}
+.figchip{
+  display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--edge);background:var(--surface);color:var(--text-hi);font-size:.8rem;
+}
+.figchip:hover{border-color:var(--brand-hi)}
+
+/* food in the bonus pool */
+.tierhead.t-food .tl{color:var(--pass)}
+.bpick.t-food .ic{--ib:24px;width:40px;height:40px;border-radius:11px;margin:2px auto}
+.bonusstrip.food .bpv .ic{--ib:20px;width:34px;height:34px;border-radius:10px}
+.poolsum .ps.t-food{color:var(--pass)}
+
+/* the feeding moment */
+.feedfx{
+  position:fixed;z-index:210;
+  top:var(--vv-top);left:var(--vv-left);width:var(--vv-w);height:var(--vv-h);
+  display:grid;place-items:center;padding:20px;cursor:pointer;
+  background:radial-gradient(circle at 50% 44%,rgba(24,40,40,.74),rgba(6,9,20,.93));
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  animation:mFade .22s var(--ease);
+}
+.fstage{display:grid;justify-items:center;text-align:center;max-width:460px}
+.fscene{position:relative;width:190px;height:190px}
+.fpip{position:absolute;inset:0}
+.fpip.fa{animation:fHide 4s steps(1,end) both}
+.fpip.fb{opacity:0;animation:fShow 4s steps(1,end) both,fChew .32s ease-in-out .95s 4}
+@keyframes fHide{0%{opacity:1}24%{opacity:0}62%{opacity:0}100%{opacity:0}}
+@keyframes fShow{0%{opacity:0}24%{opacity:1}100%{opacity:1}}
+@keyframes fChew{0%,100%{transform:scale(1,1)}50%{transform:scale(1.06,.93) translateY(6px)}}
+.ffood{
+  position:absolute;left:95px;top:106px;width:0;height:0;
+  animation:fDrop .95s cubic-bezier(.5,-.1,.7,1) both;
+}
+.ffood .femo,.ffood .ic{position:absolute;transform:translate(-50%,-50%)}
+.ffood .femo{font-size:46px;line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+.ffood .ic{--ib:30px;width:48px;height:48px}
+@keyframes fDrop{
+  0%{transform:translate(-120px,-170px) rotate(-30deg) scale(1.1);opacity:0}
+  15%{opacity:1}
+  70%{transform:translate(-8px,-26px) rotate(10deg) scale(1)}
+  100%{transform:translate(0,0) rotate(0) scale(.15);opacity:0}
+}
+.fcrumbs{position:absolute;left:95px;top:112px;width:0;height:0}
+.fcrumbs i{
+  position:absolute;width:6px;height:6px;border-radius:50%;background:#FFD27A;
+  transform:rotate(var(--a)) translateY(0);opacity:0;
+  animation:fCrumb .8s ease-out both;animation-delay:calc(.95s + var(--d));
+}
+.fcrumbs i:nth-child(odd){background:#F28B2B;width:4px;height:4px}
+@keyframes fCrumb{
+  0%{opacity:1;transform:rotate(var(--a)) translateY(0)}
+  100%{opacity:0;transform:rotate(var(--a)) translateY(-54px)}
+}
+.fhearts{position:absolute;left:95px;top:30px;width:0;height:0}
+.fhearts b{
+  position:absolute;left:var(--x);font-size:20px;color:#FF6E93;opacity:0;
+  animation:fHeart 1.6s ease-out both;animation-delay:var(--d);
+}
+@keyframes fHeart{
+  0%{opacity:0;transform:translateY(10px) scale(.5)}
+  25%{opacity:1;transform:translateY(-6px) scale(1.1)}
+  100%{opacity:0;transform:translateY(-60px) scale(.9)}
+}
+.fwords{margin-top:12px;animation:mRise .5s var(--ease) both;animation-delay:1.1s}
+.feedfx.still .fpip.fa{display:none}
+.feedfx.still .fpip.fb{opacity:1;animation:none}
+.feedfx.still .ffood,.feedfx.still .fcrumbs,.feedfx.still .fhearts{display:none}
+.feedfx.still .fwords{animation:none}
+
+/* seasonal event banners */
+.evcard.themed{
+  padding-top:50px;flex-wrap:wrap;
+  border-color:color-mix(in srgb,var(--tha) 55%,var(--edge-soft));
+  background:
+    radial-gradient(120% 80% at 100% 0%,color-mix(in srgb,var(--thb) 22%,transparent),transparent 60%),
+    linear-gradient(var(--surface),var(--sunk));
+}
+.evcard.themed>.ic{margin-top:0}
+.evbanner{
+  position:absolute;left:0;right:0;top:0;height:34px;border-radius:13px 13px 0 0;
+  display:flex;align-items:center;gap:10px;padding:0 12px;overflow:hidden;
+  background:linear-gradient(110deg,var(--tha),var(--thb));color:var(--thi);
+}
+.evbanner::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.28) 45%,transparent 60%);
+  background-size:260% 100%;animation:evShine 6s linear infinite;
+}
+@keyframes evShine{from{background-position:130% 0}to{background-position:-130% 0}}
+.evbanner .evmo{display:flex;gap:3px;font-size:1rem;line-height:1}
+.evbanner .evmo i{font-style:normal;display:inline-block;animation:evBob 2.6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes evBob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-3px) rotate(6deg)}}
+.evbanner .evbt{font-size:.68rem;font-weight:700;letter-spacing:.18em;text-shadow:0 1px 2px rgba(0,0,0,.25);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.evbanner .evcd{
+  margin-left:auto;font-size:.62rem;font-weight:700;letter-spacing:.1em;white-space:nowrap;
+  padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.28);color:#fff;
+}
+.evbanner .evcd.last{background:var(--fail)}
+.themepick{display:flex;flex-wrap:wrap;gap:6px}
+.themepick button{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--edge);background:var(--surface);color:var(--text-2);font-size:.78rem;font-weight:600;
+}
+.themepick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--brand-hi);border-color:transparent}
+.evprev{margin-top:10px}
+.evprev .evbanner{position:relative;border-radius:10px}
+.wishlock{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.wishlock svg{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:2}
+.evcard{flex-wrap:wrap}
+.evcard .evmain{flex:1 1 220px}
+.themepick{margin-bottom:12px}
+.foodcard .pill{white-space:normal;text-align:center;max-width:100%;line-height:1.3}
+
 /* ============ bonus cosmetics ============ */
 .bonusstrip{
   display:flex;align-items:center;gap:11px;margin-top:11px;
@@ -1867,7 +2040,7 @@ var SCHEMA='pip-module/1';
 var IDLE_MS=15*60*1000;
 
 var S={
-  profiles:[],active:null,modules:[],store:[],activities:[],streaks:[],events:[],settings:{},
+  profiles:[],active:null,modules:[],store:[],activities:[],streaks:[],events:[],foods:[],settings:{},
   snaps:[],lastSnapCheck:null,nagged:false,
   admin:false,idleAt:0,
   view:'catalog',arg:null,run:null,last:null,
@@ -1936,9 +2109,11 @@ function load(){
   S.activities=Array.isArray(d.activities)?d.activities:[];
   S.streaks=Array.isArray(d.streaks)?d.streaks:[];
   S.events=Array.isArray(d.events)?d.events:[];
+  S.foods=Array.isArray(d.foods)?d.foods:[];
   S.active=d.active||null;
   S.settings={pw:null,folder:'modules.json',assets:'avatars.json',autoSync:true,syncDefaulted:false,lastExport:'',
-    wish:{on:true,shortfall:25,payback:10,cap:0},
+    wish:{on:true,shortfall:25,payback:10,cap:0,lockDays:7,lockAfterGrant:false},
+    food:{on:true,gap:30,perDay:3,hold:5},
     pipshop:{on:true,prices:{},off:{}},
     events:{on:false},seeded:false,theme:'auto',immersive:true,hideInstallHint:false,lastView:''};
   if(d.settings)for(var k in d.settings){if(Object.prototype.hasOwnProperty.call(d.settings,k))S.settings[k]=d.settings[k];}
@@ -1962,7 +2137,10 @@ function load(){
     if(!p.face)p.face=p.avatar?'picture':'pip';
     if(!Array.isArray(p.entries))p.entries=[];
     if(!p.room)p.room={wall:'dusk'};
+    if(!p.pantry)p.pantry={};
+    if(!Array.isArray(p.feeds))p.feeds=[];
   });
+  seedFoods();
   if(S.active&&!profile(S.active))S.active=null;
 }
 function migrate(){
@@ -1984,7 +2162,7 @@ function save(){
   try{
     localStorage.setItem(KEY,JSON.stringify({
       v:2,profiles:S.profiles,active:S.active,modules:S.modules,store:S.store,
-      activities:S.activities,streaks:S.streaks,events:S.events,settings:S.settings
+      activities:S.activities,streaks:S.streaks,events:S.events,foods:S.foods,settings:S.settings
     }));
   }catch(e){
     storageOK=false;
@@ -1996,7 +2174,7 @@ function save(){
 function newProfile(name){
   return{id:uid(),name:String(name||'Reader').trim().slice(0,32)||'Reader',
     avatar:'',pin:null,created:nowISO(),records:[],purchases:[],activities:[],adjustments:[],
-    streaks:[],wish:null,
+    streaks:[],wish:null,pantry:{},feeds:[],
     pipOwned:['body-sun','eyes-dot'],pipLook:{body:'sun',eyes:'dot'},face:'pip',
     entries:[],room:{wall:'dusk'}};
 }
@@ -2662,7 +2840,7 @@ function exportAll(){
   download('pip-backup-'+new Date().toISOString().slice(0,10)+'.json',
     JSON.stringify({schema:'pip-backup/1',exported:nowISO(),
       profiles:S.profiles,modules:S.modules,store:S.store,
-      activities:S.activities,streaks:S.streaks,events:S.events,settings:S.settings},null,2));
+      activities:S.activities,streaks:S.streaks,events:S.events,foods:S.foods,settings:S.settings},null,2));
 }
 function restoreBackup(d){
   var counts=countsOf(d);
@@ -3529,6 +3707,12 @@ function viewIncentives(){
       '<label class="field" style="flex:1"><span>Most that can come back &mdash; 0 for no limit</span>'+
       '<input class="inp" id="w-cap" type="number" min="0" step="0.5" value="'+cfg.cap+'"></label>'+
     '</div>'+
+    '<div class="row" style="gap:10px">'+
+      '<label class="field" style="flex:1"><span>Days a chosen wish is locked in &mdash; 0 for none</span>'+
+      '<input class="inp" id="w-lock" type="number" min="0" max="365" value="'+cfg.lockDays+'"></label>'+
+    '</div>'+
+    '<label class="check"><input type="checkbox" id="w-lockgrant"'+(cfg.lockAfterGrant?' checked':'')+
+    '><span>Keep the lock running even after the wish is granted</span></label>'+
     '<button class="btn btn-primary" data-act="save-wishcfg">Save wishlist settings</button></div>';
 
   h+='<div class="panel"><div class="row" style="justify-content:space-between">'+
@@ -3976,6 +4160,22 @@ document.addEventListener('click',function(e){
     save();toast('Events '+(S.settings.events.on?'switched on.':'switched off.'),'good');render();
   }
   else if(act==='dress'){dressingRoom();}
+  else if(act==='room-wear'){wearLook(id);}
+  else if(act==='food-buy'){buyFood(id);}
+  else if(act==='food-feed'){feedPip(id);}
+  else if(act==='food-rules'){requireAdmin('Feeding rules need the instructor key.',foodRulesModal);}
+  else if(act==='food-new'){requireAdmin('Adding food needs the instructor key.',function(){foodEditor(null);});}
+  else if(act==='food-edit'){requireAdmin('Editing food needs the instructor key.',function(){
+    var f=foodById(id);if(f)foodEditor(f);});}
+  else if(act==='food-hide'){requireAdmin('Instructor key needed.',function(){
+    var f=foodById(id);if(f){f.hidden=!f.hidden;save();render();}});}
+  else if(act==='food-del'){requireAdmin('Removing food needs the instructor key.',function(){
+    var f=foodById(id);if(!f)return;
+    confirmModal('Remove '+f.name+'?','It leaves the menu and any bonus pools. Readers keep what is already in their pantry until it is eaten — but it can no longer be fed once removed.',
+      'Remove',function(){
+        S.foods=foodList().filter(function(x){return x.id!==id;});
+        save();render();
+      },true);});}
   else if(act==='pip-buy'){buyPip(id);}
   else if(act==='wish-set'){setWish(id);}
   else if(act==='wish-clear'){clearWish();}
@@ -4015,7 +4215,9 @@ document.addEventListener('click',function(e){
     S.settings.wish={on:$('#w-on').checked,
       shortfall:Math.max(0,num($('#w-short').value,25)),
       payback:Math.max(0,Math.min(100,num($('#w-back').value,10))),
-      cap:Math.max(0,num($('#w-cap').value,0))};
+      cap:Math.max(0,num($('#w-cap').value,0)),
+      lockDays:Math.max(0,num($('#w-lock').value,7)),
+      lockAfterGrant:$('#w-lockgrant').checked};
     save();toast('Wishlist settings saved.','good');render();
   }
   else if(act==='act-do'){logActivity(id);}
@@ -5076,7 +5278,10 @@ function buyItem(id){
         discount:paid.active?paid.pct:0,payback:back,
         icon:it.icon,date:nowISO(),given:false
       }]);
-      if(back)p.wish=null;                       /* the wish is granted; pick a new one */
+      if(w&&w.itemId===it.id){                   /* the wish is granted; pick a new one */
+        p.wish=null;
+        if(!wishCfg().lockAfterGrant)p.wishLockUntil=null;
+      }
       save();
       if(back)momentWish(it,back);
       grantBonus(it,p,'store');
@@ -5954,7 +6159,7 @@ function statePayload(scope){
   var out={schema:'pip-backup/2',exported:nowISO(),scope:scope,app:'PipHub'};
   if(scope!=='content')out.profiles=S.profiles;
   if(scope!=='readers'){
-    out.modules=S.modules;out.store=S.store;out.activities=S.activities;out.streaks=S.streaks;out.events=S.events;
+    out.modules=S.modules;out.store=S.store;out.activities=S.activities;out.streaks=S.streaks;out.events=S.events;out.foods=S.foods;
     var st={};
     for(var k in S.settings)if(Object.prototype.hasOwnProperty.call(S.settings,k))st[k]=S.settings[k];
     out.settings=st;
@@ -6118,6 +6323,11 @@ function applyPayload(d,mode){
         if(!itemById(it.id))S.store.push(it);
         else S.store=S.store.map(function(x){return x.id===it.id?it:x;});
       });
+      (d.foods||[]).forEach(function(f){
+        if(!Array.isArray(S.foods))S.foods=[];
+        if(!foodById(f.id))S.foods.push(f);
+        else S.foods=S.foods.map(function(x){return x.id===f.id?f:x;});
+      });
       (d.activities||[]).forEach(function(a){
         if(!activityById(a.id))S.activities.push(a);
         else S.activities=S.activities.map(function(x){return x.id===a.id?a:x;});
@@ -6128,6 +6338,7 @@ function applyPayload(d,mode){
       if(Array.isArray(d.activities))S.activities=d.activities;
       if(Array.isArray(d.streaks))S.streaks=d.streaks;
       if(Array.isArray(d.events))S.events=d.events;
+      if(Array.isArray(d.foods))S.foods=d.foods;
     }
   }
   if(d.settings){
@@ -6251,8 +6462,22 @@ function wishCfg(){
     on:w.on!==false,
     shortfall:Math.max(0,num(w.shortfall,25)),   /* % the item must exceed the balance by */
     payback:Math.max(0,Math.min(100,num(w.payback,10))),
-    cap:Math.max(0,num(w.cap,0))                 /* 0 = no cap */
+    cap:Math.max(0,num(w.cap,0)),                /* 0 = no cap */
+    lockDays:Math.max(0,num(w.lockDays,7)),      /* days a chosen wish is locked in */
+    lockAfterGrant:w.lockAfterGrant===true       /* the lock also outlasts a granted wish */
   };
+}
+/* A wish is a commitment: once chosen it cannot be swapped for a while. */
+function wishLock(p){
+  p=p||me();
+  if(!p||!p.wishLockUntil)return null;
+  var until=new Date(p.wishLockUntil);
+  if(isNaN(until.getTime())||until<=new Date())return null;
+  var w=wishOf(p);
+  /* a wish whose item has been removed does not hold anyone to it */
+  if(w&&!itemById(w.itemId))return null;
+  if(!w&&!wishCfg().lockAfterGrant)return null;
+  return{until:until,days:Math.max(1,dayDiff(until,new Date()))};
 }
 function wishOf(p){p=p||me();return (p&&p.wish&&p.wish.itemId)?p.wish:null;}
 function wishItem(p){
@@ -6267,6 +6492,7 @@ function canWish(item,p){
   if(item.hidden)return false;
   var w=wishOf(p);
   if(w&&w.itemId===item.id)return false;         /* already the wish */
+  if(wishLock(p))return false;                   /* committed to another for now */
   var price=priceOf(item).now;
   if(price<=0)return false;
   return price>=balance(p)*(1+cfg.shortfall/100)+0.0001;
@@ -6299,16 +6525,35 @@ function wishPayback(price){
 function setWish(id){
   var p=me(),it=itemById(id);
   if(!p||!it)return;
+  var lk=wishLock(p);
+  if(lk){toast('Your wish is locked in until '+fmtDay(lk.until)+'.','bad');return;}
   if(!canWish(it,p)){toast('A wish has to be something you are still saving for.','bad');return;}
-  p.wish={itemId:it.id,setAt:nowISO(),priceAtSet:priceOf(it).now,balanceAtSet:balance(p),reached:false};
-  save();
-  toast('"'+it.title+'" is your wish. Redeem it and '+pts(wishPayback(priceOf(it).now))+
-        ' points come back.','good');
-  render();
+  var cfg=wishCfg();
+  var cur=wishItem(p);
+  confirmModal('Commit to '+it.title+'?',
+    'A wish is a promise to yourself. '+
+    (cfg.lockDays?'Once you choose it, it is locked in for '+cfg.lockDays+' day'+(cfg.lockDays===1?'':'s')+
+      ' — you cannot swap it for something else until '+fmtDay(addDays(new Date(),cfg.lockDays))+'. ':'')+
+    (cur?'It replaces '+cur.title+'. ':'')+
+    'Redeem it and '+pts(wishPayback(priceOf(it).now))+' points come back.',
+    'Commit to it',function(){
+      if(wishLock(p)||!canWish(it,p)){toast('That cannot be your wish right now.','bad');return;}
+      p.wish={itemId:it.id,setAt:nowISO(),priceAtSet:priceOf(it).now,balanceAtSet:balance(p),reached:false};
+      p.wishLockUntil=cfg.lockDays?addDays(new Date(),cfg.lockDays).toISOString():null;
+      save();
+      toast('"'+it.title+'" is your wish'+(cfg.lockDays?', locked in for '+cfg.lockDays+' days':'')+'.','good');
+      render();
+    });
 }
 function clearWish(){
   var p=me();if(!p||!p.wish)return;
   var it=wishItem(p);
+  var lk=wishLock(p);
+  if(lk&&!S.admin){
+    toast('You committed to '+(it?it.title:'this wish')+'. It can change on '+fmtDay(lk.until)+'.','bad',6000);
+    return;
+  }
+  if(lk&&S.admin)p.wishLockUntil=null;           /* the instructor can release it */
   p.wish=null;save();
   toast((it?it.title:'That')+' is no longer your wish.');
   render();
@@ -6340,7 +6585,10 @@ function wishPanel(){
       '<div class="wishmark" aria-hidden="true">'+ico('star')+'</div>'+
       '<div style="flex:1;min-width:0"><div class="t">Pick something to save for</div>'+
       '<div class="d">Mark one item as your wish. When you finally redeem it, '+
-      cfg.payback+'% of the cost comes back to you.</div></div></div>';
+      cfg.payback+'% of the cost comes back to you.'+
+      (cfg.lockDays?' Choose carefully — a wish is locked in for '+cfg.lockDays+' days once picked.':'')+
+      (wishLock(p)?' <b>You can pick a new wish on '+fmtDay(wishLock(p).until)+'.</b>':'')+
+      '</div></div></div>';
   }
   var el=eligibility(prog.item,p);
   return '<div class="wishbox'+(prog.ready?' ready':'')+'">'+
@@ -6360,7 +6608,10 @@ function wishPanel(){
       (prog.ready&&el.can
         ? '<button class="btn btn-sm btn-primary" data-act="buy" data-id="'+esc(prog.item.id)+'">Redeem it</button>'
         : '')+
-      '<button class="btn btn-sm btn-ghost" data-act="wish-clear">Change</button>'+
+      (wishLock(p)&&!S.admin
+        ? '<span class="pill cold wishlock" title="You committed to this wish">'+ico('lock')+'Locked · '+
+          wishLock(p).days+' day'+(wishLock(p).days===1?'':'s')+'</span>'
+        : '<button class="btn btn-sm btn-ghost" data-act="wish-clear">'+(wishLock(p)?'Release':'Change')+'</button>')+
     '</div></div>';
 }
 /* A one-line nudge for the pages that are not the store. */
@@ -7287,9 +7538,12 @@ function activeAbility(p){
   return activePowers(p)[0]||{kind:'none',value:0,look:null};
 }
 function abilityValue(kind,p){
-  var ps=activePowers(p);
-  for(var i=0;i<ps.length;i++)if(ps[i].kind===kind)return ps[i].value;
-  return 0;
+  var v=0,ps=activePowers(p);
+  for(var i=0;i<ps.length;i++)if(ps[i].kind===kind)v=ps[i].value;
+  /* A food power adds to what the outfit gives; foods never stack with each other. */
+  var f=foodPower(p);
+  if(f&&!f.asleep&&f.kind===kind)v+=f.value;
+  return Math.round(v*10)/10;
 }
 /* Applied when points are earned, not to the running total — so the record
    shows what was actually awarded and changing outfit later rewrites nothing. */
@@ -7301,8 +7555,12 @@ function withBoost(points,p){
 }
 function abilityLine(p){
   var ps=activePowers(p);
-  if(!ps.length)return '';
-  return ps.map(function(a){
+  var f=foodPower(p);
+  var fl=(f&&!f.asleep)?'<span class="abil food">'+esc(f.name)+' &nbsp;·&nbsp; '+
+    esc(PIP_ABILITIES[f.kind].blurb(f.value))+' &nbsp;·&nbsp; <span data-until="'+esc(f.until)+'">'+
+    durWords(Math.ceil((new Date(f.until).getTime()-Date.now())/60000))+' left</span></span>':'';
+  if(!ps.length)return fl;
+  return fl+ps.map(function(a){
     return '<span class="abil'+(a.festival?' fest':'')+'">'+ico('flame')+esc(a.look.name)+' &nbsp;·&nbsp; '+
       esc(PIP_ABILITIES[a.kind].blurb(a.value))+
       (a.festival?' &nbsp;·&nbsp; '+esc(a.seasonName)+' bonus':'')+'</span>';
@@ -7564,8 +7822,12 @@ function viewEvents(){
     var kind=EVENT_KINDS[ev.kind]||EVENT_KINDS.checkin;
     var top=(av.open&&av.label&&/day|Last/.test(av.label));
     var best=(ev.rubric||DEFAULT_RUBRIC).reduce(function(m,r){return Math.max(m,num(r.points,0));},0);
-    h+='<div class="evcard'+(st.can?' open':' shut')+'">'+
-      (top?'<span class="badges" aria-hidden="true"><span class="btime '+
+    var theme=eventTheme(ev);
+    var lastDay=top&&(/Last/.test(av.label)||parseInt(av.label,10)<=1);
+    h+='<div class="evcard'+(st.can?' open':' shut')+(theme?' themed':'')+'"'+
+      (theme?' style="--tha:'+theme.a+';--thb:'+theme.b+'"':'')+'>'+
+      (theme?eventBannerHTML(ev,top?(lastDay?'LAST DAY':av.label.toUpperCase()):'',lastDay):'')+
+      (top&&!theme?'<span class="badges" aria-hidden="true"><span class="btime '+
         (/Last/.test(av.label)||parseInt(av.label,10)<=1?'last':(parseInt(av.label,10)<=5?'soon':''))+
         '"><span class="dot"></span>'+esc(/Last/.test(av.label)?'LAST DAY':av.label.toUpperCase())+
         '</span></span>':'')+
@@ -7703,8 +7965,10 @@ function eventEditor(existing){
     entries:{mode:'limit',limit:3},
     bonus:{on:false,chance:20,pool:[]},
     rubric:JSON.parse(JSON.stringify(DEFAULT_RUBRIC)),
+    banner:{theme:'none',text:''},
     hidden:false,hideWhenClosed:false,created:nowISO()
   };
+  if(!d.banner)d.banner={theme:'none',text:''};
   if(!d.rubric||!d.rubric.length)d.rubric=JSON.parse(JSON.stringify(DEFAULT_RUBRIC));
   if(!d.icon)d.icon={glyph:'paint',fg:'#F4B53F',bg:'#1C2340',scale:100};
   if(d.icon.scale==null)d.icon.scale=100;
@@ -7740,6 +8004,7 @@ function eventEditor(existing){
         '<input class="inp" id="v-unit" maxlength="30" value="'+esc(d.unit||'')+'" '+
         'placeholder="Minutes read"></label>':'')+
 
+      eventBannerEditorHTML(d)+
       '<div class="divider"></div>'+iconEditorHTML(d.icon)+
 
       '<div class="divider"></div>'+
@@ -7808,6 +8073,7 @@ function eventEditor(existing){
     if(g('#v-title')!==null)d.title=g('#v-title').trim();
     if(g('#v-brief')!==null)d.brief=g('#v-brief').trim();
     if(g('#v-unit')!==null)d.unit=g('#v-unit').trim();
+    if(g('#v-bantext')!==null)d.banner.text=g('#v-bantext').trim();
     if(g('#v-limit')!==null)d.entries.limit=Math.max(1,Math.min(20,num(g('#v-limit'),3)));
     if(g('#a-start')!==null)d.avail.start=g('#a-start');
     if(g('#a-end')!==null)d.avail.end=g('#a-end');
@@ -7835,6 +8101,8 @@ function eventEditor(existing){
       grab(scrim);
       if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
+      var th=e.target.closest('[data-theme]');
+      if(th){d.banner.theme=th.dataset.theme;redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
         if(s.dataset.seg==='kind'){
@@ -8087,10 +8355,18 @@ function viewRoom(){
       '<div class="board"></div>'+
     '</div>'+
     (trophyRow?'<div class="plinth"><div class="trophies">'+trophyRow+'</div><div class="top"></div></div>':'')+
+    roomFiguresHTML(p)+
     '<div class="pipstand" data-act="pip-poke" data-where="room">'+
       pipSVG(pipLook(p),'idle',150)+'</div>'+
+    (function(){
+      var fp=foodPower(p);
+      if(!fp)return '';
+      return '<div class="bowl'+(fp.asleep?' asleep':'')+'" title="'+esc(fp.name)+'">'+
+        '<span class="bf">'+foodIconHTML(foodById(fp.foodId))+'</span><span class="bb"></span></div>';
+    })()+
     '<div class="rug"></div>'+
     '</div>';
+  h+=abilityLine(p)?'<div class="abilbar">'+abilityLine(p)+'</div>':'';
 
   h+='<div class="stats stack">'+
     '<div class="stat gold"><div class="k">Earned in all</div><div class="v">'+pts(lifetimeEarned(p))+'</div></div>'+
@@ -8101,6 +8377,8 @@ function viewRoom(){
     '</div>'+
     '<p class="tiny muted stack">These never go down. Spending points does not touch them.</p>';
 
+  h+=roomFoodHTML(p);
+  h+=roomFiguresPanel(p);
   h+='<div class="panel stack"><h3 style="font-size:1rem">The wall</h3>'+
     '<div class="row stack">'+Object.keys(ROOM_WALLS).map(function(k){
       return '<button class="wallpick'+(k===wall?' on':'')+'" data-act="room-wall" data-w="'+k+'" '+
@@ -8119,6 +8397,685 @@ function viewRoom(){
     h+='</div></div>';
   }
   return h;
+}
+
+/* =========================================================
+   Pip's pantry.
+
+   Food is bought with points in Pip's room and fed to Pip for a
+   short-lived power: a point boost, a store discount or extra wish
+   payback, for so many minutes or hours. Only one food works at a
+   time — a second one waits until the first has worn off — and the
+   instructor decides how often each can be bought and eaten.
+   ========================================================= */
+var FOOD_UNITS={min:'minutes',hr:'hours'};
+function foodList(){return Array.isArray(S.foods)?S.foods:[];}
+function foodById(id){
+  var l=foodList();
+  for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];
+  return null;
+}
+function foodCfg(){
+  var f=S.settings.food||{};
+  return{
+    on:f.on!==false,
+    gap:Math.max(0,num(f.gap,30)),          /* minutes between any two feeds */
+    perDay:Math.max(0,num(f.perDay,3)),     /* 0 = no daily limit */
+    hold:Math.max(1,num(f.hold,5))          /* default pantry cap per food */
+  };
+}
+function foodMinutes(f){
+  var b=(f&&f.benefit)||{};
+  var n=Math.max(1,num(b.dur,30));
+  return b.unit==='hr'?n*60:n;
+}
+function durWords(min){
+  min=Math.round(min);
+  if(min<60)return min+' min';
+  var h=Math.floor(min/60),m=min%60;
+  return h+(h===1?' hour':' hours')+(m?' '+m+' min':'');
+}
+function foodBenefitText(f){
+  var b=(f&&f.benefit)||{};
+  if(!PIP_ABILITIES[b.kind]||!(num(b.value,0)>0))return 'A treat, no power';
+  var s=b.season&&PIP_SEASONS[b.season];
+  return PIP_POWER_SHORT[b.kind](num(b.value,0))+' for '+durWords(foodMinutes(f))+
+    (s?' · '+s.name+' only':'');
+}
+function foodSeasonOpen(f){
+  var b=(f&&f.benefit)||{};
+  if(!b.season)return true;
+  var w=pipSeasonWindow(b.season);
+  return !!(w&&w.open);
+}
+function pantryOf(p){p=p||me();if(!p)return{};if(!p.pantry)p.pantry={};return p.pantry;}
+function feedsOf(p){p=p||me();return (p&&Array.isArray(p.feeds))?p.feeds:[];}
+function foodBuysOf(p,id){
+  return purchasesOf(p).filter(function(r){return r.food&&r.foodId===id;})
+    .sort(function(a,b){return a.date<b.date?1:-1;});
+}
+/* The one food power working right now, if any. */
+function foodPower(p){
+  p=p||me();
+  if(!p)return null;
+  var now=Date.now(),best=null;
+  feedsOf(p).forEach(function(r){
+    var until=new Date(r.until).getTime();
+    if(until>now&&(!best||until>new Date(best.until).getTime()))best=r;
+  });
+  if(!best)return null;
+  var out={kind:best.kind,value:num(best.value,0),until:best.until,name:best.name,
+    foodId:best.foodId,season:best.season||'',asleep:false};
+  if(out.season){
+    var w=pipSeasonWindow(out.season);
+    if(!(w&&w.open))out.asleep=true;          /* eaten, but its season has closed */
+  }
+  if(!PIP_ABILITIES[out.kind]||!(out.value>0))out.asleep=true;
+  return out;
+}
+function foodPrice(f){
+  var base=Math.max(0,num(f.cost,0));
+  var wear=abilityValue('discount');
+  var pct=Math.min(90,wear);
+  return{base:base,now:pct?Math.round(base*(100-pct)/10)/10:base,pct:pct};
+}
+function sameDay(a,b){
+  return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+}
+function startOfWeek(d){
+  var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  x.setDate(x.getDate()-((x.getDay()+6)%7));
+  return x;
+}
+/* May this reader buy it right now. */
+function foodBuyState(f,p){
+  p=p||me();
+  var cfg=foodCfg();
+  if(!cfg.on)return{can:false,label:'The pantry is closed',tone:'cold'};
+  if(f.hidden)return{can:false,label:'Hidden',tone:'cold',shut:true};
+  if(f.winOnly)return{can:false,label:'Win only',tone:'warm',shut:true};
+  if(f.benefit&&f.benefit.season&&!foodSeasonOpen(f)){
+    var s=PIP_SEASONS[f.benefit.season];
+    return{can:false,label:'Back for '+(s?s.name:'its season'),tone:'cold',shut:true};
+  }
+  var av=availability(f);
+  if(!av.open)return{can:false,label:av.label||'Not available',tone:'cold',shut:true};
+  var mine=foodBuysOf(p,f.id);
+  var r=f.buy||{mode:'unlimited'};
+  var now=new Date();
+  var lim=Math.max(1,num(r.limit,1));
+  if(r.mode==='once'&&mine.length)return{can:false,label:'Already bought',tone:'good'};
+  if(r.mode==='limit'&&mine.length>=lim)return{can:false,label:'Limit of '+lim+' reached',tone:'good'};
+  if(r.mode==='daily'){
+    var today=mine.filter(function(x){return sameDay(new Date(x.date),now);}).length;
+    if(today>=lim)return{can:false,label:'Again tomorrow',tone:'cold'};
+  }
+  if(r.mode==='weekly'){
+    var wk=startOfWeek(now).getTime();
+    var week=mine.filter(function(x){return new Date(x.date).getTime()>=wk;}).length;
+    if(week>=lim)return{can:false,label:'Again next week',tone:'cold'};
+  }
+  if(r.mode==='cooldown'&&mine.length){
+    var ready=new Date(mine[0].date).getTime()+Math.max(1,num(r.hours,24))*3600000;
+    if(now.getTime()<ready)return{can:false,label:'Again in '+durWords((ready-now.getTime())/60000),tone:'cold'};
+  }
+  var hold=Math.max(1,num(f.hold,cfg.hold));
+  if((pantryOf(p)[f.id]||0)>=hold)return{can:false,label:'Pantry full ('+hold+')',tone:'cold'};
+  var price=foodPrice(f).now;
+  if(balance(p)<price)return{can:false,label:pts(price-balance(p))+' more points',tone:'cold',cost:true};
+  return{can:true,label:av.label||'',tone:av.tone||'cold'};
+}
+/* May Pip eat it right now. */
+function feedState(f,p){
+  p=p||me();
+  var cfg=foodCfg();
+  if(!cfg.on)return{can:false,label:'Feeding is switched off'};
+  if(!(pantryOf(p)[f.id]>0))return{can:false,label:'None left'};
+  var now=Date.now();
+  var fp=foodPower(p);
+  if(fp&&new Date(fp.until).getTime()>now)
+    return{can:false,label:'Still enjoying '+fp.name+' — '+durWords((new Date(fp.until).getTime()-now)/60000)+' left'};
+  if(f.benefit&&f.benefit.season&&!foodSeasonOpen(f)){
+    var s=PIP_SEASONS[f.benefit.season];
+    return{can:false,label:'Only works during '+(s?s.name:'its season')};
+  }
+  var feeds=feedsOf(p).slice().sort(function(a,b){return a.at<b.at?1:-1;});
+  if(feeds.length&&cfg.gap){
+    var next=new Date(feeds[0].at).getTime()+cfg.gap*60000;
+    if(now<next)return{can:false,label:'Hungry again in '+durWords((next-now)/60000)};
+  }
+  if(cfg.perDay){
+    var today=feeds.filter(function(r){return sameDay(new Date(r.at),new Date());}).length;
+    if(today>=cfg.perDay)return{can:false,label:'Full for today'};
+  }
+  var gapH=Math.max(0,num(f.useGap,0));
+  if(gapH){
+    var last=null;
+    feeds.forEach(function(r){if(!last&&r.foodId===f.id)last=r;});
+    if(last){
+      var ok=new Date(last.at).getTime()+gapH*3600000;
+      if(now<ok)return{can:false,label:f.name+' again in '+durWords((ok-now)/60000)};
+    }
+  }
+  return{can:true,label:'Ready'};
+}
+function buyFood(id){
+  var p=me(),f=foodById(id);
+  if(!p||!f)return;
+  var st=foodBuyState(f,p);
+  if(!st.can){toast(st.label,'bad');return;}
+  var pr=foodPrice(f);
+  confirmModal('Buy '+f.name+'?',
+    'It costs '+pts(pr.now)+' points'+(pr.pct?' ('+pr.pct+'% off)':'')+' and goes in Pip’s pantry. '+
+    'Feeding it gives '+foodBenefitText(f)+'. Your balance is '+pts(balance(p))+'.','Buy',function(){
+      var again=foodBuyState(f,p);
+      if(!again.can){toast(again.label,'bad');return;}
+      var paid=foodPrice(f);
+      p.purchases=purchasesOf(p).concat([{
+        id:uid(),itemId:'food:'+f.id,foodId:f.id,title:f.name,cost:paid.now,full:paid.base,
+        discount:paid.pct,payback:0,cosmetic:true,food:true,date:nowISO(),given:true
+      }]);
+      var pan=pantryOf(p);
+      pan[f.id]=(pan[f.id]||0)+1;
+      save();
+      toast(f.name+' is in the pantry.','good');
+      render();
+    });
+}
+function feedPip(id){
+  var p=me(),f=foodById(id);
+  if(!p||!f)return;
+  var st=feedState(f,p);
+  if(!st.can){toast(st.label,'bad');return;}
+  var b=f.benefit||{};
+  var mins=foodMinutes(f);
+  var rec={id:uid(),foodId:f.id,name:f.name,at:nowISO(),
+    until:new Date(Date.now()+mins*60000).toISOString(),
+    kind:PIP_ABILITIES[b.kind]?b.kind:'none',value:Math.max(0,num(b.value,0)),season:b.season||''};
+  if(!Array.isArray(p.feeds))p.feeds=[];
+  p.feeds.push(rec);
+  if(p.feeds.length>60)p.feeds=p.feeds.slice(-60);
+  var pan=pantryOf(p);
+  pan[f.id]=Math.max(0,(pan[f.id]||0)-1);
+  if(!pan[f.id])delete pan[f.id];
+  save();
+  render();
+  feedMoment(f,rec);
+}
+function giveFood(p,id,n){
+  var pan=pantryOf(p);
+  pan[id]=(pan[id]||0)+(n||1);
+}
+
+/* ---------- the feeding animation ---------- */
+function feedMoment(f,rec){
+  var p=me();
+  var still=reducedMotion();
+  var old=document.getElementById('feedfx');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var crumbs='',hearts='';
+  if(!still){
+    for(var i=0;i<10;i++)crumbs+='<i style="--a:'+(i*36)+'deg;--d:'+(i*25)+'ms"></i>';
+    for(var j=0;j<5;j++)hearts+='<b style="--x:'+(-44+j*22)+'px;--d:'+(1150+j*140)+'ms">♥</b>';
+  }
+  var food=(f.icon&&f.icon.emoji)?'<span class="femo">'+esc(f.icon.emoji)+'</span>':renderIcon(f.icon);
+  var el=document.createElement('div');
+  el.id='feedfx';
+  el.className='feedfx'+(still?' still':'');
+  var power=rec.kind!=='none'&&rec.value>0;
+  el.innerHTML=
+    '<div class="fstage">'+
+      '<div class="fscene">'+
+        '<div class="fpip fa">'+pipSVG(pipLook(p),'idle',190)+'</div>'+
+        '<div class="fpip fb">'+pipSVG(pipLook(p),'cheer',190)+'</div>'+
+        '<div class="ffood">'+food+'</div>'+
+        '<div class="fcrumbs">'+crumbs+'</div>'+
+        '<div class="fhearts">'+hearts+'</div>'+
+      '</div>'+
+      '<div class="fwords">'+
+        '<div class="mkicker">Yum</div>'+
+        '<div class="mtitle">Pip ate '+esc(f.name)+'</div>'+
+        (power?'<div class="mprize">'+esc(PIP_POWER_SHORT[rec.kind](rec.value))+' for '+
+          esc(durWords(foodMinutes(f)))+'</div>':'<div class="mline">A happy, full Pip.</div>')+
+      '</div>'+
+      '<div class="mtap">tap to carry on</div>'+
+    '</div>';
+  pageLock();
+  document.body.appendChild(el);
+  var done=false;
+  function close(){
+    if(done)return;done=true;
+    if(el.parentNode)el.parentNode.removeChild(el);
+    pageUnlock();
+  }
+  el.addEventListener('click',close);
+  setTimeout(close,still?2200:4200);
+}
+/* Countdowns on screen tick down without redrawing the page. */
+setInterval(function(){
+  var now=Date.now(),expired=false;
+  $$('[data-until]').forEach(function(el){
+    var left=new Date(el.dataset.until).getTime()-now;
+    if(left<=0){expired=true;el.textContent='worn off';}
+    else el.textContent=durWords(Math.ceil(left/60000))+' left';
+  });
+  if(expired&&S.view==='room'&&!document.querySelector('.scrim')&&!document.getElementById('feedfx'))render();
+},30000);
+
+/* ---------- starter foods, so the pantry is never empty on day one ---------- */
+function seedFoods(){
+  if(Array.isArray(S.foods)&&S.foods.length)return;
+  if(S.settings.foodSeeded)return;
+  S.foods=[
+    {id:'food-honeytoast',name:'Honey toast',blurb:'Warm, sticky and good for a study session.',
+     icon:{emoji:'🍯',bg:'#3A2A12',scale:100},cost:12,
+     benefit:{kind:'boost',value:2,dur:30,unit:'min',season:''},
+     buy:{mode:'daily',limit:2},hold:3,useGap:0,avail:{mode:'always'},created:nowISO()},
+    {id:'food-berrysmoothie',name:'Berry smoothie',blurb:'Makes shopping feel a little cheaper.',
+     icon:{emoji:'🥤',bg:'#3A1230',scale:100},cost:18,
+     benefit:{kind:'discount',value:3,dur:1,unit:'hr',season:''},
+     buy:{mode:'cooldown',hours:24},hold:2,useGap:12,avail:{mode:'always'},created:nowISO()},
+    {id:'food-luckycookie',name:'Lucky cookie',blurb:'A wish granted while this works pays back a bit more.',
+     icon:{emoji:'🥠',bg:'#2E2410',scale:100},cost:20,
+     benefit:{kind:'payback',value:5,dur:2,unit:'hr',season:''},
+     buy:{mode:'weekly',limit:1},hold:1,useGap:0,avail:{mode:'always'},created:nowISO()},
+    {id:'food-mooncake',name:'Lotus mooncake',blurb:'A festival treat. Only works during the Moon Festival.',
+     icon:{emoji:'🥮',bg:'#123A30',scale:100},cost:30,
+     benefit:{kind:'boost',value:5,dur:2,unit:'hr',season:'moonfest'},
+     buy:{mode:'daily',limit:1},hold:2,useGap:0,avail:{mode:'always'},created:nowISO()},
+    {id:'food-pumpkinpie',name:'Pumpkin pie',blurb:'A Halloween slice. Only works during Halloween.',
+     icon:{emoji:'🥧',bg:'#3A2010',scale:100},cost:25,
+     benefit:{kind:'discount',value:5,dur:1,unit:'hr',season:'halloween'},
+     buy:{mode:'daily',limit:1},hold:2,useGap:0,avail:{mode:'always'},created:nowISO()}
+  ];
+  S.settings.foodSeeded=true;
+}
+
+/* ---------- the pantry panel in Pip's room ---------- */
+function roomFoodHTML(p){
+  var cfg=foodCfg();
+  if(!cfg.on&&!S.admin)return '';
+  var h='';
+  var fp=foodPower(p);
+  var pan=pantryOf(p);
+  var list=foodList().filter(function(f){
+    if(S.admin)return true;
+    if(f.hidden)return false;
+    if(f.hideWhenClosed&&(!availability(f).open||!foodSeasonOpen(f)))return false;
+    return true;
+  });
+
+  h+='<div class="panel stack pantry"><div class="row" style="justify-content:space-between">'+
+    '<h3 style="font-size:1rem">Pip’s pantry</h3>'+
+    (S.admin?'<span class="row" style="gap:6px"><button class="btn btn-sm" data-act="food-rules">Feeding rules</button>'+
+      '<button class="btn btn-sm btn-primary" data-act="food-new">'+ico('plus')+'Add food</button></span>':'')+
+    '</div>';
+  if(!cfg.on)h+='<p class="tiny" style="color:var(--fail)">Feeding is switched off for readers.</p>';
+
+  if(fp){
+    h+='<div class="fedbar'+(fp.asleep?' asleep':'')+'"><span class="fedic">'+
+      foodIconHTML(foodById(fp.foodId))+'</span><div style="flex:1;min-width:0"><b>'+esc(fp.name)+'</b> '+
+      (fp.asleep?'is resting until its season comes back'
+        :'&nbsp;·&nbsp; '+esc(PIP_POWER_SHORT[fp.kind]?PIP_POWER_SHORT[fp.kind](fp.value):''))+
+      '</div><span class="pill warm" data-until="'+esc(fp.until)+'">'+
+      durWords(Math.ceil((new Date(fp.until).getTime()-Date.now())/60000))+' left</span></div>';
+  }
+
+  var owned=Object.keys(pan).filter(function(id){return pan[id]>0&&foodById(id);});
+  h+='<div class="tiny muted stack" style="margin-bottom:6px">In the pantry</div>';
+  if(!owned.length)h+='<p class="tiny muted">Nothing yet. Buy something below, or win it from an activity or event.</p>';
+  else{
+    h+='<div class="foodgrid">';
+    owned.forEach(function(id){
+      var f=foodById(id),st=feedState(f,p);
+      h+='<div class="foodcard have">'+foodIconHTML(f)+
+        '<div class="fn">'+esc(f.name)+' <span class="cnt">&times;'+pan[id]+'</span></div>'+
+        '<div class="fb">'+esc(foodBenefitText(f))+'</div>'+
+        (st.can?'<button class="btn btn-sm btn-primary" data-act="food-feed" data-id="'+esc(id)+'">Feed Pip</button>'
+               :'<span class="pill cold">'+esc(st.label)+'</span>')+
+        '</div>';
+    });
+    h+='</div>';
+  }
+
+  h+='<div class="tiny muted stack" style="margin:14px 0 6px">For sale</div>';
+  if(!list.length)h+='<p class="tiny muted">'+(S.admin?'No foods yet. Add one.':'Nothing on the menu just now.')+'</p>';
+  else{
+    h+='<div class="foodgrid">';
+    list.forEach(function(f){
+      var st=foodBuyState(f,p),pr=foodPrice(f);
+      if(!S.admin&&st.shut&&f.winOnly)return;
+      h+='<div class="foodcard'+(st.can?' buyable':'')+(st.shut?' shut':'')+'">'+foodIconHTML(f)+
+        '<div class="fn">'+esc(f.name)+'</div>'+
+        (f.blurb?'<div class="fd">'+esc(f.blurb)+'</div>':'')+
+        '<div class="fb">'+esc(foodBenefitText(f))+'</div>'+
+        '<div class="fp">'+(pr.pct?'<s>'+pts(pr.base)+'</s> ':'')+pts(pr.now)+' <small>points</small></div>'+
+        (st.can?'<button class="btn btn-sm btn-primary" data-act="food-buy" data-id="'+esc(f.id)+'">Buy</button>'
+               :'<span class="pill '+(st.tone||'cold')+'">'+esc(st.label)+'</span>')+
+        (S.admin?'<div class="adminrow">'+
+          '<button class="btn btn-sm btn-ghost" data-act="food-edit" data-id="'+esc(f.id)+'">Edit</button>'+
+          '<button class="btn btn-sm btn-ghost" data-act="food-hide" data-id="'+esc(f.id)+'">'+(f.hidden?'Show':'Hide')+'</button>'+
+          '<button class="btn btn-sm btn-danger" data-act="food-del" data-id="'+esc(f.id)+'">Remove</button>'+
+          '</div>':'')+
+        '</div>';
+    });
+    h+='</div>';
+  }
+  h+='<p class="tiny muted stack">Only one food works at a time. '+
+    (cfg.gap?'Pip needs '+durWords(cfg.gap)+' between meals'+(cfg.perDay?', and eats at most '+cfg.perDay+' a day.':'.'):
+      (cfg.perDay?'Pip eats at most '+cfg.perDay+' a day.':''))+'</p>';
+  return h+'</div>';
+}
+function foodIconHTML(f){
+  if(!f)return '<span class="ic"><span class="emo">🍽️</span></span>';
+  return renderIcon(f.icon||{emoji:'🍪'});
+}
+
+/* ---------- instructor: feeding rules ---------- */
+function foodRulesModal(){
+  var c=foodCfg();
+  openModal('<h3>Feeding rules</h3>'+
+    '<p class="lede">These apply to every food. Each food can add its own wait on top.</p>'+
+    '<label class="check stack"><input type="checkbox" id="fr-on"'+(c.on?' checked':'')+
+    '><span>Readers can buy food and feed Pip</span></label>'+
+    '<label class="field"><span>Minutes Pip needs between any two meals</span>'+
+    '<input class="inp" id="fr-gap" type="number" min="0" value="'+c.gap+'"></label>'+
+    '<label class="field"><span>Most meals a day &mdash; 0 for no limit</span>'+
+    '<input class="inp" id="fr-day" type="number" min="0" value="'+c.perDay+'"></label>'+
+    '<label class="field"><span>Most of one food a reader can keep in the pantry (unless the food says otherwise)</span>'+
+    '<input class="inp" id="fr-hold" type="number" min="1" value="'+c.hold+'"></label>'+
+    '<p class="tiny muted">Food powers never stack: while one is working, Pip will not eat another.</p>'+
+    '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+    '<button class="btn btn-primary" id="fr-save">Save rules</button></div>',
+  function(scrim){
+    scrim.querySelector('#fr-save').addEventListener('click',function(){
+      S.settings.food={on:scrim.querySelector('#fr-on').checked,
+        gap:Math.max(0,num(scrim.querySelector('#fr-gap').value,30)),
+        perDay:Math.max(0,num(scrim.querySelector('#fr-day').value,3)),
+        hold:Math.max(1,num(scrim.querySelector('#fr-hold').value,5))};
+      save();closeModal();toast('Feeding rules saved.','good');render();
+    });
+  });
+}
+
+/* ---------- instructor: the food editor ---------- */
+function foodEditor(existing){
+  var d=existing?JSON.parse(JSON.stringify(existing)):{
+    id:'food-'+uid(),name:'',blurb:'',
+    icon:{emoji:'🍪',bg:'#3A2A12',scale:100},cost:15,
+    benefit:{kind:'boost',value:2,dur:30,unit:'min',season:''},
+    buy:{mode:'daily',limit:1,hours:24},hold:foodCfg().hold,useGap:0,
+    avail:{mode:'always',start:'',end:'',days:7,everyMonths:12},
+    hidden:false,winOnly:false,hideWhenClosed:false,created:nowISO()
+  };
+  if(!d.icon)d.icon={emoji:'🍪',bg:'#3A2A12',scale:100};
+  if(!d.benefit)d.benefit={kind:'boost',value:2,dur:30,unit:'min',season:''};
+  if(!d.buy)d.buy={mode:'unlimited',limit:1,hours:24};
+  if(!d.avail)d.avail={mode:'always',start:'',end:'',days:7,everyMonths:12};
+
+  function seg(field,opts,cur){
+    return '<div class="seg">'+opts.map(function(o){
+      return '<button type="button" data-seg="'+field+'" data-v="'+o[0]+'" aria-pressed="'+
+        (cur===o[0])+'">'+esc(o[1])+'</button>';
+    }).join('')+'</div>';
+  }
+  function body(){
+    var b=d.benefit,r=d.buy;
+    return '<h3>'+(existing?'Edit food':'New food')+'</h3>'+
+      '<p class="lede">Something readers buy with points and feed to Pip for a short power.</p>'+
+      '<div class="row" style="gap:16px;margin-top:10px;align-items:flex-start">'+renderIcon(d.icon)+
+        '<div style="flex:1;min-width:190px">'+
+        '<label class="field"><span>Name</span><input class="inp" id="f-name" data-focus maxlength="32" '+
+          'value="'+esc(d.name)+'" placeholder="Honey toast"></label></div></div>'+
+      '<label class="field"><span>Description</span><input class="inp" id="f-blurb" maxlength="120" '+
+        'value="'+esc(d.blurb||'')+'" placeholder="Warm, sticky and good for a study session"></label>'+
+      '<label class="field"><span>Price in points</span><input class="inp" id="f-cost" type="number" min="0" step="0.5" value="'+
+        esc(d.cost)+'"></label>'+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">What eating it does</h4>'+
+      '<div class="stack">'+seg('kind',[['boost','Point boost'],['discount','Store discount'],
+        ['payback','Wish payback'],['none','Nothing, just a treat']],PIP_ABILITIES[b.kind]?b.kind:'none')+'</div>'+
+      (PIP_ABILITIES[b.kind]?'<div class="subfields"><div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>Amount (%)</span><input class="inp" id="f-val" type="number" min="0.1" max="100" step="0.1" value="'+
+          esc(b.value)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Lasts</span><input class="inp" id="f-dur" type="number" min="1" value="'+
+          esc(b.dur)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Unit</span><select class="inp" id="f-unit">'+
+          Object.keys(FOOD_UNITS).map(function(u){return '<option value="'+u+'"'+(b.unit===u?' selected':'')+'>'+FOOD_UNITS[u]+'</option>';}).join('')+
+        '</select></label></div>'+
+        '<label class="field"><span>Only works during a season</span><select class="inp" id="f-season">'+
+          '<option value="">Any time</option>'+Object.keys(PIP_SEASONS).map(function(k){
+            var w=pipSeasonWindow(k);
+            return '<option value="'+k+'"'+(b.season===k?' selected':'')+'>'+esc(PIP_SEASONS[k].name)+
+              (w?' ('+fmtDay(w.from)+' – '+fmtDay(w.to)+')':'')+'</option>';
+          }).join('')+'</select></label>'+
+        '<p class="tiny muted">A seasonal food is only sold in its season, and its power pauses if the season ends while it is working.</p>'+
+        '</div>':'')+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">How often it can be bought</h4>'+
+      '<div class="stack">'+seg('buy',[['unlimited','Any time'],['once','Once ever'],['limit','Up to a number'],
+        ['daily','Per day'],['weekly','Per week'],['cooldown','With a wait']],r.mode)+'</div>'+
+      (['limit','daily','weekly'].indexOf(r.mode)>=0?'<div class="subfields"><label class="field"><span>'+
+        (r.mode==='limit'?'Most ever':(r.mode==='daily'?'Most a day':'Most a week'))+'</span>'+
+        '<input class="inp" id="f-lim" type="number" min="1" value="'+esc(r.limit||1)+'"></label></div>':'')+
+      (r.mode==='cooldown'?'<div class="subfields"><label class="field"><span>Hours between purchases</span>'+
+        '<input class="inp" id="f-hours" type="number" min="1" value="'+esc(r.hours||24)+'"></label></div>':'')+
+      '<div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>Most a reader can keep at once</span>'+
+        '<input class="inp" id="f-hold" type="number" min="1" value="'+esc(d.hold||foodCfg().hold)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Hours before Pip eats this one again &mdash; 0 for none</span>'+
+        '<input class="inp" id="f-gap" type="number" min="0" step="0.5" value="'+esc(d.useGap||0)+'"></label>'+
+      '</div>'+
+
+      '<div class="divider"></div>'+
+      '<h4 style="font-size:.95rem;color:var(--text-hi)">When it is on the menu</h4>'+
+      '<div class="stack">'+seg('av',[['always','Always'],['window','Between two dates'],
+        ['season','Returns on a cycle']],d.avail.mode)+'</div>'+
+      (d.avail.mode==='window'?'<div class="subfields"><div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>From</span><input class="inp" id="a-start" type="date" value="'+esc(d.avail.start)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Until</span><input class="inp" id="a-end" type="date" value="'+esc(d.avail.end)+'"></label>'+
+        '</div></div>':'')+
+      (d.avail.mode==='season'?'<div class="subfields">'+
+        '<label class="field"><span>First appears on</span><input class="inp" id="a-start" type="date" value="'+esc(d.avail.start)+'"></label>'+
+        '<div class="row" style="gap:10px">'+
+        '<label class="field" style="flex:1"><span>Stays for this many days</span><input class="inp" id="a-days" type="number" min="1" value="'+esc(d.avail.days)+'"></label>'+
+        '<label class="field" style="flex:1"><span>Comes back every this many months</span><input class="inp" id="a-every" type="number" min="1" value="'+esc(d.avail.everyMonths)+'"></label>'+
+        '</div></div>':'')+
+      '<label class="check"><input type="checkbox" id="f-hidden"'+(d.hidden?' checked':'')+'><span>Hidden from readers</span></label>'+
+      '<label class="check"><input type="checkbox" id="f-win"'+(d.winOnly?' checked':'')+'><span>Win only &mdash; not for sale, but can be given as a bonus</span></label>'+
+      '<label class="check"><input type="checkbox" id="f-hideclosed"'+(d.hideWhenClosed?' checked':'')+'><span>Hide it completely when it is off the menu</span></label>'+
+
+      '<div class="divider"></div>'+iconEditorHTML(d.icon)+
+      '<div class="err" id="f-err"></div>'+
+      '<div class="foot"><button class="btn" data-close>Cancel</button>'+
+      '<button class="btn btn-primary" id="f-save">'+(existing?'Save food':'Add food')+'</button></div>';
+  }
+  function grab(scrim){
+    var g=function(s){var el=scrim.querySelector(s);return el?el.value:null;};
+    var cb=function(s){var el=scrim.querySelector(s);return el?el.checked:null;};
+    if(g('#f-name')!==null)d.name=g('#f-name').trim();
+    if(g('#f-blurb')!==null)d.blurb=g('#f-blurb').trim();
+    if(g('#f-cost')!==null)d.cost=Math.max(0,num(g('#f-cost'),0));
+    if(g('#f-val')!==null)d.benefit.value=Math.max(0,Math.min(100,num(g('#f-val'),1)));
+    if(g('#f-dur')!==null)d.benefit.dur=Math.max(1,num(g('#f-dur'),30));
+    if(g('#f-unit')!==null)d.benefit.unit=g('#f-unit');
+    if(g('#f-season')!==null)d.benefit.season=g('#f-season');
+    if(g('#f-lim')!==null)d.buy.limit=Math.max(1,num(g('#f-lim'),1));
+    if(g('#f-hours')!==null)d.buy.hours=Math.max(1,num(g('#f-hours'),24));
+    if(g('#f-hold')!==null)d.hold=Math.max(1,num(g('#f-hold'),5));
+    if(g('#f-gap')!==null)d.useGap=Math.max(0,num(g('#f-gap'),0));
+    if(g('#a-start')!==null)d.avail.start=g('#a-start');
+    if(g('#a-end')!==null)d.avail.end=g('#a-end');
+    if(g('#a-days')!==null)d.avail.days=Math.max(1,num(g('#a-days'),7));
+    if(g('#a-every')!==null)d.avail.everyMonths=Math.max(1,num(g('#a-every'),12));
+    if(cb('#f-hidden')!==null)d.hidden=cb('#f-hidden');
+    if(cb('#f-win')!==null)d.winOnly=cb('#f-win');
+    if(cb('#f-hideclosed')!==null)d.hideWhenClosed=cb('#f-hideclosed');
+    if(g('#i-scale')!==null)d.icon.scale=Math.max(50,Math.min(180,num(g('#i-scale'),100)));
+    if(g('#i-emoji')!==null){
+      var em=g('#i-emoji').trim();
+      if(em){d.icon.emoji=em;delete d.icon.image;}else delete d.icon.emoji;
+    }
+  }
+  function redraw(){redrawModal(body(),mount);}
+  function mount(scrim){
+    scrim.addEventListener('click',function(e){
+      var s=e.target.closest('[data-seg]');
+      var ic=e.target.closest('[data-emoji],[data-glyph],[data-icbg],[data-icfg]');
+      if(!s&&!ic)return;
+      grab(scrim);
+      if(ic){if(iconEditorClick(e,d.icon))redraw();return;}
+      if(s.dataset.seg==='kind')d.benefit.kind=s.dataset.v;
+      else if(s.dataset.seg==='buy')d.buy.mode=s.dataset.v;
+      else if(s.dataset.seg==='av')d.avail.mode=s.dataset.v;
+      redraw();
+    });
+    var pic=scrim.querySelector('#i-pic');
+    if(pic)pic.addEventListener('click',function(){
+      grab(scrim);closeModal();
+      avatarPicker(function(uri){d.icon.image=uri;openModal(body(),mount,{dismissable:false});});
+    });
+    var nopic=scrim.querySelector('#i-nopic');
+    if(nopic)nopic.addEventListener('click',function(){
+      grab(scrim);delete d.icon.image;delete d.icon.emoji;redraw();
+    });
+    var sc=scrim.querySelector('#i-scale');
+    if(sc){
+      var out=scrim.querySelector('#i-scale-v'),tile=scrim.querySelector('.ic');
+      sc.addEventListener('input',function(){
+        d.icon.scale=num(sc.value,100);
+        if(out)out.textContent=d.icon.scale+'%';
+        if(tile)tile.style.setProperty('--is',Math.max(0.5,Math.min(1.8,d.icon.scale/100)));
+      });
+    }
+    scrim.querySelector('#f-save').addEventListener('click',function(){
+      grab(scrim);
+      var err=scrim.querySelector('#f-err');
+      if(!d.name){err.textContent='Give it a name.';return;}
+      if(PIP_ABILITIES[d.benefit.kind]&&!(d.benefit.value>0)){err.textContent='Set how strong the power is.';return;}
+      if(d.avail.mode==='window'&&(!d.avail.start||!d.avail.end)){err.textContent='A date window needs both dates.';return;}
+      if(d.avail.mode==='window'&&dnum(d.avail.end)<dnum(d.avail.start)){err.textContent='The end date is before the start date.';return;}
+      if(d.avail.mode==='season'&&!d.avail.start){err.textContent='A cycle needs a first date.';return;}
+      if(!Array.isArray(S.foods))S.foods=[];
+      var i=-1;
+      for(var k=0;k<S.foods.length;k++)if(S.foods[k].id===d.id)i=k;
+      if(i>=0)S.foods[i]=d;else S.foods.push(d);
+      save();closeModal();
+      toast(existing?'Food saved.':'"'+d.name+'" is on the menu.','good');
+      render();
+    });
+  }
+  openModal(body(),mount,{dismissable:false});
+}
+
+/* =========================================================
+   Pips on display.
+
+   Complete looks a reader owns but is not wearing stand about
+   the room as figurines. Tap one to put it on.
+   ========================================================= */
+function lookPreview(l){
+  var pv={};
+  l.grants.forEach(function(g){var pt=pipPart(g);if(pt)pv[pt.slot]=pt.v;});
+  return pv;
+}
+function displayLooks(p){
+  p=p||me();
+  if(!p)return [];
+  return PIP_LOOKS.filter(function(l){
+    return l.grants.every(function(g){return ownsPip(g,p);})&&!(p.face==='pip'&&wearingLook(l,p));
+  });
+}
+function wearLook(id){
+  var p=me(),l=pipLookById(id);
+  if(!p||!l)return;
+  if(!l.grants.every(function(g){return ownsPip(g,p);})){toast('Not unlocked yet.','bad');return;}
+  p.pipLook={body:'sun',eyes:'dot'};
+  l.grants.forEach(function(g){var pt=pipPart(g);if(pt)p.pipLook[pt.slot]=pt.v;});
+  p.face='pip';
+  save();
+  toast('Pip is wearing '+l.name+'.','good');
+  render();
+}
+var FIGURE_SPOTS=[
+  {l:3,b:3},{r:3,b:3},{l:15,b:1},{r:15,b:1},{l:27,b:4},{r:27,b:4}
+];
+var FIGURE_POSES=['idle','wait','read','cheer','sleep','idle'];
+function roomFiguresHTML(p){
+  var looks=displayLooks(p);
+  if(!looks.length)return '';
+  var shown=looks.slice(0,FIGURE_SPOTS.length);
+  var h='';
+  shown.forEach(function(l,i){
+    var s=FIGURE_SPOTS[i];
+    h+='<button class="figure'+(l.tier==='top'?' top':'')+'" data-act="room-wear" data-id="'+esc(l.id)+'" '+
+      'style="'+(s.l!=null?'left:'+s.l+'%;':'right:'+s.r+'%;')+'bottom:'+s.b+'%" '+
+      'title="'+esc(l.name)+' — tap to wear">'+
+      pipSVG(lookPreview(l),FIGURE_POSES[i%FIGURE_POSES.length],72)+
+      '<span class="fl">'+esc(l.name)+'</span></button>';
+  });
+  if(looks.length>shown.length)h+='<span class="figmore">+'+(looks.length-shown.length)+' more</span>';
+  return h;
+}
+function roomFiguresPanel(p){
+  var looks=displayLooks(p);
+  if(!looks.length)return '';
+  return '<div class="panel stack"><h3 style="font-size:1rem">Pips on display</h3>'+
+    '<p class="tiny muted" style="margin-top:4px">Looks you own but are not wearing decorate the room. Tap one to put it on.</p>'+
+    '<div class="figlist stack">'+looks.map(function(l){
+      return '<button class="figchip" data-act="room-wear" data-id="'+esc(l.id)+'">'+
+        pipSVG(lookPreview(l),'idle',48,{shadow:false,still:true})+
+        '<span>'+esc(l.name)+(l.tier==='top'?' <span class="pill warm">top</span>':'')+'</span></button>';
+    }).join('')+'</div></div>';
+}
+
+/* =========================================================
+   Event banners.
+   ========================================================= */
+var EVENT_THEMES={
+  none:{name:'None'},
+  spring:{name:'Spring',label:'SPRING',a:'#F7A6C6',b:'#7FD28A',ink:'#1E2A12',motif:['🌸','🌷','🦋']},
+  summer:{name:'Summer',label:'SUMMER',a:'#FFC23D',b:'#2FB5D9',ink:'#12222A',motif:['☀️','🌊','🍉']},
+  fall:{name:'Fall',label:'FALL',a:'#F28B2B',b:'#8E2F1E',ink:'#fff',motif:['🍂','🍁','🌰']},
+  winter:{name:'Winter',label:'WINTER',a:'#B8DDFA',b:'#4A6FB5',ink:'#0B1A33',motif:['❄️','⛄','🧣']},
+  halloween:{name:'Halloween',label:'HALLOWEEN',a:'#FF8A2B',b:'#3A1E5A',ink:'#fff',motif:['🎃','🦇','👻']},
+  christmas:{name:'Christmas',label:'CHRISTMAS',a:'#C9302C',b:'#1E7A3E',ink:'#fff',motif:['🎄','🎁','⭐']},
+  newyear:{name:'New Year',label:'NEW YEAR',a:'#F4C542',b:'#1A1F4A',ink:'#fff',motif:['🎉','🥂','✨']},
+  independence:{name:'Independence Day',label:'INDEPENDENCE DAY',a:'#C9302C',b:'#1F3A8A',ink:'#fff',motif:['🎆','🇺🇸','⭐']},
+  moonfest:{name:'Moon Festival',label:'MOON FESTIVAL',a:'#F4C542',b:'#1B6E5A',ink:'#fff',motif:['🥮','🏮','🌕']}
+};
+function eventTheme(ev){
+  var k=ev&&ev.banner&&ev.banner.theme;
+  return (k&&k!=='none'&&EVENT_THEMES[k])?EVENT_THEMES[k]:null;
+}
+function eventBannerHTML(ev,timeLabel,last){
+  var t=eventTheme(ev);
+  if(!t)return '';
+  var text=(ev.banner.text||t.label);
+  return '<div class="evbanner" style="--tha:'+t.a+';--thb:'+t.b+';--thi:'+t.ink+'">'+
+    '<span class="evmo" aria-hidden="true">'+t.motif.map(function(m,i){
+      return '<i style="--d:'+(i*0.6)+'s">'+m+'</i>';}).join('')+'</span>'+
+    '<span class="evbt">'+esc(text)+'</span>'+
+    (timeLabel?'<span class="evcd'+(last?' last':'')+'">'+esc(timeLabel)+'</span>':'')+
+    '</div>';
+}
+function eventBannerEditorHTML(d){
+  var b=d.banner||{theme:'none',text:''};
+  var t=EVENT_THEMES[b.theme]||EVENT_THEMES.none;
+  return '<div class="divider"></div>'+
+    '<h4 style="font-size:.95rem;color:var(--text-hi)">Seasonal banner</h4>'+
+    '<p class="tiny muted" style="margin-top:4px">Dress the card for the time of year.</p>'+
+    '<div class="themepick stack">'+Object.keys(EVENT_THEMES).map(function(k){
+      var th=EVENT_THEMES[k];
+      return '<button type="button" data-theme="'+k+'" aria-pressed="'+(b.theme===k||(!b.theme&&k==='none'))+'" '+
+        'style="'+(th.a?'background:linear-gradient(120deg,'+th.a+','+th.b+');color:'+th.ink:'')+'">'+
+        (th.motif?'<span>'+th.motif[0]+'</span>':'')+esc(th.name)+'</button>';
+    }).join('')+'</div>'+
+    (b.theme&&b.theme!=='none'?'<label class="field"><span>Banner text</span>'+
+      '<input class="inp" id="v-bantext" maxlength="28" value="'+esc(b.text||'')+'" placeholder="'+esc(t.label||'')+'"></label>'+
+      '<div class="evprev">'+eventBannerHTML({banner:b},'3 days left')+'</div>':'');
 }
 
 /* =========================================================
@@ -8152,17 +9109,34 @@ function bonusFor(thing,p){
   var cfg=bonusCfg(thing);
   if(!cfg.on||!cfg.chance||!cfg.pool.length)return null;
   var eligible=cfg.pool.filter(function(id){
+    if(id.indexOf('food:')===0)return !!foodById(id.slice(5));
     return pipPart(id)&&!ownsPip(id,p);
   });
   if(!eligible.length)return null;
   var seed=thing.id+':'+p.id+':'+todayKey();
   if(hashUnit(seed)*100>=cfg.chance)return null;
   var pick=Math.floor(hashUnit(seed+'#pick')*eligible.length);
-  return pipPart(eligible[Math.min(pick,eligible.length-1)]);
+  var id=eligible[Math.min(pick,eligible.length-1)];
+  if(id.indexOf('food:')===0){
+    var f=foodById(id.slice(5));
+    return {id:id,food:true,foodId:f.id,name:f.name,icon:f.icon};
+  }
+  return pipPart(id);
 }
 function grantBonus(thing,p,why){
   var part=bonusFor(thing,p);
   if(!part)return null;
+  if(part.food){
+    /* food can be won again another day, but only once per thing per day */
+    if(!p.foodWins)p.foodWins={};
+    var key=thing.id+':'+todayKey();
+    if(p.foodWins[key])return null;
+    p.foodWins[key]=1;
+    giveFood(p,part.foodId,1);
+    save();
+    toast('A bonus came with it — '+part.name+'. It is in Pip\u2019s pantry.','good',8000);
+    return part;
+  }
   if(!Array.isArray(p.pipOwned))p.pipOwned=[];
   if(p.pipOwned.indexOf(part.id)<0)p.pipOwned.push(part.id);
   if(!p.pipLook)p.pipLook={};
@@ -8176,6 +9150,15 @@ function grantBonus(thing,p,why){
 function bonusStrip(thing,p){
   var part=bonusFor(thing,p);
   if(!part)return '';
+  if(part.food){
+    var won=p&&p.foodWins&&p.foodWins[thing.id+':'+todayKey()];
+    if(won)return '';
+    return '<div class="bonusstrip food">'+
+      '<span class="bpv">'+foodIconHTML(foodById(part.foodId))+'</span>'+
+      '<span class="btxt"><b>Comes with '+esc(part.name)+'</b>'+
+      '<span>a treat for Pip\u2019s pantry, today only</span></span>'+
+      '<span class="bspark">'+ico('star')+'</span></div>';
+  }
   var preview={body:pipLook(p).body};
   preview[part.slot]=part.v;
   return '<div class="bonusstrip">'+
@@ -8214,11 +9197,11 @@ function bonusEditorHTML(d){
   var h='<div class="divider"></div>'+
     '<h4 style="font-size:.95rem;color:var(--text-hi)">Bonus for Pip</h4>'+
     '<p class="tiny muted" style="margin-top:4px;max-width:70ch">Now and then this can carry a '+
-    'cosmetic as well. The chance is rolled once a day per reader, and a part they already own is '+
+    'cosmetic or a food for Pip as well. The chance is rolled once a day per reader, and a part they already own is '+
     'never picked. Parts you have taken off sale in the Pip shelf can still be won here — which is '+
     'how something becomes win-only.</p>'+
     '<label class="check stack"><input type="checkbox" id="b-on"'+(cfg.on?' checked':'')+
-    '><span>Sometimes comes with a Pip cosmetic</span></label>';
+    '><span>Sometimes comes with a Pip cosmetic or food</span></label>';
   if(!cfg.on)return h;
   h+='<div class="subfields">'+
     '<label class="field"><span>Chance each day (%)</span>'+
@@ -8256,9 +9239,29 @@ function bonusEditorHTML(d){
     h+='</div>';
   });
 
-  var picked=cfg.pool.map(pipPart).filter(Boolean);
+  var foods=foodList();
+  if(foods.length){
+    var fchosen=foods.filter(function(f){return cfg.pool.indexOf('food:'+f.id)>=0;}).length;
+    h+='<div class="tierhead t-food"><span class="tl">Food for Pip\u2019s pantry</span>'+
+      '<span class="tn">Can be won again on another day.</span>'+
+      (fchosen?'<span class="tc">'+fchosen+' chosen</span>':'')+'</div><div class="bonuspool">';
+    foods.forEach(function(f){
+      var on=cfg.pool.indexOf('food:'+f.id)>=0;
+      h+='<button type="button" class="bpick t-food'+(on?' on':'')+'" data-pool="food:'+esc(f.id)+'" '+
+        'title="'+esc(f.name+' — '+foodBenefitText(f))+'">'+foodIconHTML(f)+
+        '<span class="n">'+esc(f.name)+'</span>'+
+        '<span class="in">'+esc(foodBenefitText(f))+'</span>'+
+        '<span class="pr">'+pts(num(f.cost,0))+'</span>'+
+        (f.winOnly?'<span class="winonly">win only</span>':'')+'</button>';
+    });
+    h+='</div>';
+  }
+  var picked=cfg.pool.map(function(id){
+    if(id.indexOf('food:')===0){var f=foodById(id.slice(5));return f?{name:f.name,food:true}:null;}
+    return pipPart(id);
+  }).filter(Boolean);
   h+=(picked.length?'<div class="poolsum">Giving away: '+picked.map(function(pt){
-        return '<span class="ps t-'+partTier(pt)+'">'+esc(pt.name)+'</span>';
+        return '<span class="ps t-'+(pt.food?'food':partTier(pt))+'">'+esc(pt.name)+'</span>';
       }).join('')+'</div>':'')+
     (cfg.pool.length?'':'<p class="tiny" style="color:var(--fail);margin-top:8px">'+
       'Pick at least one part, or the bonus can never happen.</p>')+
