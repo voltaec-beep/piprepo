@@ -683,7 +683,12 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 @keyframes evFlash{0%,100%{box-shadow:var(--sh-1)}50%{box-shadow:0 0 0 3px var(--gold),0 0 28px -4px var(--gold)}}
 .townpace{margin-top:4px;color:var(--gold-hi)}
 /* what's new */
-.sheet.wnsheet{width:min(760px,100%);padding:0;overflow:hidden}
+.sheet.wnsheet{width:min(760px,100%);padding:0;overflow:hidden;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);display:flex;flex-direction:column}
+.sheet.wnsheet>.wn{display:flex;flex-direction:column;min-height:0;flex:1}
+.wn .wnhero{flex:none}
+.wn .wnfoot{flex:none}
+@media(max-height:780px){.wnsheet .wn .wnmain .pip{width:120px;height:120px}.wnsheet .wn .wnside .pip{width:70px;height:70px}.wnsheet .wn .wntitle{font-size:clamp(1.5rem,4vw,2.1rem)}.wnsheet .wn .wnhero{padding-top:18px}}
+@media(max-height:560px){.wnsheet .wn .wnstage{display:none}}
 .wn .wnhero{position:relative;padding:26px 26px 10px;text-align:center;color:#fff;overflow:hidden;
   background:radial-gradient(120% 90% at 50% 0%,#F2B4C9 0%,#7B4FB8 45%,#1C1440 100%)}
 .wn .wnkick{font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.9}
@@ -704,15 +709,23 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .wn .wnconf i:nth-child(11){left:86%;animation-delay:-2.4s}.wn .wnconf i:nth-child(12){left:94%;animation-delay:-.2s}
 .wn .wnconf i:nth-child(13){left:10%;animation-delay:-3s}.wn .wnconf i:nth-child(14){left:90%;animation-delay:-1s}
 @keyframes wnFall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(420px) rotate(540deg)}}
-.wn .wnbody{padding:18px 22px 6px;max-height:min(52vh,560px);overflow:auto}
+.wn .wnbody{padding:18px 22px 6px;flex:1;min-height:120px;overflow:auto}
 .wn .wncount{text-align:center;font-weight:800;color:var(--gold-hi);margin-bottom:8px}
 .wn .wnsec{margin:14px 0 18px}
 .wn .wnsec h3{font-size:1.1rem;color:var(--text-hi);margin-bottom:8px}
 .wn .wnsec h3 span{font-size:.72rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-left:6px}
-.wn .wngrid{display:grid;gap:10px}
-.wn .wngrid.looks{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
-.wn .wngrid.pets{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-.wn .wngrid.parts{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+.wn .wnsec{text-align:center}
+.wn .wngrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.wn .wngrid.looks>*{flex:0 1 190px}
+.wn .wngrid.pets>*{flex:0 1 150px}
+.wn .wngrid.parts>*{flex:0 1 96px}
+.wn .wnchips{justify-content:center}
+.wn .wnlist{justify-items:center}
+.wn .wnrow{width:min(100%,460px)}
+.wnsheet .wn .wnfeats{display:flex;flex-wrap:wrap;justify-content:center}
+.wnsheet .wn .wngrid.parts>.wnpart.more{flex:0 1 160px;font-size:1.1rem}
+.wnsheet .wn .wnpart.more span{font-size:.72rem}
+.wnsheet .wn .wnfeat{flex:0 1 300px;text-align:left}
 .wn .wnlook,.wn .wnpet{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;
   padding:12px 10px;border-radius:14px;background:var(--surface);border:1px solid var(--edge-soft)}
 .wn .wnlook.top{border-color:var(--gold);background:linear-gradient(var(--gold-faint),var(--surface));box-shadow:0 0 22px -10px var(--gold)}
@@ -756,6 +769,28 @@ html.modal-open body{overflow:hidden;-webkit-overflow-scrolling:auto}
 .ecov{font-size:.68rem;font-weight:700;color:var(--text-hi)}
 .ecom{font-size:.64rem;color:var(--text-2)}
 .ecod{font-size:.58rem;color:var(--text-3);white-space:nowrap}
+/* companions moving around Pip */
+.petmove,.petflip{transform-box:view-box}
+.pip-live .pm-orbit{animation:pmOrbit 14s linear infinite}
+.pip-live .pm-roam{animation:pmRoam 18s ease-in-out infinite}
+.pip-live .pm-roam .petflip{transform-box:fill-box;transform-origin:50% 50%;animation:pmFlipRoam 18s steps(1,end) infinite}
+.pip-live .pm-hopabout{animation:pmHop 12s ease-in-out infinite}
+.pip-live .pm-hopabout .petflip{transform-box:fill-box;transform-origin:50% 100%;animation:pmBounce .75s ease-in-out infinite,pmFlipHop 12s steps(1,end) infinite}
+.pip-live .pm-stroll{animation:pmStroll 16s ease-in-out infinite}
+.pip-live .pm-stroll .petflip{transform-box:fill-box;transform-origin:50% 50%;animation:pmFlipStroll 16s steps(1,end) infinite,pmWaddle .6s ease-in-out infinite}
+@keyframes pmFlipRoam{0%{transform:scaleX(1)}26%{transform:scaleX(-1)}56%{transform:scaleX(1)}}
+@keyframes pmFlipHop{0%{transform:scaleX(1)}50%{transform:scaleX(-1)}100%{transform:scaleX(1)}}
+@keyframes pmFlipStroll{0%{transform:scaleX(1)}50%{transform:scaleX(-1)}}
+@keyframes pmBounce{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@keyframes pmWaddle{0%,100%{rotate:-4deg}50%{rotate:4deg}}
+.pip-live .petpose-sleep .petmove,.pip-live .petpose-sad .petmove{animation:none}
+.pip-live .petpose-sleep .petflip,.pip-live .petpose-sad .petflip{animation:none}
+.pip-live .petpose-cheer .pm-orbit{animation-duration:9s}
+.pip-live .petpose-cheer .pm-roam,.pip-live .petpose-cheer .pm-roam .petflip{animation-duration:12s}
+@keyframes pmOrbit{0%{transform:translate(-1.3px,0.6px)}8.33333%{transform:translate(3.9px,22.9px)}16.6667%{transform:translate(-4.8px,44.5px)}25%{transform:translate(-25px,59.5px)}33.3333%{transform:translate(-51.4px,63.9px)}41.6667%{transform:translate(-76.9px,56.6px)}50%{transform:translate(-94.7px,39.4px)}58.3333%{transform:translate(-99.9px,17.1px)}66.6667%{transform:translate(-91.2px,-4.5px)}75%{transform:translate(-71px,-19.5px)}83.3333%{transform:translate(-44.6px,-23.9px)}91.6667%{transform:translate(-19.1px,-16.6px)}100%{transform:translate(-1.3px,0.6px)}}
+@keyframes pmRoam{0%{transform:translate(0px,0px)}12%{transform:translate(-4px,40px)}26%{transform:translate(-48px,58px)}40%{transform:translate(-98px,42px)}50%{transform:translate(-104px,6px)}62%{transform:translate(-70px,-30px)}74%{transform:translate(-30px,-36px)}86%{transform:translate(-6px,-14px)}100%{transform:translate(0px,0px)}}
+@keyframes pmStroll{0%{transform:translate(0px,0px)}10%{transform:translate(0px,54px)}45%{transform:translate(-100px,56px)}55%{transform:translate(-100px,56px)}90%{transform:translate(0px,54px)}100%{transform:translate(0px,0px)}}
+@keyframes pmHop{0%{transform:translate(0px,0px)}8.33333%{transform:translate(-18px,50px)}16.6667%{transform:translate(-36px,50px)}25%{transform:translate(-54px,50px)}33.3333%{transform:translate(-72px,50px)}41.6667%{transform:translate(-90px,50px)}50%{transform:translate(-100px,50px)}58.3333%{transform:translate(-82px,50px)}66.6667%{transform:translate(-64px,50px)}75%{transform:translate(-46px,50px)}83.3333%{transform:translate(-28px,50px)}91.6667%{transform:translate(-10px,50px)}100%{transform:translate(0px,0px)}}
 /* collapsible settings panels */
 .panel.fold>.phead{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
 .panel.fold>.phead>.pgrow{flex:1;min-width:0}
@@ -2298,9 +2333,14 @@ tbody tr:hover{background:rgba(255,255,255,.022)}
 }
 .mtap{
   margin-top:22px;font-size:.7rem;letter-spacing:.1em;color:var(--text-3);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
   animation:mFade 1s var(--ease) both;animation-delay:1.2s;
 }
 .moment.still .mpip,.moment.still .mwords,.moment.still .mtoken,.moment.still .mtap{animation:none}
+.mdismiss{min-width:150px;font-size:.95rem;letter-spacing:0;padding:10px 22px;justify-content:center;text-align:center}
+.mmore{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.feedfx .mtap{animation:mFade 1s var(--ease) both;animation-delay:1.6s}
+.feedfx.still .mtap{animation:none}
 @media(max-width:480px){
   .mrays{width:420px;height:420px}
   .mpip .pip{width:146px;height:146px}
@@ -7736,7 +7776,10 @@ function pipSVG(look,pose,size,opts){
   /* A companion floats beside Pip, whatever pose he is in. */
   var pet=(look.pet&&A.pets)?fix(A.pets[look.pet]||''):'';
   /* A companion reacts to the pose: it hops when Pip cheers, dozes when he sleeps. */
-  if(pet)pet='<g class="petpose-'+(A.poses[pose]?pose:'idle')+'">'+pet+'</g>';
+  if(pet){
+    var mv=petMove(look.pet);
+    pet='<g class="petpose-'+(A.poses[pose]?pose:'idle')+'"><g class="petmove pm-'+mv+'"><g class="petflip">'+pet+'</g></g></g>';
+  }
   /* The ground sits under Pip's feet, behind his shadow. */
   var ground=(look.ground&&A.grounds)?fix(A.grounds[look.ground]||''):'';
   var hat='',held='';
@@ -9241,7 +9284,7 @@ function eventCardHTML(ev,p){
   entriesOf(p).forEach(function(e){if(e.eventId===ev.id&&e.status==='rated')roundsDone[entryRound(ev,e)]=1;});
   var nRounds=Object.keys(roundsDone).length;
 
-  var h='<div data-evid="'+esc(ev.id)+'" class="evcard'+(st.can?' open':' shut')+(st.claim?' claimable':'')+(st.locked?' locked':'')+(theme?' themed':'')+(ev.hours&&ev.hours.on?' timed':'')+'"'+
+  var h='<div data-evid="'+esc(ev.id)+'" class="evcard'+((st.can||st.needJoin)?' open':' shut')+(st.claim?' claimable':'')+(st.locked?' locked':'')+(theme?' themed':'')+(ev.hours&&ev.hours.on?' timed':'')+'"'+
     (theme?' style="--tha:'+theme.a+';--thb:'+theme.b+'"':'')+'>';
   if(theme)h+=eventBannerHTML(ev,cdText,last).replace('<span class="evcd','<span'+cdAttr+' class="evcd');
   else if(showCd)h+='<span class="badges" aria-hidden="true"><span class="btime'+(last?' last':(ms<5*864e5?' soon':''))+
@@ -9254,7 +9297,7 @@ function eventCardHTML(ev,p){
     h+='<div class="goalbar"><div class="wbar"><span style="width:'+gp.pct+'%"></span></div>'+
       '<div class="tiny">'+pts(gp.total)+' of '+pts(gp.target)+' '+esc(goalUnit(ev))+
       (gp.townOn?' &nbsp;·&nbsp; you '+pts(gp.real)+' + '+esc(townCfg().label)+' '+pts(gp.town)+
-        ' &nbsp;·&nbsp; '+gp.townHelpers+' neighbours helping'+(gp.joined!=null?' &nbsp;·&nbsp; '+gp.joined+' of you joined':' &nbsp;·&nbsp; '+gp.realHelpers+' of you helping')
+        ' &nbsp;·&nbsp; '+helpWords(gp,ev,p)
         :' &nbsp;·&nbsp; '+gp.helpers+' helping')+
       (gp.reached?' &nbsp;·&nbsp; <b style="color:var(--pass)">reached!</b>':(gp.ended?' &nbsp;·&nbsp; <b>ended short</b>':''))+'</div>'+
       (gp.townOn?townPaceLine(ev):'')+'</div>';
@@ -9768,8 +9811,10 @@ function viewEvents(){
       '</div>';
   }
 
+  var sentHTML='';
   var mine=entriesOf(p);
   if(mine.length){
+    var h0=h;h='';
     var recent=mine.slice().sort(function(a,b){return a.at<b.at?1:-1;}).slice(0,4);
     h+='<div class="panel stack"><h3 style="font-size:1rem">What you have sent in</h3><div class="stack">';
     recent.forEach(function(e){
@@ -9786,6 +9831,7 @@ function viewEvents(){
         '</div>';
     });
     h+='</div></div>';
+    sentHTML=h.replace('<div class="panel stack">','<div class="panel stack-lg evsent">');h=h0;
   }
 
   if(!list.length){
@@ -9795,7 +9841,7 @@ function viewEvents(){
         ? 'Set something to make, write or do, and decide what each rating is worth.'
         : 'Check back — your instructor puts things here now and then.')+'</p>'+
       (S.admin?'<div class="stack"><button class="btn btn-primary" data-act="ev-new">'+
-        ico('plus')+'Add an event</button></div>':'')+'</div>';
+        ico('plus')+'Add an event</button></div>':'')+'</div>'+sentHTML;
   }
 
   var now=new Date();
@@ -9827,7 +9873,7 @@ function viewEvents(){
     done.forEach(function(ev){h+=eventCardHTML(ev,p);});
     h+='</div></details>';
   }
-  return h;
+  return h+sentHTML;
 }
 
 /* ---------- instructor review ---------- */
@@ -10647,7 +10693,7 @@ function feedMoment(f,rec){
         (power?'<div class="mprize">'+esc(PIP_POWER_SHORT[rec.kind](rec.value))+' for '+
           esc(durWords(foodMinutes(f)))+'</div>':'<div class="mline">A happy, full Pip.</div>')+
       '</div>'+
-      '<div class="mtap">tap to carry on</div>'+
+      '<div class="mtap"><button type="button" class="btn btn-primary mdismiss">Yum, thanks!</button></div>'+
     '</div>';
   pageLock();
   document.body.appendChild(el);
@@ -10657,8 +10703,7 @@ function feedMoment(f,rec){
     if(el.parentNode)el.parentNode.removeChild(el);
     pageUnlock();
   }
-  el.addEventListener('click',close);
-  setTimeout(close,still?2200:4200);
+  momentHold(el,close,0);
 }
 /* Countdowns on screen tick down without redrawing the page. */
 setInterval(function(){
@@ -11100,7 +11145,8 @@ function aliveCfg(){
   var a=S.settings.ambient||{};
   return{tod:a.tod!==false,weather:a.weather!==false,force:a.force||'',
     finds:a.finds!==false,findChance:Math.max(0,Math.min(100,num(a.findChance,50))),
-    zones:a.zones!==false};
+    zones:a.zones!==false,petMoves:a.petMoves||'',
+    momentAuto:a.momentAuto===true,momentSecs:Math.max(2,Math.min(60,num(a.momentSecs,6)))};
 }
 function remindCfg(){
   var r=S.settings.reminders||{};
@@ -11219,6 +11265,17 @@ var PET_TRAITS={
   carouselpony:{trait:'proud',name:'Proud',verb:'pranced a lap of the room and came back with'},
   lamb:{trait:'sleepy',name:'Sleepy',verb:'dozed in the hay and woke up with'}
 };
+/* How a companion gets around Pip. New pets can set their own in PET_MOVES;
+   otherwise their personality decides. */
+var PET_MOVES={ghostling:'orbit',jaderabbit:'hopabout',carouselpony:'roam',lamb:'stroll'};
+var PET_MOVE_NAMES={orbit:'Circles around Pip',hopabout:'Hops about',roam:'Explores all around',stroll:'Strolls along the ground',hover:'Stays beside Pip'};
+function petMove(v){
+  var a=(typeof S!=='undefined'&&S.settings&&S.settings.ambient)||{};
+  if(a.petMoves==='still')return 'hover';
+  if(PET_MOVES[v])return PET_MOVES[v];
+  var t=(PET_TRAITS[v]||{}).trait;
+  return t==='sleepy'?'orbit':(t==='curious'?'roam':'hopabout');
+}
 function petTrait(v){return PET_TRAITS[v]||{trait:'proud',name:'Proud',verb:'strutted over with'};}
 function petPart(v){
   for(var i=0;i<PIP_PARTS.length;i++)if(PIP_PARTS[i].slot==='pet'&&PIP_PARTS[i].v===v)return PIP_PARTS[i];
@@ -12125,7 +12182,7 @@ function viewTown(){
   var online=rows.filter(function(r){return r.st.dot==='on';}).length;
   var active=Math.round(c.size*Math.min(.95,townBusy(now)));
   var h='<div class="pagehead"><div><h2>'+esc(c.label)+'</h2>'+
-    '<div class="sub">Your neighbours — characters who live in PipHub’s world</div></div>'+
+    '<div class="sub">Your neighbours in '+esc(c.label)+'</div></div>'+
     '<div class="row"><div class="stat" style="min-width:120px"><div class="k">Around town now</div>'+
     '<div class="v">'+Math.max(active,online)+'</div></div></div></div>';
   var order={on:0,recent:1,off:2};
@@ -12154,7 +12211,7 @@ function viewTown(){
     var fl=friendLevel(p,f.id);
     h+='<div class="folkcard'+(st.dot==='off'?' away':'')+'">'+
       '<div class="fav">'+pipSVG(folkLook(f),pose,64,{still:true})+'</div>'+
-      '<div class="fmain"><div class="fname">'+esc(f.name)+'</div>'+folkBadge()+(isNewFolk(f)?' <span class="newbadge">NEW</span>':'')+
+      '<div class="fmain"><div class="fname">'+esc(f.name)+'</div>'+folkBadge()+
       (c.statuses?'<div class="fstat">'+statusDot(st)+esc(st.label)+(st.detail?'<span class="muted"> · '+esc(st.detail)+'</span>':'')+'</div>':'')+
       '<div class="tiny muted">'+esc(per.name)+(fl?' · <span class="hearts">'+'♥'.repeat(fl)+'</span>':'')+'</div></div>'+
       (canGiveAt('town')?'<button class="btn btn-sm" data-act="town-give" data-id="'+esc(f.id)+'" data-place="town">🎁 Gift</button>':'')+
@@ -12171,7 +12228,7 @@ function viewTown(){
       got.map(function(g){return '<div class="receipt"><span class="pill good">got</span><div class="tiny" style="flex:1">'+esc(itemName(g.item))+' from <b>'+esc(g.fromName)+'</b></div><span class="tiny muted">'+esc(dateShort(g.at))+'</span></div>';}).join('')+
       '</div></div>';
   }
-  h+='<p class="tiny muted stack">'+esc(c.label)+' neighbours are part of PipHub’s world. Gifts you give them are items only, and so are gifts they send you.</p>';
+  h+='<p class="tiny muted stack">Gifts you give are items from your pantry'+(c.giveParts?' or wardrobe':'')+'.</p>';
   return h;
 }
 
@@ -12266,7 +12323,7 @@ function townGoalFeed(ev,n,now){
         if(part<=0)break;
         var f=folk[Math.floor(hashUnit(ev.id+':w:'+t.getTime()+':'+j)*folk.length)%folk.length];
         var at=t.getTime()-hashUnit(ev.id+':at:'+t.getTime()+':'+j)*Math.min(stepMs,3*3600000);
-        out.push({folk:f,text:'added '+String(Math.round(part*10)/10)+' '+(goalUnit(ev)||''),icon:'➕',at:Math.min(at,now.getTime())});
+        out.push({folk:f,text:'added '+String(Math.round(part*10)/10)+' '+(function(u){return (Math.round(part*10)/10===1&&/s$/.test(u))?u.replace(/s$/,''):u;})(goalUnit(ev)||''),icon:'➕',at:Math.min(at,now.getTime())});
       }
     }
     t=prevT;
@@ -12310,6 +12367,21 @@ function eventTownHTML(ev,n,place){
 }
 
 /* ---------- joining community events ---------- */
+function plural(n,one,many){return n+' '+(n===1?one:(many||one+'s'));}
+/* "12 neighbours helping · you and 2 other readers joined" */
+function helpWords(gp,ev,p){
+  var parts=[];
+  if(gp.townOn)parts.push(plural(gp.townHelpers,'neighbour')+' helping');
+  if(gp.joined!=null){
+    var mine=hasJoined(ev,p);
+    var others=gp.joined-(mine?1:0);
+    if(mine)parts.push(others?'you and '+plural(others,'other reader')+' joined':'you joined');
+    else parts.push(others?plural(others,'reader')+' joined — join them':'no readers yet — be the first to join');
+  }else{
+    parts.push(plural(gp.realHelpers,'reader')+' helping');
+  }
+  return parts.join(' · ');
+}
 function isCommunityEvent(ev){
   return !!ev&&((ev.kind==='goal'&&goalTownCfg(ev).on)||!!(ev.town&&ev.town.sitewide));
 }
@@ -12440,7 +12512,7 @@ function siteBannersHTML(){
     if(ev.kind==='goal'){
       var gp=goalProgress(ev);
       line='<span class="sbbar"><span style="width:'+gp.pct+'%"></span></span><span class="sbnum">'+gp.pct+'%</span>'+
-        '<span class="sbsub">'+(gp.reached?'Reached!':(gp.townHelpers?gp.townHelpers+' neighbours and '+(gp.joined!=null?gp.joined+' of you joined':gp.realHelpers+' of you helping'):gp.helpers+' helping'))+'</span>';
+        '<span class="sbsub">'+(gp.reached?'Reached!':helpWords(gp,ev,p))+'</span>';
     }else{
       var n=townJoinCount(ev);
       line='<span class="sbsub">'+(n?n+' in '+esc(townCfg().label)+' have joined':'Everyone’s invited')+'</span>';
@@ -12575,16 +12647,36 @@ function townFolkDel(id){
       The first time (no snapshot yet) the release's `spotlight`
       decides which items to feature.
    ========================================================= */
-var APP_VERSION='pip-2026-10-10-1';
+var APP_VERSION='pip-2026-10-12-1';
 var APP_RELEASES=[
+  {version:'pip-2026-10-12-1',date:'2026-09-16',
+   kicker:'New update',
+   title:'Companions on the move!',
+   headline:'Your companion now explores around Pip — circling, hopping and trotting beside you.',
+   spotlight:{seasons:['harvestfair']},
+   features:[
+     {icon:'🐾',title:'Companions explore',text:'Every companion has its own way of getting around: some circle Pip, some hop about, some go for a stroll.'},
+     {icon:'🤝',title:'Community events',text:'Event banners now show how many neighbours are helping and how many readers have joined.'},
+     {icon:'🛠️',title:'For instructors',text:'Settings → Living Pip: choose whether companions move about or stay beside Pip.',admin:true}
+   ]},
+  {version:'pip-2026-10-11-1',date:'2026-09-16',
+   kicker:'Small fix',
+   title:'Take your time!',
+   headline:'Parcels, finds and Pip’s snacks now wait for you — read them, then tap Got it.',
+   spotlight:{seasons:['harvestfair']},
+   features:[
+     {icon:'🎁',title:'Parcels stay open',text:'Opening a parcel from a neighbour now waits until you tap Got it.'},
+     {icon:'🍯',title:'Feeding Pip',text:'The snack pop-up stays until you tap “Yum, thanks!”.'},
+     {icon:'🛠️',title:'For instructors',text:'Settings → Living Pip can make celebration pop-ups close by themselves after a set number of seconds.',admin:true}
+   ]},
   {version:'pip-2026-10-10-1',date:'2026-09-16',
    kicker:'Town news',
    title:'Pip Town is growing!',
-   headline:'New neighbours are moving in, some take a break now and then, and the town goes quiet at night — just like a real neighbourhood.',
+   headline:'New neighbours are moving in and the town is busier than ever.',
    spotlight:{seasons:['harvestfair']},
    features:[
-     {icon:'📦',title:'New neighbours',text:'Look for the NEW badge on the Town page, and the “New here” filter.'},
-     {icon:'😴',title:'Away and asleep',text:'Neighbours on a break show as Away, and most are offline late at night.'},
+     {icon:'📦',title:'New neighbours',text:'Say hello on the Town page — try the “New here” filter.'},
+     {icon:'😴',title:'Away',text:'See who is away and who is around right now.'},
      {icon:'👋',title:'Moving day',text:'The town feed tells you when someone moves in or moves away.'},
      {icon:'🛠️',title:'For instructors',text:'Add neighbours in bulk with generated names, and run the Town ecosystem: breaks, quiet hours, monthly move-ins and move-outs, with a 12-month forecast.',admin:true}
    ]},
@@ -12730,7 +12822,10 @@ function showWhatsNew(force){
     scrim.querySelector('#wn-ok').addEventListener('click',function(){done(null);});
     var st=scrim.querySelector('#wn-store');if(st)st.addEventListener('click',function(){done('store');});
     var evb=scrim.querySelector('#wn-events');if(evb)evb.addEventListener('click',function(){done('events');});
-  },{cls:'wnsheet'});
+  },{cls:'wnsheet',focus:false});
+  var top=S.modals[S.modals.length-1];
+  if(top){top.scrollTop=0;var b=top.querySelector('.wnbody');if(b)b.scrollTop=0;
+    requestAnimationFrame(function(){top.scrollTop=0;});}
 }
 /* A fresh install has nothing to announce: remember the catalogue as it is. */
 function whatsNewInit(){
@@ -13057,6 +13152,12 @@ function aliveSettingsHTML(){
     '</select></label>'+
     '<label class="check"><input type="checkbox" id="al-finds"'+(a.finds?' checked':'')+'><span>Companions sometimes find things (food, a few points, rarely a Pip part)</span></label>'+
     '<label class="field"><span>Chance of a find each day (%)</span><input class="inp" id="al-chance" type="number" min="0" max="100" value="'+a.findChance+'"></label>'+
+    '<label class="field"><span>Companions</span><select class="inp" id="al-pmove">'+
+      '<option value="">Move around Pip in their own way</option>'+
+      '<option value="still"'+(a.petMoves==='still'?' selected':'')+'>Stay beside Pip</option></select></label>'+
+    '<p class="tiny muted">'+Object.keys(PIP_ART.pets||{}).map(function(v){var pt=petPart(v);return esc((pt?pt.name:v)+': '+PET_MOVE_NAMES[petMove(v)]);}).join(' · ')+'</p>'+
+    '<label class="check"><input type="checkbox" id="al-mauto"'+(a.momentAuto?' checked':'')+'><span>Celebration pop-ups (parcels, finds, feeding, rewards) close by themselves — otherwise they stay until the reader taps Got it</span></label>'+
+    '<label class="field" style="max-width:260px"><span>…after this many seconds</span><input class="inp" id="al-msecs" type="number" min="2" max="60" value="'+a.momentSecs+'"></label>'+
     '<div class="divider"></div><h3>Countdown reminders</h3>'+
     '<p class="tiny muted" style="margin-top:4px;max-width:72ch">One strip on the catalogue with the most pressing thing. Readers can dismiss each one until its next stage.</p>'+
     '<label class="check stack"><input type="checkbox" id="rm-on"'+(r.on?' checked':'')+'><span>Show reminders</span></label>'+
@@ -13068,7 +13169,8 @@ function aliveSettingsHTML(){
 function saveAlive(){
   S.settings.ambient={zones:$('#al-zones').checked,tod:$('#al-tod').checked,weather:$('#al-wx').checked,
     force:$('#al-force').value,finds:$('#al-finds').checked,
-    findChance:Math.max(0,Math.min(100,num($('#al-chance').value,50)))};
+    findChance:Math.max(0,Math.min(100,num($('#al-chance').value,50))),
+    momentAuto:$('#al-mauto').checked,petMoves:$('#al-pmove').value,momentSecs:Math.max(2,Math.min(60,num($('#al-msecs').value,6)))};
   var r={on:$('#rm-on').checked};
   $$('[data-rmk]').forEach(function(el){r[el.dataset.rmk]=el.checked;});
   S.settings.reminders=r;
@@ -13978,6 +14080,7 @@ function celebrate(m){
   if(!m)return;
   momentQ.push(m);
   if(!momentLive)runMoment();
+  else{var nb=document.querySelector('#moment .mdismiss');if(nb&&!m.button)nb.textContent='Next';}
 }
 function closeMoment(){
   if(momentTimer){clearTimeout(momentTimer);momentTimer=null;}
@@ -14017,11 +14120,31 @@ function runMoment(){
         (m.line?'<div class="mline">'+esc(m.line)+'</div>':'')+
         (m.prize?'<div class="mprize">'+m.prize+'</div>':'')+
       '</div>'+
-      '<div class="mtap">tap to carry on</div>'+
+      '<div class="mtap"><button type="button" class="btn btn-primary mdismiss">'+esc(m.button||(momentQ.length?'Next':'Got it'))+'</button>'+
+        (momentQ.length?'<div class="mmore">'+momentQ.length+' more</div>':'')+'</div>'+
     '</div>';
   document.body.appendChild(el);
-  el.addEventListener('click',closeMoment);
-  momentTimer=setTimeout(closeMoment,still?1800:3200);
+  momentHold(el,closeMoment,m.auto?(still?1800:3200):0);
+}
+/* A moment stays up until it is dismissed: the button, Escape, or a tap
+   anywhere once it has had a moment to be read (so the tap that caused it
+   can't close it). Instructors can let them close by themselves. */
+function momentHold(el,close,autoMs){
+  var armed=false;
+  setTimeout(function(){armed=true;},700);
+  var btn=el.querySelector('.mdismiss');
+  if(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();close();});
+    setTimeout(function(){try{btn.focus({preventScroll:true});}catch(err){}},60);
+  }
+  el.addEventListener('click',function(){if(armed)close();});
+  function key(e){
+    if(!el.parentNode){document.removeEventListener('keydown',key,true);return;}
+    if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();document.removeEventListener('keydown',key,true);close();}
+  }
+  document.addEventListener('keydown',key,true);
+  var ms=autoMs||(aliveCfg().momentAuto?aliveCfg().momentSecs*1000:0);
+  if(ms)momentTimer=setTimeout(close,ms);
 }
 
 /* ---------- the four ---------- */

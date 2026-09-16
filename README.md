@@ -717,3 +717,30 @@ While PipHub is open, community goals refresh by themselves the moment the town'
 The panel shows neighbours now, away now, moved in and moved away this month, a 12-month population forecast and the latest moves. **Reshuffle the future** changes who moves from next month on without touching anyone who has already moved.
 
 Nothing here is stored or runs in the background: moves and breaks are worked out from the month and the ecosystem's seed, so every device shows the same town.
+
+## Pop-ups wait for the reader
+
+Celebration pop-ups (parcels from neighbours, companion finds, gifts, won looks, finished books, streaks, wishes) and the feeding animation no longer close by themselves. Each one has a clear button ("Got it", "Next" when more are waiting, "Yum, thanks!" after feeding). Escape or Enter closes it too, and so does a tap anywhere once it has been up for a moment, so the tap that opened it can't close it straight away. Settings → Living Pip has an option to make them close by themselves after a number of seconds.
+
+## Companions on the move
+
+Companions now move around Pip instead of only floating beside him, each in its own way:
+
+| Companion | How it moves |
+|---|---|
+| Ghostling | Circles around Pip |
+| Jade rabbit | Hops about along the ground, turning to face where it's going |
+| Carousel pony | Explores all around: down past Pip's feet, up the far side and over his head |
+| Blue-ribbon lamb | Strolls along the ground with a little waddle |
+
+Companions speed up when Pip cheers, and stay put when he is asleep or sad. Small previews stay still, and reduced motion stops all of it. Settings → Living Pip can keep every companion beside Pip instead, and lists each companion's style. New companions take their style from `PET_MOVES` (orbit, hopabout, roam, stroll or hover); without an entry, their personality decides (Sleepy circles, Curious explores, Proud hops about).
+
+## Smaller changes
+
+- The What's new popup opens at the top and fits the screen: the header and buttons stay in view and the list scrolls between them. Its showcase is centred.
+- Community event banners and cards read, for example, "12 neighbours helping · you and 2 other readers joined", or "no readers yet — be the first to join".
+- Neighbours no longer carry a NEW badge. The "New here" filter on the Town page still finds recent arrivals.
+
+## Events page layout
+
+Community events a reader hasn't joined yet are shown at full strength with their Join button; they're no longer faded. "What you have sent in" now sits at the bottom of the Events page, below the events and the Ended events section.
