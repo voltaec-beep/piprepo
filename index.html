@@ -8101,8 +8101,8 @@ function eventEditor(existing){
       grab(scrim);
       if(bonusEditorClick(e,d)){redraw();return;}
       if(iconEditorClick(e,d.icon)){redraw();return;}
-      var th=e.target.closest('[data-theme]');
-      if(th){d.banner.theme=th.dataset.theme;redraw();return;}
+      var th=e.target.closest('[data-evtheme]');
+      if(th){d.banner.theme=th.dataset.evtheme;redraw();return;}
       var s=e.target.closest('[data-seg]');
       if(s){
         if(s.dataset.seg==='kind'){
@@ -9069,7 +9069,7 @@ function eventBannerEditorHTML(d){
     '<p class="tiny muted" style="margin-top:4px">Dress the card for the time of year.</p>'+
     '<div class="themepick stack">'+Object.keys(EVENT_THEMES).map(function(k){
       var th=EVENT_THEMES[k];
-      return '<button type="button" data-theme="'+k+'" aria-pressed="'+(b.theme===k||(!b.theme&&k==='none'))+'" '+
+      return '<button type="button" data-evtheme="'+k+'" aria-pressed="'+(b.theme===k||(!b.theme&&k==='none'))+'" '+
         'style="'+(th.a?'background:linear-gradient(120deg,'+th.a+','+th.b+');color:'+th.ink:'')+'">'+
         (th.motif?'<span>'+th.motif[0]+'</span>':'')+esc(th.name)+'</button>';
     }).join('')+'</div>'+
